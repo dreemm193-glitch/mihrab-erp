@@ -858,7 +858,7 @@
           </div>
           <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
             <label for="todayScheduleDateInput" style="font-size: 0.82rem; font-weight: 800; color: #065F46;">📅 يوم المتابعة:</label>
-            <input type="date" id="todayScheduleDateInput" class="form-input" value="2026-11-09" style="width: 140px; font-weight: 700; padding: 6px 10px;" />
+            <input type="date" id="todayScheduleDateInput" class="form-input" value="2026-11-15" style="width: 140px; font-weight: 700; padding: 6px 10px;" />
             <button type="button" id="btnSetTodayDate" class="btn btn-soft">اليوم الحالي</button>
             <button type="button" id="btnCopyTodayScheduleWhatsapp" class="btn btn-emerald" style="padding: 9px 16px;">
               <span>📲 نسخ جدول اليوم للواتساب</span>
@@ -890,14 +890,19 @@
         </div>
       </div>
 
-      <!-- جدول حلقات ومواعيد اليوم -->
-      <div class="card" style="margin-bottom: 20px;">
+      <!-- جدول حلقات ومواعيد اليوم التلقائي واعتماد الحلقات في نفس المكان -->
+      <div class="card" style="margin-bottom: 20px; border: 2px solid var(--emerald-border);">
         <div class="section-header">
           <div>
-            <div class="section-title">📋 قائمة حلقات ومواعيد هذا اليوم بالتفصيل</div>
-            <div class="section-desc">يمكنك تعديل الساعة أو التاريخ أو المعلم أو نوع المعالجة مباشرة من داخل الصف</div>
+            <div class="section-title" style="color:#065F46;">📋 جدول حلقات اليوم واعتماد التنفيذ الفوري (<span id="todayArabicDayNameLabel">الأحد</span>)</div>
+            <div class="section-desc">تظهر هنا حلقات اليوم تلقائياً من مواعيد الطلاب الثابتة — عدّل التوقيت بمرونة، واعتمد الحلقة (✅ تمت فتُخصم من الباقة وتُضاف للمعلم فوراً) أو (⭕ لم تتم مع السبب) دون الدخول للباقات!</div>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+            <select id="todayRosterModeSelect" class="form-select" style="width: auto; padding: 6px 10px; font-size: 0.78rem; font-weight: 800; color: var(--primary);">
+              <option value="TODAY_MATCH">📅 عرض حلقات هذا اليوم فقط (تلقائي)</option>
+              <option value="ALL_STUDENTS">📚 عرض جميع الطلاب (لإضافة حلقة استثنائية/تعويضية)</option>
+            </select>
+            <input type="text" id="todayScheduleSearchInput" class="form-input" placeholder="🔍 بحث بطالب أو معلم..." style="width: 180px; padding: 6px 10px; font-size: 0.78rem;" />
             <button type="button" id="btnCopyTeachersBriefToday" class="btn btn-soft">📲 نسخ ملخص المعلمين لواتساب</button>
           </div>
         </div>
@@ -906,14 +911,13 @@
           <table>
             <thead>
               <tr>
-                <th style="width: 110px;">الساعة / الموعد</th>
-                <th>الطالب</th>
+                <th style="width: 120px;">⏰ توقيت اليوم (مرن)</th>
+                <th>الطالب والموعد الثابت</th>
                 <th>المعلم المكلف</th>
-                <th style="width: 85px;">المدة</th>
-                <th>نوع المعالجة</th>
-                <th>ملاحظات</th>
-                <th style="width: 140px;">نقل لتاريخ آخر</th>
-                <th style="width: 155px;">إجراءات المتابعة</th>
+                <th style="width: 90px;">المدة (د)</th>
+                <th style="width: 115px;">رصيد الباقة</th>
+                <th style="width: 165px;">حالة حلقة اليوم</th>
+                <th id="thTodayApprovalCol" style="min-width: 280px;">اعتماد الحلقة بجوار الموعد (تمت / لم تتم + السبب)</th>
               </tr>
             </thead>
             <tbody id="todayScheduleDedicatedBody"></tbody>
@@ -961,7 +965,7 @@
           </div>
           <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
             <label for="reportsDateInput" style="font-size:0.78rem; font-weight:700;">تاريخ التقارير:</label>
-            <input type="date" id="reportsDateInput" class="form-input" value="2026-11-12" style="width:140px; padding:5px 8px; font-weight:700;" />
+            <input type="date" id="reportsDateInput" class="form-input" value="2026-11-15" style="width:140px; padding:5px 8px; font-weight:700;" />
           </div>
         </div>
         <div id="complianceStatusGrid" class="rates-grid"></div>
@@ -1892,6 +1896,7 @@
               <div style="font-size: 0.8rem; font-weight: 800; color: #065F46; margin-bottom: 8px;">2️⃣ العمليات والتعديلات المسموح للمشرف القيام بها:</div>
               <div class="grid-2" style="font-size: 0.78rem; gap: 8px;">
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_edit_schedule" checked /> <span>تغيير مواعيد وساعات الحلقات</span></label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_approve_today" checked /> <span>اعتماد حلقات اليوم (تمت / لم تتم)</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_add_lesson" checked /> <span>تسجيل حلقات جديدة</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_edit_teachers" checked /> <span>إضافة وتعديل بيانات المعلمين</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_see_teacher_rates" /> <span>رؤية أسعار ساعات المعلمين وأجورهم</span></label>
@@ -2088,7 +2093,8 @@
         permissions: {
           view_today: true, view_reports: true, view_all_reports: true, view_analytics: true,
           view_lessons: true, view_teachers: true, view_students: true, view_campaigns: true,
-          view_trash: true, view_finance: true, edit_schedule: false, add_lesson: false,
+          view_trash: true, view_finance: true, edit_schedule: false,
+          approve_today_lessons: false, add_lesson: false,
           edit_teachers: false, see_teacher_rates: true, edit_students: false,
           see_student_money: true, delete_items: false, copy_whatsapp: true
         }
@@ -2101,7 +2107,8 @@
         permissions: {
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: true, view_teachers: true, view_students: true, view_campaigns: false,
-          view_trash: false, view_finance: false, edit_schedule: true, add_lesson: true,
+          view_trash: false, view_finance: false, edit_schedule: true,
+          approve_today_lessons: true, add_lesson: true,
           edit_teachers: true, see_teacher_rates: true, edit_students: true,
           see_student_money: true, delete_items: true, copy_whatsapp: true
         }
@@ -2114,7 +2121,8 @@
         permissions: {
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: true, view_teachers: true, view_students: false, view_campaigns: false,
-          view_trash: false, view_finance: false, edit_schedule: false, add_lesson: false,
+          view_trash: false, view_finance: false, edit_schedule: false,
+          approve_today_lessons: false, add_lesson: false,
           edit_teachers: true, see_teacher_rates: true, edit_students: true,
           see_student_money: false, delete_items: true, copy_whatsapp: true
         }
@@ -2127,7 +2135,8 @@
         permissions: {
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: true, view_teachers: true, view_students: true, view_campaigns: false,
-          view_trash: true, view_finance: false, edit_schedule: true, add_lesson: true,
+          view_trash: true, view_finance: false, edit_schedule: true,
+          approve_today_lessons: true, add_lesson: true,
           edit_teachers: true, see_teacher_rates: true, edit_students: true,
           see_student_money: false, delete_items: true, copy_whatsapp: true
         }
@@ -2140,7 +2149,8 @@
         permissions: {
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: false, view_teachers: false, view_students: false, view_campaigns: false,
-          view_trash: false, view_finance: false, edit_schedule: true, add_lesson: false,
+          view_trash: false, view_finance: false, edit_schedule: true,
+          approve_today_lessons: true, add_lesson: false,
           edit_teachers: false, see_teacher_rates: false, edit_students: false,
           see_student_money: false, delete_items: false, copy_whatsapp: true
         }
@@ -2203,7 +2213,7 @@
       exchangeRates: Object.assign({}, DEFAULT_EXCHANGE_RATES),
       supervisors: JSON.parse(JSON.stringify(DEFAULT_SUPERVISORS)),
       activeSupervisorId: 'sup_1',
-      reportsDateFilter: '2026-11-12',
+      reportsDateFilter: '2026-11-15',
       activeReportSubtab: 'execution',
       autoRosterSearch: '',
       selectedRosterLessonId: null,
@@ -2296,7 +2306,11 @@
       teacherFilter: 'ALL',
       studentPayFilter: 'ALL',
       editingTeacherId: null,
-      scheduleDateFilter: '2026-11-09',
+      scheduleDateFilter: '2026-11-15',
+      todayRosterMode: 'TODAY_MATCH',
+      todayScheduleSearch: '',
+      customDayTimes: {},
+      activeNotDoneRowKey: null,
       lessonsTabDateFilter: '',
       activeCodeTab: 'apps_script',
       webhookUrl: 'https://script.google.com/macros/s/AKfycbxsXs8hNg16CiLPe_GFOBUcX7Zewk1L_lRnkzueC9wJ2szLxevsrkcqLrzyBWC9xsdC/exec',
@@ -2540,6 +2554,7 @@
           if (parsed.adminAccessCode) state.adminAccessCode = parsed.adminAccessCode;
           if (typeof parsed.sessionAuthenticated === 'boolean') state.sessionAuthenticated = parsed.sessionAuthenticated;
           if (parsed.hostedAppUrl) state.hostedAppUrl = parsed.hostedAppUrl;
+          if (parsed.customDayTimes) state.customDayTimes = parsed.customDayTimes;
         }
       } catch (e) {}
       purgeDemoItemsFromState();
@@ -2796,6 +2811,7 @@
           view_analytics: true,
           view_finance: true,
           edit_schedule: true,
+          approve_today_lessons: true,
           add_lesson: true,
           edit_teachers: true,
           see_teacher_rates: true,
@@ -2821,6 +2837,7 @@
       { key: 'view_finance', label: '📊 رؤية الميزانية والأرباح' },
       { key: 'view_campaigns', label: '📢 رؤية الحملات الإعلانية' },
       { key: 'edit_schedule', label: '⏰ تعديل المواعيد والساعات' },
+      { key: 'approve_today_lessons', label: '✅ اعتماد حلقات اليوم (تمت / لم تتم)' },
       { key: 'add_lesson', label: '➕ إضافة وتسجيل الحلقات' },
       { key: 'edit_teachers', label: '✏️ إضافة وتعديل المعلمين' },
       { key: 'see_teacher_rates', label: '💵 رؤية أسعار وأجور المعلمين' },
@@ -3515,7 +3532,8 @@
         adMode: state.adMode,
         supervisorHideFinance: state.supervisorHideFinance,
         adminAccessCode: state.adminAccessCode,
-        hostedAppUrl: state.hostedAppUrl
+        hostedAppUrl: state.hostedAppUrl,
+        customDayTimes: state.customDayTimes
       };
 
       fetch(url, {
@@ -3588,6 +3606,7 @@
             if (typeof sh.supervisorHideFinance === 'boolean') state.supervisorHideFinance = sh.supervisorHideFinance;
             if (sh.adminAccessCode) state.adminAccessCode = sh.adminAccessCode;
             if (sh.hostedAppUrl) state.hostedAppUrl = sh.hostedAppUrl;
+            if (sh.customDayTimes) state.customDayTimes = Object.assign({}, state.customDayTimes, sh.customDayTimes);
             purgeDemoItemsFromState();
             state.lastUpdatedBy = data.updatedBy || 'الفريق';
             state.lastUpdatedAt = data.updatedAt || new Date().toLocaleString('ar-EG');
@@ -3897,77 +3916,237 @@
       return lines.join('\n');
     }
 
+    var ARABIC_DAYS_MAP = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    var ARABIC_DAY_ALIASES = {
+      0: ['الأحد', 'الاحد', 'أحد', 'احد'],
+      1: ['الاثنين', 'الإثنين', 'اثنين', 'إثنين'],
+      2: ['الثلاثاء', 'ثلاثاء'],
+      3: ['الأربعاء', 'الاربعاء', 'أربعاء', 'اربعاء'],
+      4: ['الخميس', 'خميس'],
+      5: ['الجمعة', 'الجمعه', 'جمعة', 'جمعه'],
+      6: ['السبت', 'سبت']
+    };
+
+    function getDayIndexFromIsoDate(dateStr) {
+      var parts = String(dateStr || '2026-11-15').split('-');
+      if (parts.length !== 3) return 6;
+      var dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      return dt.getDay();
+    }
+
+    function doesScheduleMatchDay(scheduleText, dayIdx) {
+      var txt = String(scheduleText || '');
+      if (!txt || txt.indexOf('يوميا') !== -1 || txt.indexOf('يومياً') !== -1) return true;
+      var aliases = ARABIC_DAY_ALIASES[dayIdx] || [];
+      for (var i = 0; i < aliases.length; i++) {
+        if (txt.indexOf(aliases[i]) !== -1) return true;
+      }
+      return false;
+    }
+
+    function extractDefaultTimeFromScheduleText(scheduleText) {
+      var txt = String(scheduleText || '');
+      var m = txt.match(/(\d{1,2})(?:[:.,،](\d{2}))?\s*(صباح|ص|مساء|م|ظهر)/);
+      if (m) {
+        var hh = parseInt(m[1], 10);
+        var mm = m[2] ? m[2] : '00';
+        var period = m[3];
+        if ((period.indexOf('م') !== -1 || period.indexOf('مساء') !== -1) && hh < 12) hh += 12;
+        if ((period.indexOf('ص') !== -1 || period.indexOf('صباح') !== -1) && hh === 12) hh = 0;
+        return (hh < 10 ? '0' + hh : String(hh)) + ':' + mm;
+      }
+      return '17:00';
+    }
+
+    function buildCombinedTodayRows(dateStr, mode) {
+      var dayIdx = getDayIndexFromIsoDate(dateStr);
+      var rows = [];
+      var handledStudentIds = {};
+
+      // 1. الحلقات المسجلة بالفعل في هذا التاريخ
+      state.lessons.forEach(function (l) {
+        if (l.date !== dateStr) return;
+        var st = state.students.find(function (s) { return s.id === l.studentId; });
+        var t = state.teachers.find(function (x) { return x.id === l.teacherId; });
+        if (st) handledStudentIds[st.id] = true;
+        var execRep = state.dailyReports.find(function (r) {
+          return r.type === 'EXECUTION' && r.date === dateStr && (r.studentId === l.studentId || (st && r.studentName === st.name));
+        });
+        rows.push({
+          rowKey: 'les_' + l.id,
+          isLoggedLesson: true,
+          lessonId: l.id,
+          studentId: l.studentId,
+          studentName: st ? st.name : 'طالب',
+          studentCountry: st ? st.country : '',
+          scheduleText: st ? (st.scheduleText || '') : '',
+          consumedLessons: st ? st.consumedLessons : 0,
+          totalLessons: st ? st.totalLessons : 8,
+          teacherId: l.teacherId,
+          teacherName: t ? t.name : 'غير محدد',
+          time: l.time || '17:00',
+          durationMin: l.durationMin || (st ? st.defaultDurationMin : 45) || 45,
+          status: (l.treatment === 'ABSENCE' || (execRep && execRep.status === 'NOT_DONE')) ? 'NOT_DONE' : 'DONE',
+          reasonNote: (execRep && execRep.note) ? execRep.note : (l.notes || '')
+        });
+      });
+
+      // 2. الطلاب الذين يوافق موعدهم الثابت هذا اليوم (أو كل الطلاب عند اختيار ALL_STUDENTS)
+      state.students.forEach(function (st) {
+        if (handledStudentIds[st.id]) return;
+        var matchesToday = doesScheduleMatchDay(st.scheduleText, dayIdx);
+        if (mode === 'TODAY_MATCH' && !matchesToday) return;
+
+        var t = state.teachers.find(function (x) { return x.id === st.teacherId; });
+        var customKey = dateStr + '__' + st.id;
+        var customEntry = state.customDayTimes[customKey] || {};
+        var timeVal = customEntry.time || extractDefaultTimeFromScheduleText(st.scheduleText);
+        var durVal = customEntry.durationMin || st.defaultDurationMin || 30;
+
+        var execRep = state.dailyReports.find(function (r) {
+          return r.type === 'EXECUTION' && r.date === dateStr && (r.studentId === st.id || r.studentName === st.name);
+        });
+
+        rows.push({
+          rowKey: 'stu_' + st.id,
+          isLoggedLesson: false,
+          lessonId: null,
+          studentId: st.id,
+          studentName: st.name,
+          studentCountry: st.country || '',
+          scheduleText: st.scheduleText || '',
+          consumedLessons: st.consumedLessons,
+          totalLessons: st.totalLessons,
+          teacherId: st.teacherId,
+          teacherName: t ? t.name : 'غير محدد',
+          time: timeVal,
+          durationMin: durVal,
+          status: execRep ? (execRep.status === 'NOT_DONE' ? 'NOT_DONE' : 'DONE') : 'PENDING',
+          reasonNote: execRep ? (execRep.note || REASON_LABELS[execRep.reasonCat] || '') : ''
+        });
+      });
+
+      rows.sort(function (a, b) {
+        return (a.time || '00:00').localeCompare(b.time || '00:00');
+      });
+      return rows;
+    }
+
     function renderTodayScheduleView() {
-      var d = state.scheduleDateFilter || '2026-11-09';
+      var d = state.scheduleDateFilter || '2026-11-15';
       var perms = getActivePermissions();
+      var canApproveToday = perms.isAdmin || (perms.approve_today_lessons !== false && !(!perms.isAdmin && !perms.edit_schedule && !perms.add_lesson && !perms.edit_teachers && !perms.edit_students && !perms.delete_items));
+      var canEditTime = perms.isAdmin || !!perms.edit_schedule;
+
       var quickAddBtn = document.getElementById('btnQuickAddScheduleLesson');
       if (quickAddBtn) quickAddBtn.classList.toggle('hidden', !perms.add_lesson);
       var waTodayBtn = document.getElementById('btnCopyTodayScheduleWhatsapp');
       if (waTodayBtn) waTodayBtn.classList.toggle('hidden', !perms.copy_whatsapp);
       var waTeachersBtn = document.getElementById('btnCopyTeachersBriefToday');
       if (waTeachersBtn) waTeachersBtn.classList.toggle('hidden', !perms.copy_whatsapp);
+
+      var thApp = document.getElementById('thTodayApprovalCol');
+      if (thApp) thApp.classList.toggle('hidden', !canApproveToday);
+
       var dateInput = document.getElementById('todayScheduleDateInput');
       if (dateInput && document.activeElement !== dateInput) {
         dateInput.value = d;
       }
 
-      var lessonsToday = state.lessons.filter(function (l) { return l.date === d; });
-      lessonsToday.sort(function (a, b) {
-        return (a.time || '00:00').localeCompare(b.time || '00:00');
+      var dayIdx = getDayIndexFromIsoDate(d);
+      var dayName = ARABIC_DAYS_MAP[dayIdx] || '';
+      var dayLbl = document.getElementById('todayArabicDayNameLabel');
+      if (dayLbl) dayLbl.textContent = 'يوم ' + dayName + ' ' + d;
+
+      var allTodayRows = buildCombinedTodayRows(d, state.todayRosterMode || 'TODAY_MATCH');
+      var q = (state.todayScheduleSearch || '').trim();
+      var filteredRows = allTodayRows.filter(function (r) {
+        if (!q) return true;
+        return r.studentName.indexOf(q) !== -1 || r.teacherName.indexOf(q) !== -1 || r.scheduleText.indexOf(q) !== -1;
       });
 
-      // إحصائيات سريعة لليوم
       var totalMinutes = 0;
       var totalCost = 0;
       var teachersMap = {};
 
-      lessonsToday.forEach(function (l) {
-        totalMinutes += l.durationMin;
-        teachersMap[l.teacherId] = true;
-        var t = state.teachers.find(function (x) { return x.id === l.teacherId; });
-        var rule = TREATMENT_RULES[l.treatment] || TREATMENT_RULES.NORMAL_MAKEUP;
-        var rate = t ? ((l.rateTier === 'RATE_2' && t.rate2 > 0) ? t.rate2 : t.rate1) : 0;
-        if (rule.paysTeacher) {
-          totalCost += (l.durationMin / 60) * rate;
+      allTodayRows.forEach(function (r) {
+        totalMinutes += Number(r.durationMin || 0);
+        if (r.teacherId) teachersMap[r.teacherId] = true;
+        var t = state.teachers.find(function (x) { return x.id === r.teacherId; });
+        var rate = t ? t.rate1 : 0;
+        if (r.status !== 'NOT_DONE') {
+          totalCost += (Number(r.durationMin || 0) / 60) * rate;
         }
       });
 
-      document.getElementById('statTodayTotalLessons').textContent = String(lessonsToday.length);
+      document.getElementById('statTodayTotalLessons').textContent = String(allTodayRows.length);
       document.getElementById('statTodayTotalMinutes').textContent = totalMinutes + ' دقيقة (' + (totalMinutes / 60).toFixed(1) + ' س)';
       document.getElementById('statTodayActiveTeachers').textContent = Object.keys(teachersMap).length + ' معلمين';
-      document.getElementById('statTodayEstimatedWages').textContent = totalCost.toFixed(2) + ' جنيه';
-      document.getElementById('badgeTodayCount').textContent = String(lessonsToday.length);
+      document.getElementById('statTodayEstimatedWages').textContent = (perms.see_teacher_rates ? (totalCost.toFixed(2) + ' جنيه') : 'معتمد');
+      document.getElementById('badgeTodayCount').textContent = String(allTodayRows.length);
 
-      // جدول حلقات اليوم
       var tbody = document.getElementById('todayScheduleDedicatedBody');
       if (!tbody) return;
 
-      if (lessonsToday.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:28px; color:var(--slate-500); background:#FAFAFA;">' +
-          '🏖️ لا توجد حلقات مجدولة في يوم (' + d + '). يمكنك الضغط على "+ إضافة موعد لليوم" لجدولة حلقة جديدة أو اختيار تاريخ آخر أعلاه.' +
+      if (filteredRows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:26px; color:var(--slate-500); background:#FAFAFA;">' +
+          'لا توجد حلقات مطابقة ليوم (' + dayName + ' ' + d + '). يمكنك تغيير القائمة أعلاه إلى "📚 عرض جميع الطلاب" لجدولة أي طالب في هذا اليوم.' +
           '</td></tr>';
       } else {
-        tbody.innerHTML = lessonsToday.map(function (l) {
-          var student = state.students.find(function (s) { return s.id === l.studentId; });
-          var teacher = state.teachers.find(function (t) { return t.id === l.teacherId; });
-          var rule = TREATMENT_RULES[l.treatment] || TREATMENT_RULES.NORMAL_MAKEUP;
-          var timeVal = l.time || '17:00';
+        tbody.innerHTML = filteredRows.map(function (r) {
+          var statusPill = '<span class="status-pill pill-amber">⏳ مجدولة اليوم (بانتظار الاعتماد)</span>';
+          var rowBg = '#FFFFFF';
+          if (r.status === 'DONE') {
+            statusPill = '<span class="status-pill pill-emerald">✅ تمت الحلقة واعتمدت</span>';
+            rowBg = '#F0FDF4';
+          } else if (r.status === 'NOT_DONE') {
+            statusPill = '<span class="status-pill pill-rose">⭕ لم تتم (' + escHtml(r.reasonNote || 'اعتذار/غياب') + ')</span>';
+            rowBg = '#FFF1F2';
+          }
 
-          return '<tr style="background:#FFFFFF;">' +
-            '<td><input type="time" class="form-input" data-edit-lesson-time="' + l.id + '" value="' + timeVal + '" style="font-weight:800; font-size:0.86rem; color:#1E3A8A; background:#EFF6FF; border-color:#BFDBFE; padding:5px 8px;" title="تغيير الساعة فوراً" /></td>' +
-            '<td><strong>' + (student ? student.name : 'غير معروف') + '</strong><div style="font-size:0.72rem; color:var(--slate-500);">' + (student ? (student.country + ' • ' + (student.scheduleText || '')) : '') + '</div></td>' +
-            '<td>' + (teacher ? ('<strong>' + teacher.name + '</strong>') : 'غير محدد') + '</td>' +
-            '<td><strong>' + l.durationMin + ' د</strong></td>' +
-            '<td><span class="status-pill ' + rule.pillClass + '">' + rule.label + '</span></td>' +
-            '<td><span style="font-size:0.76rem; color:var(--slate-600);">' + (l.notes || '—') + '</span></td>' +
-            '<td><input type="date" class="form-input" data-edit-lesson-date="' + l.id + '" value="' + l.date + '" style="padding:4px 7px; font-size:0.76rem; width:130px;" title="تأجيل أو تقديم ليوم آخر" /></td>' +
-            '<td>' +
-            '<div style="display:flex; gap:4px;">' +
-            '<button type="button" class="btn btn-emerald" data-wa-single-lesson="' + l.id + '" style="padding:4px 8px; font-size:0.74rem;" title="نسخ رسالة واتساب للطالب والمعلم">📲 واتساب</button>' +
-            (perms.delete_items ? '<button type="button" class="btn btn-danger-soft" data-delete-lesson="' + l.id + '" style="padding:4px 8px; font-size:0.74rem;">حذف</button>' : '') +
-            '</div>' +
-            '</td>' +
-            '</tr>';
+          var isOpeningReason = (state.activeNotDoneRowKey === r.rowKey);
+
+          var approvalCellHtml = '';
+          if (canApproveToday) {
+            var reasonDrawer = '';
+            if (isOpeningReason) {
+              reasonDrawer = '<div style="margin-top:8px; padding:10px; background:#FFF1F2; border:1px solid #FECDD3; border-radius:10px;">' +
+                '<div style="font-size:0.74rem; font-weight:800; color:#9F1239; margin-bottom:5px;">حدد سبب عدم إتمام الحلقة (أو اكتبه):</div>' +
+                '<select id="notDoneCat_' + r.rowKey + '" class="form-select" style="padding:4px 8px; font-size:0.75rem; margin-bottom:6px;">' +
+                  '<option value="STUDENT_NO_REPLY">الطالب لم يرد (يُخصم أو يُسجل غياب)</option>' +
+                  '<option value="STUDENT_EXCUSE">ظروف / انقطاع نت عند الطالب</option>' +
+                  '<option value="TEACHER_NET">انقطاع نت / عذر عند المعلم</option>' +
+                  '<option value="SUPERVISOR_ERR">تأجيل / متابعة إشراف</option>' +
+                '</select>' +
+                '<input type="text" id="notDoneNote_' + r.rowKey + '" class="form-input" placeholder="اكتب السبب التفصيلي (مثال: النت فاصل عند المعلمة)..." value="' + escHtml(r.reasonNote || '') + '" style="padding:5px 8px; font-size:0.75rem; margin-bottom:6px;" />' +
+                '<div style="display:flex; gap:6px;">' +
+                  '<button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.74rem; background:#E11D48;" data-confirm-today-notdone="' + r.rowKey + '" data-stuid="' + r.studentId + '" data-teaid="' + r.teacherId + '" data-lesid="' + (r.lessonId || '') + '">حفظ سبب عدم الإتمام</button>' +
+                  '<button type="button" class="btn btn-soft" style="padding:4px 8px; font-size:0.74rem;" data-cancel-today-notdone="' + r.rowKey + '">إلغاء</button>' +
+                '</div>' +
+              '</div>';
+            }
+
+            approvalCellHtml = '<td>' +
+              '<div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">' +
+                (r.status !== 'DONE'
+                  ? '<button type="button" class="btn btn-emerald" style="padding:5px 10px; font-size:0.75rem;" data-approve-today-done="' + r.rowKey + '" data-stuid="' + r.studentId + '" data-teaid="' + r.teacherId + '" data-time="' + r.time + '" data-dur="' + r.durationMin + '">✅ تمت الحلقة</button>'
+                  : '<span style="font-size:0.74rem; font-weight:800; color:#065F46;">✔️ معتمدة في الباقة والمالية</span>') +
+                '<button type="button" class="btn btn-danger-soft" style="padding:5px 10px; font-size:0.75rem;" data-open-today-notdone="' + r.rowKey + '">⭕ لم تتم (كتابة السبب)</button>' +
+                (perms.copy_whatsapp ? '<button type="button" class="btn btn-soft" style="padding:5px 8px; font-size:0.74rem;" data-wa-today-row="' + r.studentId + '" data-time="' + r.time + '">📲</button>' : '') +
+              '</div>' +
+              reasonDrawer +
+            '</td>';
+          }
+
+          return '<tr style="background:' + rowBg + ';">' +
+            '<td><input type="time" class="form-input" data-flex-day-time="' + r.studentId + '" data-lesid="' + (r.lessonId || '') + '" value="' + r.time + '" ' + (canEditTime ? '' : 'disabled') + ' style="font-weight:800; font-size:0.86rem; color:#1E3A8A; background:#EFF6FF; border-color:#BFDBFE; padding:5px 8px;" title="تعديل التوقيت بمرونة لهذا اليوم" /></td>' +
+            '<td><strong>' + escHtml(r.studentName) + '</strong> <span class="status-pill pill-blue" style="font-size:0.68rem;">' + escHtml(r.studentCountry) + '</span><div style="font-size:0.73rem; color:var(--slate-500); margin-top:2px;">📌 الموعد الثابت: ' + escHtml(r.scheduleText || 'غير محدد') + '</div></td>' +
+            '<td><strong>' + escHtml(r.teacherName) + '</strong></td>' +
+            '<td><input type="number" min="15" step="5" class="form-input" data-flex-day-dur="' + r.studentId + '" data-lesid="' + (r.lessonId || '') + '" value="' + r.durationMin + '" ' + (canEditTime ? '' : 'disabled') + ' style="width:72px; padding:4px 6px; font-weight:800; text-align:center;" title="تعديل مدة حلقة اليوم بالدقائق" /></td>' +
+            '<td><strong style="font-size:0.86rem; color:var(--primary);">' + r.consumedLessons + ' / ' + r.totalLessons + '</strong><div style="font-size:0.7rem; color:var(--slate-500);">متبقي: ' + Math.max(0, r.totalLessons - r.consumedLessons) + '</div></td>' +
+            '<td>' + statusPill + '</td>' +
+            approvalCellHtml +
+          '</tr>';
         }).join('');
       }
 
@@ -3977,13 +4156,13 @@
         rosterBody.innerHTML = state.students.map(function (s) {
           var t = state.teachers.find(function (x) { return x.id === s.teacherId; });
           return '<tr>' +
-            '<td><strong>' + s.name + '</strong></td>' +
-            '<td>' + s.country + '</td>' +
-            '<td>' + (t ? t.name : 'غير محدد') + '</td>' +
-            '<td><input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + (s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="padding:4px 8px; font-size:0.78rem; font-weight:700; color:var(--primary); width:200px;" /></td>' +
+            '<td><strong>' + escHtml(s.name) + '</strong></td>' +
+            '<td>' + escHtml(s.country) + '</td>' +
+            '<td>' + escHtml(t ? t.name : 'غير محدد') + '</td>' +
+            '<td><input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + escHtml(s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="padding:4px 8px; font-size:0.78rem; font-weight:700; color:var(--primary); width:240px;" /></td>' +
             '<td><strong>' + s.consumedLessons + ' / ' + s.totalLessons + '</strong> حلقات</td>' +
-            '<td><span class="status-pill pill-purple">' + (s.foreignPackageText || '—') + '</span></td>' +
-            '<td><strong style="color:var(--emerald);">' + Number(s.tuitionReceived || 0).toFixed(2) + ' جنيه</strong></td>' +
+            '<td><span class="status-pill pill-purple">' + escHtml(s.foreignPackageText || '—') + '</span></td>' +
+            '<td><strong style="color:var(--emerald);">' + (perms.see_student_money ? (Number(s.tuitionReceived || 0).toFixed(2) + ' جنيه') : '—') + '</strong></td>' +
             '</tr>';
         }).join('');
       }
@@ -4363,7 +4542,18 @@
       // أحداث جدول مواعيد اليوم والمتابعة
       document.getElementById('todayScheduleDateInput').addEventListener('change', function (e) {
         state.scheduleDateFilter = e.target.value;
-        renderAll();
+        state.reportsDateFilter = e.target.value;
+        renderAll(true);
+      });
+
+      document.getElementById('todayRosterModeSelect').addEventListener('change', function (e) {
+        state.todayRosterMode = e.target.value;
+        renderTodayScheduleView();
+      });
+
+      document.getElementById('todayScheduleSearchInput').addEventListener('input', function (e) {
+        state.todayScheduleSearch = e.target.value;
+        renderTodayScheduleView();
       });
 
       document.getElementById('btnSetTodayDate').addEventListener('click', function () {
@@ -4375,8 +4565,27 @@
       });
 
       document.getElementById('btnCopyTodayScheduleWhatsapp').addEventListener('click', function () {
-        var text = generateTodayWhatsAppAgenda();
-        copyText(text, 'جدول مواعيد اليوم للواتساب');
+        var d = state.scheduleDateFilter || '2026-11-15';
+        var dayName = ARABIC_DAYS_MAP[getDayIndexFromIsoDate(d)] || '';
+        var rows = buildCombinedTodayRows(d, state.todayRosterMode || 'TODAY_MATCH');
+        if (rows.length === 0) {
+          showToast('لا توجد حلقات في هذا اليوم لنسخها', false);
+          return;
+        }
+        var doneCnt = rows.filter(function (r) { return r.status === 'DONE'; }).length;
+        var notDoneCnt = rows.filter(function (r) { return r.status === 'NOT_DONE'; }).length;
+        var lines = [
+          '📋 *تقرير وجدول حلقات يوم ' + dayName + ' (' + d + ')*',
+          'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ'
+        ];
+        rows.forEach(function (r, idx) {
+          var stIcon = r.status === 'DONE' ? '✅ تمت الحلقة' : (r.status === 'NOT_DONE' ? ('⭕ لم تتم — ' + (r.reasonNote || '')) : '⏰ الموعد: ' + r.time);
+          lines.push((idx + 1) + '• المعلم : ' + r.teacherName + '\n- الطالب : ' + r.studentName + ' (' + r.time + ')\n' + stIcon + '\nــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ');
+        });
+        lines.push('📊 *إجمالي حلقات اليوم : ' + rows.length + '*');
+        lines.push('✅ *عدد الحلقات التي تمت : ' + doneCnt + '*');
+        lines.push('⭕ *عدد الحلقات التي لم تتم : ' + notDoneCnt + '*');
+        copyText(lines.join('\n'), 'جدول وتقرير حلقات اليوم للواتساب');
       });
 
       document.getElementById('btnCopyTeachersBriefToday').addEventListener('click', function () {
@@ -4475,6 +4684,36 @@
           });
           renderAll();
           showToast('تم تحديث ما يعادل الباقة بالمصري وتحديث الميزانية', false);
+          return;
+        }
+
+        var flexStuTimeId = e.target.getAttribute && e.target.getAttribute('data-flex-day-time');
+        if (flexStuTimeId) {
+          var newTVal = e.target.value;
+          var linkedLesId = e.target.getAttribute('data-lesid');
+          var dCur = state.scheduleDateFilter || '2026-11-15';
+          var cKey = dCur + '__' + flexStuTimeId;
+          state.customDayTimes[cKey] = Object.assign({}, state.customDayTimes[cKey] || {}, { time: newTVal });
+          if (linkedLesId) {
+            state.lessons = state.lessons.map(function (l) { return l.id === linkedLesId ? Object.assign({}, l, { time: newTVal }) : l; });
+          }
+          renderAll();
+          showToast('⏰ تم تعديل توقيت حلقة اليوم بمرونة إلى الساعة ' + newTVal, false);
+          return;
+        }
+
+        var flexStuDurId = e.target.getAttribute && e.target.getAttribute('data-flex-day-dur');
+        if (flexStuDurId) {
+          var newDVal = Math.max(10, Number(e.target.value) || 30);
+          var linkedLesId2 = e.target.getAttribute('data-lesid');
+          var dCur2 = state.scheduleDateFilter || '2026-11-15';
+          var cKey2 = dCur2 + '__' + flexStuDurId;
+          state.customDayTimes[cKey2] = Object.assign({}, state.customDayTimes[cKey2] || {}, { durationMin: newDVal });
+          if (linkedLesId2) {
+            state.lessons = state.lessons.map(function (l) { return l.id === linkedLesId2 ? Object.assign({}, l, { durationMin: newDVal }) : l; });
+          }
+          renderAll();
+          showToast('⏱️ تم تعديل مدة حلقة اليوم إلى ' + newDVal + ' دقيقة', false);
           return;
         }
 
@@ -4773,6 +5012,139 @@
           state.currentUserName = supObj.name;
           renderAll(true);
           showToast('👁️ أنت الآن تعاين الواجهة بصلاحيات: ' + supObj.name + ' (يمكنك العودة للإدارة من القائمة العلوية)', false);
+          return;
+        }
+
+        // اعتماد حلقة اليوم بضغطة واحدة من جدول مواعيد اليوم: "✅ تمت الحلقة"
+        var approveTodayKey = target.getAttribute('data-approve-today-done');
+        if (approveTodayKey) {
+          var stuId = target.getAttribute('data-stuid');
+          var teaId = target.getAttribute('data-teaid');
+          var timeVal = target.getAttribute('data-time') || '17:00';
+          var durVal = Number(target.getAttribute('data-dur')) || 30;
+          var d = state.scheduleDateFilter || '2026-11-15';
+          var stObj = state.students.find(function (s) { return s.id === stuId; });
+          var tObj = state.teachers.find(function (t) { return t.id === teaId; });
+          var activeSup = getActiveSupervisorObj();
+
+          var existingLesson = state.lessons.find(function (l) { return l.date === d && l.studentId === stuId; });
+          if (!existingLesson) {
+            state.lessons.unshift({
+              id: 'l_day_' + Date.now(),
+              date: d,
+              time: timeVal,
+              studentId: stuId,
+              teacherId: teaId,
+              durationMin: durVal,
+              rateTier: 'RATE_1',
+              treatment: 'NORMAL_MAKEUP',
+              notes: 'تمت الحلقة (معتمدة من جدول مواعيد اليوم)'
+            });
+            state.students = state.students.map(function (s) {
+              return s.id === stuId ? Object.assign({}, s, { consumedLessons: s.consumedLessons + 1 }) : s;
+            });
+          } else {
+            state.lessons = state.lessons.map(function (l) {
+              return l.id === existingLesson.id ? Object.assign({}, l, { treatment: 'NORMAL_MAKEUP', notes: 'تمت الحلقة' }) : l;
+            });
+          }
+
+          state.dailyReports = state.dailyReports.filter(function (r) {
+            return !(r.type === 'EXECUTION' && r.date === d && (r.studentId === stuId || (stObj && r.studentName === stObj.name)));
+          });
+          state.dailyReports.unshift({
+            id: 'rep_day_' + Date.now(),
+            type: 'EXECUTION',
+            date: d,
+            studentId: stuId,
+            teacherId: teaId,
+            teacherName: tObj ? tObj.name : '',
+            studentName: stObj ? stObj.name : '',
+            status: 'DONE',
+            reasonCat: 'NONE',
+            note: 'تمت الحلقة (' + durVal + ' دقيقة)',
+            createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : activeSup.id,
+            createdByName: state.currentUserName || activeSup.name,
+            createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+          });
+
+          state.activeNotDoneRowKey = null;
+          renderAll();
+          showToast('✅ تم اعتماد إتمام الحلقة وخصمها من باقة الطالب وإضافتها لساعات المعلم والتقرير اليومي!', false);
+          return;
+        }
+
+        // فتح خانة سبب "⭕ لم تتم الحلقة" بجوار الحلقة مباشرة
+        var openNotDoneKey = target.getAttribute('data-open-today-notdone');
+        if (openNotDoneKey) {
+          state.activeNotDoneRowKey = (state.activeNotDoneRowKey === openNotDoneKey) ? null : openNotDoneKey;
+          renderAll(true);
+          return;
+        }
+
+        var cancelNotDoneKey = target.getAttribute('data-cancel-today-notdone');
+        if (cancelNotDoneKey) {
+          state.activeNotDoneRowKey = null;
+          renderAll(true);
+          return;
+        }
+
+        // تأكيد وحفظ "⭕ لم تتم الحلقة" مع السبب بجوار الحلقة مباشرة
+        var confirmNotDoneKey = target.getAttribute('data-confirm-today-notdone');
+        if (confirmNotDoneKey) {
+          var stuId2 = target.getAttribute('data-stuid');
+          var teaId2 = target.getAttribute('data-teaid');
+          var lesId2 = target.getAttribute('data-lesid');
+          var d2 = state.scheduleDateFilter || '2026-11-15';
+          var catEl = document.getElementById('notDoneCat_' + confirmNotDoneKey);
+          var noteEl = document.getElementById('notDoneNote_' + confirmNotDoneKey);
+          var reasonCat2 = catEl ? catEl.value : 'STUDENT_EXCUSE';
+          var noteText2 = (noteEl && noteEl.value.trim()) ? noteEl.value.trim() : (REASON_LABELS[reasonCat2] || 'لم تتم الحلقة');
+
+          var stObj2 = state.students.find(function (s) { return s.id === stuId2; });
+          var tObj2 = state.teachers.find(function (t) { return t.id === teaId2; });
+          var activeSup2 = getActiveSupervisorObj();
+
+          if (lesId2) {
+            state.lessons = state.lessons.filter(function (l) { return l.id !== lesId2; });
+            state.students = state.students.map(function (s) {
+              return s.id === stuId2 ? Object.assign({}, s, { consumedLessons: Math.max(0, s.consumedLessons - 1) }) : s;
+            });
+          }
+
+          state.dailyReports = state.dailyReports.filter(function (r) {
+            return !(r.type === 'EXECUTION' && r.date === d2 && (r.studentId === stuId2 || (stObj2 && r.studentName === stObj2.name)));
+          });
+          state.dailyReports.unshift({
+            id: 'rep_nd_' + Date.now(),
+            type: 'EXECUTION',
+            date: d2,
+            studentId: stuId2,
+            teacherId: teaId2,
+            teacherName: tObj2 ? tObj2.name : '',
+            studentName: stObj2 ? stObj2.name : '',
+            status: 'NOT_DONE',
+            reasonCat: reasonCat2,
+            note: noteText2,
+            createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : activeSup2.id,
+            createdByName: state.currentUserName || activeSup2.name,
+            createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+          });
+
+          state.activeNotDoneRowKey = null;
+          renderAll();
+          showToast('⭕ تم تسجيل عدم إتمام الحلقة مع السبب وإدراجه في تقرير اليوم تلقائياً', false);
+          return;
+        }
+
+        // نسخ تذكير واتساب لحلقة طالب من جدول اليوم
+        var waRowStuId = target.getAttribute('data-wa-today-row');
+        if (waRowStuId) {
+          var stW = state.students.find(function (s) { return s.id === waRowStuId; });
+          var tW = stW ? state.teachers.find(function (t) { return t.id === stW.teacherId; }) : null;
+          var tmW = target.getAttribute('data-time') || '17:00';
+          var msgW = '🌿 *تذكير بموعد الحلقة اليوم (' + (state.scheduleDateFilter || '') + ')*\n• الطالب: *' + (stW ? stW.name : '') + '*\n• المعلم: *' + (tW ? tW.name : '') + '*\n• الموعد: الساعة *' + tmW + '*';
+          copyText(msgW, 'تذكير الحلقة للواتساب');
           return;
         }
 
@@ -5458,6 +5830,7 @@
             view_analytics: document.getElementById('perm_view_analytics').checked,
             view_finance: document.getElementById('perm_view_finance').checked,
             edit_schedule: document.getElementById('perm_edit_schedule').checked,
+            approve_today_lessons: document.getElementById('perm_approve_today').checked,
             add_lesson: document.getElementById('perm_add_lesson').checked,
             edit_teachers: document.getElementById('perm_edit_teachers').checked,
             see_teacher_rates: document.getElementById('perm_see_teacher_rates').checked,
