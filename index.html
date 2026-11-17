@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>نظام مِحراب ERP الإداري والمالي — تعدد عملات الطلاب، سلة المحذوفات، والتخزين الآمن</title>
+  <meta name="theme-color" content="#0F172A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="مِحراب ERP" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%230F172A'/%3E%3Cpath d='M64 20 L96 52 L96 104 L32 104 L32 52 Z' fill='%2310B981' opacity='0.2'/%3E%3Ctext x='64' y='82' font-size='64' text-anchor='middle' fill='%23FCD34D'%3E🕌%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%230F172A'/%3E%3Ctext x='64' y='84' font-size='68' text-anchor='middle' fill='%23FCD34D'%3E🕌%3C/text%3E%3C/svg%3E" />
   <style>
     :root {
       --primary: #1F4E78;
@@ -707,6 +714,50 @@
     </div>
   </div>
 
+  <!-- نافذة تثبيت المنصة كتطبيق على الهاتف أو الكمبيوتر (مجاني 100% وبدون متجر) -->
+  <div id="pwaInstallGuideModal" class="hidden" style="position:fixed; inset:0; z-index:9998; background:rgba(15,23,42,0.78); display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div class="card" style="max-width:480px; width:100%; padding:24px; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.4);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <strong style="font-size:1.1rem; color:var(--primary);">📲 تثبيت منصة مِحراب ERP كتطبيق مستقل</strong>
+        <button type="button" id="btnClosePwaModal" class="btn btn-soft" style="padding:4px 10px;">إغلاق ✕</button>
+      </div>
+      <p style="font-size:0.82rem; color:var(--slate-600); margin-bottom:14px;">
+        يمكنك تثبيت المنصة على شاشة هاتفك أو جهازك لتفتح بضغطة واحدة بشاشة كاملة مثل أي تطبيق وبلا أي رسوم:
+      </p>
+      <div style="background:var(--emerald-bg); border:1px solid var(--emerald-border); border-radius:12px; padding:12px; margin-bottom:10px; font-size:0.8rem;">
+        <strong style="color:#065F46; display:block; margin-bottom:4px;">📱 على هواتف أندرويد (Chrome):</strong>
+        اضغط على النقاط الثلاث <strong>(⋮)</strong> أعلى يسار المتصفح ← اختر <strong>"تثبيت التطبيق" (Install app)</strong> أو <strong>"الإضافة إلى الشاشة الرئيسية"</strong>.
+      </div>
+      <div style="background:var(--blue-bg); border:1px solid var(--blue-border); border-radius:12px; padding:12px; margin-bottom:10px; font-size:0.8rem;">
+        <strong style="color:#1E3A8A; display:block; margin-bottom:4px;">🍎 على آيفون وآيباد (Safari):</strong>
+        اضغط على زر المشاركة <strong>(Share ⬆️)</strong> أسفل المتصفح ← اختر <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</strong>.
+      </div>
+      <div style="background:var(--slate-50); border:1px solid var(--slate-200); border-radius:12px; padding:12px; margin-bottom:14px; font-size:0.8rem;">
+        <strong style="color:var(--slate-800); display:block; margin-bottom:4px;">💻 على الكمبيوتر واللابتوب (Chrome / Edge):</strong>
+        اضغط على أيقونة الشاشة الصغيرة <strong>(📥 تثبيت)</strong> الموجودة في يمين شريط العنوان أعلى المتصفح.
+      </div>
+      <button type="button" id="btnConfirmPwaModal" class="btn btn-primary" style="width:100%; padding:10px;">حسناً، فهمت الطريقة</button>
+    </div>
+  </div>
+
+  <!-- صندوق النسخ المضمون الفوري (يفتح تلقائياً مع تحديد النص بالكامل لضمان عمل النسخ 100% في كل المتصفحات والجوال) -->
+  <div id="instantCopyBoxModal" class="hidden" style="position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,0.75); display:flex; align-items:center; justify-content:center; padding:16px;">
+    <div class="card" style="max-width:560px; width:100%; padding:20px; border-radius:18px; box-shadow:0 20px 50px rgba(0,0,0,0.45); border:2px solid var(--emerald);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <strong id="instantCopyBoxTitle" style="font-size:1rem; color:#065F46;">📋 صندوق النسخ الجاهز</strong>
+        <button type="button" id="btnCloseInstantCopyModal" class="btn btn-soft" style="padding:4px 10px;">إغلاق ✕</button>
+      </div>
+      <div style="font-size:0.76rem; color:var(--slate-600); margin-bottom:8px;">
+        النص محدد وجاهز — اضغط زر <strong>"📋 نسخ النص الآن"</strong> بالأسفل أو اضغط <strong>(Ctrl + C)</strong>:
+      </div>
+      <textarea id="instantCopyTextarea" class="form-input" rows="10" readonly style="width:100%; font-family:'Tajawal',sans-serif; font-size:0.82rem; line-height:1.65; background:#F8FAFC; border:2px solid var(--emerald-border); padding:10px; margin-bottom:12px; resize:vertical;"></textarea>
+      <div style="display:flex; gap:8px;">
+        <button type="button" id="btnExecModalCopyNow" class="btn btn-emerald" style="flex:1; padding:10px; font-size:0.88rem;">📋 نسخ النص الآن وتحديده</button>
+        <button type="button" id="btnCloseInstantCopyModal2" class="btn btn-soft" style="padding:10px 16px;">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
   <!-- الهيدر الرئيسي -->
   <header class="app-header">
     <div class="container">
@@ -720,6 +771,9 @@
         </div>
 
         <div class="header-actions">
+          <button type="button" id="btnInstallPwaApp" class="btn btn-emerald" style="background: linear-gradient(135deg, #059669, #10B981); border-color: #34D399;" title="تثبيت المنصة كتطبيق مستقل على شاشة الهاتف أو الكمبيوتر مجاناً">
+            <span>📲 تثبيت كتطبيق</span>
+          </button>
           <button type="button" id="btnOpenCodeLoginModal" class="btn btn-glass" title="تبديل الحساب بكود مستخدم أو قفل الشاشة">
             <span>🔑 تبديل الكود</span>
           </button>
@@ -750,29 +804,22 @@
             </select>
           </div>
 
-          <button type="button" id="btnDownloadAdminAppDirect" class="btn btn-emerald" title="تنزيل أحدث نسخة من تطبيق الإدارة كملف واحد جاهز بدون ضغط">
-            <span>💻 تنزيل تطبيق الإدارة (.html)</span>
-          </button>
-
-          <button type="button" id="btnDownloadOwnerAppDirect" class="btn btn-glass" style="background: rgba(245, 158, 11, 0.28); border-color: #FCD34D;" title="تنزيل نسخة صاحب الأكاديمية">
-            <span>🏛️ تنزيل نسخة صاحب الأكاديمية (.html)</span>
-          </button>
-
-          <button type="button" id="btnDownloadSupAppDirect" class="btn btn-glass" title="تنزيل نسخة الإشراف الأكاديمي">
-            <span>📤 تنزيل نسخة الإشراف (.html)</span>
-          </button>
-
-          <button type="button" id="btnDownloadJsonBackup" class="btn btn-glass" title="حفظ نسخة احتياطية كاملة على جهازك">
-            <span>💾 حفظ نسخة احتياطية</span>
-          </button>
-
           <button type="button" id="btnCopyWhatsapp" class="btn btn-emerald">
             <span>📲 نسخ تقرير الواتساب</span>
           </button>
 
-          <button type="button" id="btnExportSummaryCsv" class="btn btn-glass">
-            <span>📥 تصدير شيت الميزانية</span>
-          </button>
+          <div id="headerExportDropdownWrap" style="position:relative; display:inline-block;">
+            <button type="button" id="btnToggleExportMenu" class="btn btn-glass">
+              <span>⚙️ التصدير والنسخ ▾</span>
+            </button>
+            <div id="headerExportMenu" class="hidden" style="position:absolute; left:0; top:110%; z-index:200; min-width:250px; background:#FFFFFF; border:1px solid var(--slate-200); border-radius:12px; box-shadow:0 12px 30px rgba(15,23,42,0.22); padding:8px; display:flex; flex-direction:column; gap:6px;">
+              <button type="button" id="btnDownloadAdminAppDirect" class="btn btn-emerald" style="justify-content:flex-start; width:100%;">💻 تنزيل تطبيق الإدارة (.html)</button>
+              <button type="button" id="btnDownloadOwnerAppDirect" class="btn btn-soft" style="justify-content:flex-start; width:100%;">🏛️ تنزيل نسخة صاحب الأكاديمية (.html)</button>
+              <button type="button" id="btnDownloadSupAppDirect" class="btn btn-soft" style="justify-content:flex-start; width:100%;">📤 تنزيل نسخة الإشراف (.html)</button>
+              <button type="button" id="btnDownloadJsonBackup" class="btn btn-soft" style="justify-content:flex-start; width:100%;">💾 حفظ نسخة احتياطية (JSON)</button>
+              <button type="button" id="btnExportSummaryCsv" class="btn btn-soft" style="justify-content:flex-start; width:100%;">📥 تصدير شيت الميزانية (CSV)</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -850,60 +897,59 @@
     <!-- ========================================================= -->
     <section id="tab-today-schedule" class="tab-panel hidden">
       <!-- بطاقة التحكم بجدول اليوم وأزرار الواتساب -->
-      <div class="card" style="margin-bottom: 18px; border-color: var(--emerald-border); background: #FAFDFB;">
-        <div class="section-header">
+      <div class="card" style="margin-bottom: 16px; border-color: var(--emerald-border); background: #FAFDFB;">
+        <div class="section-header" style="margin-bottom: 10px;">
           <div>
-            <div class="section-title" style="color: #065F46; font-size: 1.15rem;">📅 جدول مواعيد اليوم والمتابعة اليومية</div>
-            <div class="section-desc">مخصص لمتابعة مواعيد حلقات اليوم وتغيير الوقت ونسخ الأجندة اليومية لواتساب الإدارة أو المعلمين</div>
+            <div class="section-title" style="color: #065F46; font-size: 1.15rem;">📅 غرفة عمليات اليوم والمتابعة الموحدة (<span id="todayArabicDayNameLabel">يوم السبت</span>)</div>
+            <div class="section-desc">جدول مدمج يعرض حلقات اليوم تلقائياً — اضغط على الإجراء المطلوب أمام أي حلقة لفتح درج (⚡ اعتماد التنفيذ والمالية بالمعالجات الـ 4) أو (🌷 تقييم الجودة) أو (🔒 ملاحظة سرية للإدارة)</div>
           </div>
-          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
-            <label for="todayScheduleDateInput" style="font-size: 0.82rem; font-weight: 800; color: #065F46;">📅 يوم المتابعة:</label>
-            <input type="date" id="todayScheduleDateInput" class="form-input" value="2026-11-15" style="width: 140px; font-weight: 700; padding: 6px 10px;" />
-            <button type="button" id="btnSetTodayDate" class="btn btn-soft">اليوم الحالي</button>
-            <button type="button" id="btnCopyTodayScheduleWhatsapp" class="btn btn-emerald" style="padding: 9px 16px;">
-              <span>📲 نسخ جدول اليوم للواتساب</span>
-            </button>
-            <button type="button" id="btnQuickAddScheduleLesson" class="btn btn-primary">
-              <span>+ إضافة موعد لليوم</span>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+            <label for="todayScheduleDateInput" style="font-size: 0.8rem; font-weight: 800; color: #065F46;">📅 التاريخ:</label>
+            <input type="date" id="todayScheduleDateInput" class="form-input" value="2026-11-15" style="width: 138px; font-weight: 700; padding: 5px 8px;" />
+            <button type="button" id="btnSetTodayDate" class="btn btn-soft" style="padding: 6px 10px;">اليوم الحالي</button>
+            <button type="button" id="btnQuickAddScheduleLesson" class="btn btn-primary" style="padding: 6px 12px;">
+              <span>+ إضافة حلقة استثنائية</span>
             </button>
           </div>
         </div>
 
-        <!-- ملخص أرقام اليوم -->
-        <div class="grid-4" style="margin-top: 10px;">
-          <div class="matrix-box blue" style="padding: 10px 14px;">
-            <span>حلقات اليوم المجدولة:</span>
-            <strong id="statTodayTotalLessons" style="font-size: 1.1rem;">0</strong>
+        <!-- ملخص أرقام اليوم الحي -->
+        <div class="grid-4" style="margin-top: 8px;">
+          <div class="matrix-box blue" style="padding: 9px 12px;">
+            <span>إجمالي حلقات اليوم:</span>
+            <strong id="statTodayTotalLessons" style="font-size: 1.05rem;">0</strong>
           </div>
-          <div class="matrix-box emerald" style="padding: 10px 14px;">
-            <span>إجمالي دقائق اليوم:</span>
-            <strong id="statTodayTotalMinutes" style="font-size: 1.1rem;">0 دقيقة</strong>
+          <div class="matrix-box emerald" style="padding: 9px 12px;">
+            <span>حالة التنفيذ اليوم:</span>
+            <strong id="statTodayTotalMinutes" style="font-size: 0.95rem;">0 تمت | 0 لم تتم</strong>
           </div>
-          <div class="matrix-box indigo" style="padding: 10px 14px;">
-            <span>المعلمون المكلفون اليوم:</span>
-            <strong id="statTodayActiveTeachers" style="font-size: 1.1rem;">0</strong>
+          <div class="matrix-box indigo" style="padding: 9px 12px;">
+            <span>تقييمات الجودة الصادرة:</span>
+            <strong id="statTodayActiveTeachers" style="font-size: 0.95rem;">0 تقييمات</strong>
           </div>
-          <div class="matrix-box amber" style="padding: 10px 14px;">
-            <span>تكلفة أجور حلقات اليوم:</span>
-            <strong id="statTodayEstimatedWages" style="font-size: 1.1rem;">0.00 جنيه</strong>
+          <div class="matrix-box amber" style="padding: 9px 12px;">
+            <span>إجمالي الساعات والأجور:</span>
+            <strong id="statTodayEstimatedWages" style="font-size: 0.95rem;">0.00 جنيه</strong>
           </div>
         </div>
       </div>
+      <div id="todayDropoutBannerBox" class="card hidden" style="margin-bottom: 14px; padding: 10px 14px; background: #FFF1F2; border: 1px solid #FDA4AF;"></div>
 
-      <!-- جدول حلقات ومواعيد اليوم التلقائي واعتماد الحلقات في نفس المكان -->
-      <div class="card" style="margin-bottom: 20px; border: 2px solid var(--emerald-border);">
-        <div class="section-header">
-          <div>
-            <div class="section-title" style="color:#065F46;">📋 جدول حلقات اليوم واعتماد التنفيذ الفوري (<span id="todayArabicDayNameLabel">الأحد</span>)</div>
-            <div class="section-desc">تظهر هنا حلقات اليوم تلقائياً من مواعيد الطلاب الثابتة — عدّل التوقيت بمرونة، واعتمد الحلقة (✅ تمت فتُخصم من الباقة وتُضاف للمعلم فوراً) أو (⭕ لم تتم مع السبب) دون الدخول للباقات!</div>
+      <!-- الجدول المدمج لحلقات اليوم مع نظام الكشف التدريجي (Progressive Disclosure Drawers) -->
+      <div class="card" style="margin-bottom: 18px; border: 2px solid var(--emerald-border);">
+        <div class="section-header" style="margin-bottom: 10px;">
+          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+            <button type="button" class="btn btn-primary today-filter-pill" data-tfilter="ALL" style="padding:5px 10px; font-size:0.75rem;">الكل</button>
+            <button type="button" class="btn btn-soft today-filter-pill" data-tfilter="PENDING" style="padding:5px 10px; font-size:0.75rem;">⏳ بانتظار الاعتماد</button>
+            <button type="button" class="btn btn-soft today-filter-pill" data-tfilter="DONE" style="padding:5px 10px; font-size:0.75rem;">✅ تمت</button>
+            <button type="button" class="btn btn-soft today-filter-pill" data-tfilter="NOT_DONE" style="padding:5px 10px; font-size:0.75rem;">⭕ لم تتم</button>
           </div>
           <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
-            <select id="todayRosterModeSelect" class="form-select" style="width: auto; padding: 6px 10px; font-size: 0.78rem; font-weight: 800; color: var(--primary);">
-              <option value="TODAY_MATCH">📅 عرض حلقات هذا اليوم فقط (تلقائي)</option>
-              <option value="ALL_STUDENTS">📚 عرض جميع الطلاب (لإضافة حلقة استثنائية/تعويضية)</option>
+            <select id="todayRosterModeSelect" class="form-select" style="width: auto; padding: 5px 10px; font-size: 0.76rem; font-weight: 800; color: var(--primary);">
+              <option value="TODAY_MATCH">📅 حلقات هذا اليوم فقط (تلقائي)</option>
+              <option value="ALL_STUDENTS">📚 جميع الطلاب (للتعويض أو الإضافة)</option>
             </select>
-            <input type="text" id="todayScheduleSearchInput" class="form-input" placeholder="🔍 بحث بطالب أو معلم..." style="width: 180px; padding: 6px 10px; font-size: 0.78rem;" />
-            <button type="button" id="btnCopyTeachersBriefToday" class="btn btn-soft">📲 نسخ ملخص المعلمين لواتساب</button>
+            <input type="text" id="todayScheduleSearchInput" class="form-input" placeholder="🔍 بحث بطالب أو معلم..." style="width: 175px; padding: 5px 10px; font-size: 0.76rem;" />
           </div>
         </div>
 
@@ -911,29 +957,39 @@
           <table>
             <thead>
               <tr>
-                <th style="width: 120px;">⏰ توقيت اليوم (مرن)</th>
-                <th>الطالب والموعد الثابت</th>
-                <th>المعلم المكلف</th>
-                <th style="width: 90px;">المدة (د)</th>
-                <th style="width: 115px;">رصيد الباقة</th>
-                <th style="width: 165px;">حالة حلقة اليوم</th>
-                <th id="thTodayApprovalCol" style="min-width: 280px;">اعتماد الحلقة بجوار الموعد (تمت / لم تتم + السبب)</th>
+                <th style="width: 112px;">⏰ الوقت</th>
+                <th>الطالب (الباقة والدولة)</th>
+                <th>المعلم</th>
+                <th style="width: 78px;">المدة</th>
+                <th style="width: 210px;">حالة التنفيذ والمعالجة المالية</th>
+                <th id="thTodayApprovalCol" style="width: 270px;">الإجراءات (تفتح عند الطلب)</th>
               </tr>
             </thead>
             <tbody id="todayScheduleDedicatedBody"></tbody>
           </table>
         </div>
-      </div>
 
-      <!-- مواعيد الطلاب الثابتة الأسبوعية للرجوع والتنسيق -->
-      <div class="card">
-        <div class="section-header">
-          <div>
-            <div class="section-title">🗓️ دليل المواعيد الثابتة للطلاب (Weekly Roster)</div>
-            <div class="section-desc">مواعيد كل طالب المقررة أسبوعياً لمعرفة مواعيد الغد وبعد الغد وتنسيق الجداول</div>
+        <!-- شريط تصدير التقارير الفوري من السجلات الفعلية (بدون كتابة يدوية مكررة) -->
+        <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--slate-300); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+          <div style="font-size: 0.78rem; font-weight: 800; color: var(--slate-700);">
+            📤 نسخ تقارير اليوم الجاهزة للواتساب (تتولد تلقائياً من السجلات المعتمدة أعلاه):
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button type="button" id="btnCopyTodayScheduleWhatsapp" class="btn btn-emerald" style="padding: 6px 12px; font-size: 0.76rem;">📲 1. نسخ تقرير التنفيذ اليومي</button>
+            <button type="button" id="btnQuickCopyQualityWaToday" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.76rem;">🌷 2. نسخ تقرير الجودة الأكاديمي</button>
+            <button type="button" id="btnCopyTeachersBriefToday" class="btn btn-soft" style="padding: 6px 12px; font-size: 0.76rem;">📋 3. ملخص مواعيد المعلمين</button>
+            <button type="button" id="btnQuickCopySecretWaToday" class="btn btn-danger-soft hidden" style="padding: 6px 12px; font-size: 0.76rem;">🔒 4. نسخ التقرير السري للإدارة</button>
           </div>
         </div>
-        <div class="table-wrap">
+      </div>
+
+      <!-- مواعيد الطلاب الثابتة الأسبوعية (قابلة للطي لتخفيف الازدحام البصري) -->
+      <details class="card" style="cursor:pointer;">
+        <summary style="font-size:0.95rem; font-weight:800; color:var(--primary); padding:4px 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+          <span>🗓️ دليل المواعيد الأسبوعية الثابتة للطلاب (اضغط هنا لفتح الجدول الكامل وتعديل المواعيد)</span>
+          <span class="status-pill pill-blue">عرض / إخفاء ▾</span>
+        </summary>
+        <div class="table-wrap" style="margin-top:12px;">
           <table>
             <thead>
               <tr>
@@ -949,7 +1005,7 @@
             <tbody id="studentsFixedScheduleRosterBody"></tbody>
           </table>
         </div>
-      </div>
+      </details>
     </section>
 
     <!-- ========================================================= -->
@@ -971,8 +1027,8 @@
         <div id="complianceStatusGrid" class="rates-grid"></div>
       </div>
 
-      <!-- القائمة التلقائية الذكية لحلقات ومعلمي اليوم (بدون بحث يدوي + ربط كامل بالجدول والمالية) -->
-      <div class="card" style="margin-bottom: 18px; border-color: var(--primary-light); background: #F8FAFC;">
+      <!-- القائمة التلقائية المكررة مخفية لتوحيد الإدخال من غرفة عمليات اليوم -->
+      <div id="legacyAutoRosterCard" class="card hidden" style="margin-bottom: 18px; border-color: var(--primary-light); background: #F8FAFC;">
         <div class="section-header">
           <div>
             <div class="section-title" style="color: var(--primary);">⚡ القائمة التلقائية لحلقات ومعلمي هذا اليوم (اضغط للتقييم الفوري أو تسجيل عدم الإتمام)</div>
@@ -986,18 +1042,19 @@
         <div id="autoScheduledSessionsRoster" class="table-wrap"></div>
       </div>
 
-      <!-- أزرار التبديل بين أنواع التقارير الأربعة + التحليلات -->
+      <!-- أزرار التبديل بين التقارير المعتمدة + السجل السري + التحليلات -->
       <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
-        <button type="button" class="btn btn-primary report-subtab-btn" data-rsub="execution">📋 1. تقرير التنفيذ والأسباب (تمت / لم تتم)</button>
-        <button type="button" class="btn btn-soft report-subtab-btn" data-rsub="academic">🌷 2. التقييم الأكاديمي وجودة المعلمين</button>
+        <button type="button" class="btn btn-primary report-subtab-btn" data-rsub="execution">📋 1. أرشيف تقرير التنفيذ اليومي</button>
+        <button type="button" class="btn btn-soft report-subtab-btn" data-rsub="academic">🌷 2. أرشيف التقييم الأكاديمي والجودة</button>
         <button type="button" class="btn btn-soft report-subtab-btn" data-rsub="trials">🌸 3. متابعة حلقات التجريبي</button>
-        <button type="button" class="btn btn-soft report-subtab-btn" data-rsub="analytics" id="btnSubtabAnalytics">📈 4. تحليلات الأداء التاريخية (معلمين / طلاب / إشراف)</button>
+        <button type="button" class="btn btn-soft report-subtab-btn" data-rsub="confidential" id="btnSubtabConfidential">🔒 4. السجل الرقابي والملاحظات السرية</button>
+        <button type="button" class="btn btn-soft report-subtab-btn" data-rsub="analytics" id="btnSubtabAnalytics">📈 5. تحليلات الأداء التراكمية</button>
       </div>
 
       <!-- القسم الفرعي 1: تقرير التنفيذ والأسباب -->
       <div id="rsub-execution" class="report-subpanel">
-        <div class="grid-1-2">
-          <div class="card">
+        <div style="display:block;">
+          <div class="card hidden">
             <div class="section-header">
               <div>
                 <div class="section-title">📝 تسجيل نتيجة حلقة في تقرير التنفيذ</div>
@@ -1058,8 +1115,8 @@
 
       <!-- القسم الفرعي 2: التقييم الأكاديمي وجودة المعلمين (الخانات الإلزامية الدقيقة) -->
       <div id="rsub-academic" class="report-subpanel hidden">
-        <div class="grid-1-2">
-          <div class="card">
+        <div style="display:block;">
+          <div class="card hidden">
             <div class="section-header">
               <div>
                 <div class="section-title">🌷 استمارة التقييم الأكاديمي الإلزامية</div>
@@ -1255,7 +1312,21 @@
         </div>
       </div>
 
-      <!-- القسم الفرعي 4: تحليلات الأداء التاريخية (معلمين / طلاب / إشراف) -->
+      <!-- القسم الفرعي 4: السجل الرقابي والملاحظات السرية (منفصل تماماً عن تقارير الواتساب العامة) -->
+      <div id="rsub-confidential" class="report-subpanel hidden">
+        <div class="card" style="border-color: #FECDD3; background: #FFFDFD;">
+          <div class="section-header">
+            <div>
+              <div class="section-title" style="color: #9F1239;">🔒 سجل الملاحظات الإشرافية السرية والرقابية</div>
+              <div class="section-desc">الملاحظات المدونة هنا خاصة بالإدارة ولا تظهر أبداً في تقارير الواتساب العامة للمعلمين (كل مشرف يرى ما كتبه فقط، وتراها الإدارة وصاحب الأكاديمية بالكامل)</div>
+            </div>
+            <button type="button" id="btnCopyConfidentialReportWa" class="btn btn-danger-soft">🔒 نسخ التقرير الرقابي السري للإدارة</button>
+          </div>
+          <div id="confidentialNotesListContainer"></div>
+        </div>
+      </div>
+
+      <!-- القسم الفرعي 5: تحليلات الأداء التاريخية (معلمين / طلاب / إشراف) -->
       <div id="rsub-analytics" class="report-subpanel hidden">
         <div class="card">
           <div class="section-header">
@@ -1309,9 +1380,39 @@
           <span>👔 أرباح الإدارة الصافية (الثلث)</span>
         </div>
         <div class="kpi-value" style="color: var(--indigo);" id="kpiAdminShare">0.00</div>
-        <div class="kpi-sub" id="kpiAcademySub">نصيب الأكاديمية (الثلثين): 0.00</div>
+        <div class="kpi-sub" id="kpiAcademySub">نسبة الأكاديمية (الثلثين): 0.00</div>
       </div>
     </section>
+
+    <!-- الملخص الكبير الرئيسي للأكاديمية (إجمالي المعلمين والطلاب + ملخص حلقات اليوم وأسباب الاعتذار + رادار تكرار الانقطاع) -->
+    <div id="executiveAcademyOverview" class="card" style="margin-bottom: 18px; border: 2px solid var(--primary-light); background: linear-gradient(to left, #FFFFFF, #F8FAFC);">
+      <div class="section-header" style="margin-bottom: 12px;">
+        <div>
+          <div class="section-title" style="color: var(--primary); font-size: 1.08rem;">🏛️ الملخص الرئيسي الشامل للأكاديمية وحلقات اليوم</div>
+          <div class="section-desc">نظرة فورية على إجمالي معلميك وطلابك، وما تم أو اعتُذر عنه اليوم مع الأسباب، ورادار التنبيه المبكر بتكرار انقطاع أي طالب</div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button type="button" class="btn btn-soft" id="btnExecGoToday" style="padding:6px 12px; font-size:0.76rem;">📅 فتح جدول حلقات اليوم ←</button>
+          <button type="button" class="btn btn-soft" id="btnExecGoTeachers" style="padding:6px 12px; font-size:0.76rem;">👤 إدارة المعلمين ←</button>
+          <button type="button" class="btn btn-soft" id="btnExecGoStudents" style="padding:6px 12px; font-size:0.76rem;">🎓 إدارة الطلاب ←</button>
+        </div>
+      </div>
+
+      <!-- الصف الأول: الأعداد الرئيسية للمعلمين والطلاب وملخص تنفيذ اليوم -->
+      <div class="grid-3" style="gap: 12px; margin-bottom: 14px;" id="execTopCountersGrid"></div>
+
+      <!-- الصف الثاني: تفصيل حلقات اليوم التي لم تتم أو تحتاج توضيح السبب + رادار تكرار انقطاع الطلاب -->
+      <div class="grid-2" style="gap: 14px;">
+        <div style="background: #FFFDF7; border: 1px solid var(--amber-border); border-radius: 12px; padding: 12px;">
+          <div style="font-size: 0.84rem; font-weight: 800; color: #92400E; margin-bottom: 8px;">📋 موقف حلقات اليوم وأسباب الاعتذار / ما يحتاج توضيحاً:</div>
+          <div id="execTodayReasonsBox"></div>
+        </div>
+        <div style="background: #FFF1F2; border: 1px solid #FECDD3; border-radius: 12px; padding: 12px;">
+          <div style="font-size: 0.84rem; font-weight: 800; color: #9F1239; margin-bottom: 8px;">🚨 رادار التنبيه بتكرار انقطاع الطلاب (مؤشر خطر التسرب):</div>
+          <div id="execDropoutRadarBox"></div>
+        </div>
+      </div>
+    </div>
 
 
 
@@ -1896,12 +1997,15 @@
               <div style="font-size: 0.8rem; font-weight: 800; color: #065F46; margin-bottom: 8px;">2️⃣ العمليات والتعديلات المسموح للمشرف القيام بها:</div>
               <div class="grid-2" style="font-size: 0.78rem; gap: 8px;">
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_edit_schedule" checked /> <span>تغيير مواعيد وساعات الحلقات</span></label>
-                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_approve_today" checked /> <span>اعتماد حلقات اليوم (تمت / لم تتم)</span></label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_approve_today" checked /> <span>⚡ اعتماد تنفيذ حلقات اليوم</span></label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_evaluate_quality" checked /> <span>🌷 إصدار تقييم الجودة</span></label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_add_confidential" checked /> <span>🔒 كتابة ملاحظة سرية للإدارة</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_add_lesson" checked /> <span>تسجيل حلقات جديدة</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_edit_teachers" checked /> <span>إضافة وتعديل بيانات المعلمين</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_see_teacher_rates" /> <span>رؤية أسعار ساعات المعلمين وأجورهم</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_edit_students" checked /> <span>إضافة وتعديل الطلاب والباقات</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_see_student_money" /> <span>رؤية مبالغ باقات الطلاب</span></label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#9F1239;"><input type="checkbox" id="perm_view_unpaid_alert" checked /> <span>🔔 رؤية تذكير الطلاب غير المجددين/غير المسددين</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_delete_items" checked /> <span>نقل عناصر لسلة المحذوفات</span></label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="perm_copy_whatsapp" checked /> <span>نسخ جداول وكشوف الواتساب</span></label>
               </div>
@@ -2094,9 +2198,12 @@
           view_today: true, view_reports: true, view_all_reports: true, view_analytics: true,
           view_lessons: true, view_teachers: true, view_students: true, view_campaigns: true,
           view_trash: true, view_finance: true, edit_schedule: false,
-          approve_today_lessons: false, add_lesson: false,
+          approve_today_lessons: false,
+          evaluate_quality: false,
+          add_confidential_note: false, add_lesson: false,
           edit_teachers: false, see_teacher_rates: true, edit_students: false,
-          see_student_money: true, delete_items: false, copy_whatsapp: true
+          see_student_money: true,
+          view_unpaid_renewal_alert: true, delete_items: false, copy_whatsapp: true
         }
       },
       {
@@ -2108,9 +2215,12 @@
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: true, view_teachers: true, view_students: true, view_campaigns: false,
           view_trash: false, view_finance: false, edit_schedule: true,
-          approve_today_lessons: true, add_lesson: true,
+          approve_today_lessons: true,
+          evaluate_quality: true,
+          add_confidential_note: true, add_lesson: true,
           edit_teachers: true, see_teacher_rates: true, edit_students: true,
-          see_student_money: true, delete_items: true, copy_whatsapp: true
+          see_student_money: true,
+          view_unpaid_renewal_alert: true, delete_items: true, copy_whatsapp: true
         }
       },
       {
@@ -2122,9 +2232,12 @@
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: true, view_teachers: true, view_students: false, view_campaigns: false,
           view_trash: false, view_finance: false, edit_schedule: false,
-          approve_today_lessons: false, add_lesson: false,
+          approve_today_lessons: false,
+          evaluate_quality: true,
+          add_confidential_note: true, add_lesson: false,
           edit_teachers: true, see_teacher_rates: true, edit_students: true,
-          see_student_money: false, delete_items: true, copy_whatsapp: true
+          see_student_money: false,
+          view_unpaid_renewal_alert: false, delete_items: true, copy_whatsapp: true
         }
       },
       {
@@ -2136,9 +2249,12 @@
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: true, view_teachers: true, view_students: true, view_campaigns: false,
           view_trash: true, view_finance: false, edit_schedule: true,
-          approve_today_lessons: true, add_lesson: true,
+          approve_today_lessons: true,
+          evaluate_quality: true,
+          add_confidential_note: true, add_lesson: true,
           edit_teachers: true, see_teacher_rates: true, edit_students: true,
-          see_student_money: false, delete_items: true, copy_whatsapp: true
+          see_student_money: false,
+          view_unpaid_renewal_alert: true, delete_items: true, copy_whatsapp: true
         }
       },
       {
@@ -2150,9 +2266,12 @@
           view_today: true, view_reports: true, view_all_reports: false, view_analytics: false,
           view_lessons: false, view_teachers: false, view_students: false, view_campaigns: false,
           view_trash: false, view_finance: false, edit_schedule: true,
-          approve_today_lessons: true, add_lesson: false,
+          approve_today_lessons: true,
+          evaluate_quality: true,
+          add_confidential_note: true, add_lesson: false,
           edit_teachers: false, see_teacher_rates: false, edit_students: false,
-          see_student_money: false, delete_items: false, copy_whatsapp: true
+          see_student_money: false,
+          view_unpaid_renewal_alert: false, delete_items: false, copy_whatsapp: true
         }
       }
     ];
@@ -2183,12 +2302,13 @@
       { id: 's_1794647493701', name: 'أحمد تيبار', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794552115707', totalLessons: 4, defaultDurationMin: 60, consumedLessons: 1, scheduleText: 'السبت الساعة 4 ظهرا توقيت مصر وليبيا', foreignPackageText: '120 دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
       { id: 's_1794647720166', name: 'الواثق بالله', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794552642342', totalLessons: 4, defaultDurationMin: 30, consumedLessons: 1, scheduleText: 'السبت الساعة 9صبا توقيت مصر وليبيا', foreignPackageText: '60دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
       { id: 's_1794648010943', name: 'ابتسام محمد', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794553058923', totalLessons: 4, defaultDurationMin: 30, consumedLessons: 2, scheduleText: 'السبت الساعة 9مساء توقيت مصر وليبيا', foreignPackageText: '60دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
-      { id: 's_1794648106186', name: 'فاطمة الزرووق', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794513928944', totalLessons: 8, defaultDurationMin: 30, consumedLessons: 5, scheduleText: 'السبت والثلاثاء الساعة 8 صباحا توقيت مصر وليبيا', foreignPackageText: '120 دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
+      { id: 's_1794648106186', name: 'فاطمة الزرووق', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794513928944', totalLessons: 8, defaultDurationMin: 30, consumedLessons: 5, scheduleText: 'السبت والثلاثاء الساعة 8 صباحا توقيت مصر وليبيا', foreignPackageText: '120 دينار', tuitionReceived: 360, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
       { id: 's_1794649744477', name: 'سيليا', country: 'تونس', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794648297043', totalLessons: 12, defaultDurationMin: 60, consumedLessons: 6, scheduleText: 'السبت والأحد الساعة 3 توقيت مصر الساعة 2 توقيت تونس /الثلاثاء الساعة 7 توقيت مصر الساعة 6 توقيت تونس', foreignPackageText: '360دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
       { id: 's_1794649834383', name: 'بلقيس', country: 'تونس', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794648297043', totalLessons: 12, defaultDurationMin: 60, consumedLessons: 0, scheduleText: 'السبت والأحد الساعة 4 توقيت مصر الساعة 2 توقيت تونس /الاربعاء الساعة 7 توقيت مصر الساعة 6 توقيت تونس', foreignPackageText: '360دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'UNPAID', renewalStatus: 'NEW_SUB' },
       { id: 's_1794649995553', name: 'مؤنس حمزة', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794514229389', totalLessons: 8, defaultDurationMin: 30, consumedLessons: 0, scheduleText: 'السبت والأربعاء الساعة 7 مساء توقيت ليبيا ومصر', foreignPackageText: '120 دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'UNPAID', renewalStatus: 'NEW_SUB' },
-      { id: 's_1794650332108', name: 'رنيم رضا', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794513928944', totalLessons: 16, defaultDurationMin: 30, consumedLessons: 14, scheduleText: 'السبت والاثنين والاربعاء الساعه 8,30 مساء توقيت مصر وليبيا', foreignPackageText: '240 دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
-      { id: 's_1794650585150', name: 'عبد المنعم الساعدي', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794552642342', totalLessons: 4, defaultDurationMin: 30, consumedLessons: 3, scheduleText: 'السبت الساعة 7 مساء توقيت مصر وليبيا', foreignPackageText: '60 دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' }
+      { id: 's_1794650332108', name: 'رنيم رضا', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794513928944', totalLessons: 16, defaultDurationMin: 30, consumedLessons: 15, scheduleText: 'السبت والاثنين والاربعاء الساعه 8,30 مساء توقيت مصر وليبيا', foreignPackageText: '240 دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
+      { id: 's_1794650585150', name: 'عبد المنعم الساعدي', country: 'ليبيا', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794552642342', totalLessons: 4, defaultDurationMin: 30, consumedLessons: 4, scheduleText: 'السبت الساعة 7 مساء توقيت مصر وليبيا', foreignPackageText: '60 دينار', tuitionReceived: 0, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'CREDIT_ALLOWED', renewalStatus: 'PENDING_RENEWAL' },
+      { id: 's_1794746702834', name: 'احمد الفاروق', country: 'السعودية', adCampaign: 'اعلان_نوفمبر', teacherId: 't_1794500798921', totalLessons: 8, defaultDurationMin: 45, consumedLessons: 4, scheduleText: 'السبت والثلاثاء 5:00 م', foreignPackageText: '15 دينار', tuitionReceived: 1200, subStartDate: '2026-11-01', renewalDate: '2026-12-01', paymentStatus: 'PAID', renewalStatus: 'RENEWED' }
     ];
 
     var DEFAULT_CAMPAIGNS = [
@@ -2311,6 +2431,10 @@
       todayScheduleSearch: '',
       customDayTimes: {},
       activeNotDoneRowKey: null,
+      activeRowDrawer: null,
+      todayStatusFilter: 'ALL',
+      adminUnpaidBannerOpen: false,
+      confidentialNotes: [],
       lessonsTabDateFilter: '',
       activeCodeTab: 'apps_script',
       webhookUrl: 'https://script.google.com/macros/s/AKfycbxsXs8hNg16CiLPe_GFOBUcX7Zewk1L_lRnkzueC9wJ2szLxevsrkcqLrzyBWC9xsdC/exec',
@@ -2369,7 +2493,7 @@
       "      mSheet.appendRow(['الربح الصافي الأولي', s.initialNetProfit, payload.updatedAt]);",
       "      mSheet.appendRow(['مخصص الإعلانات', s.adBudget, payload.updatedAt]);",
       "      mSheet.appendRow(['الصدقة المباركة (5%)', s.charityAmount, payload.updatedAt]);",
-      "      mSheet.appendRow(['نصيب الأكاديمية (الثلثين)', s.academyShare, payload.updatedAt]);",
+      "      mSheet.appendRow(['نسبة الأكاديمية (الثلثين)', s.academyShare, payload.updatedAt]);",
       "      mSheet.appendRow(['أرباح الإدارة الصافية (الثلث)', s.adminShare, payload.updatedAt]);",
       "    }",
       "",
@@ -2486,9 +2610,9 @@
         }
       });
       state.supervisors = state.supervisors.map(function (sp, idx) {
-        if (!sp.accessCode) {
-          var defMatch = DEFAULT_SUPERVISORS.find(function (d) { return d.id === sp.id; });
-          sp.accessCode = defMatch ? defMatch.accessCode : String(1001 + idx);
+        var defMatch = DEFAULT_SUPERVISORS.find(function (d) { return d.id === sp.id; });
+        if (!sp.accessCode || (sp.id === 'sup_1' && sp.accessCode === '1001')) {
+          sp.accessCode = defMatch ? defMatch.accessCode : String(1005 + idx);
         }
         return sp;
       });
@@ -2555,6 +2679,7 @@
           if (typeof parsed.sessionAuthenticated === 'boolean') state.sessionAuthenticated = parsed.sessionAuthenticated;
           if (parsed.hostedAppUrl) state.hostedAppUrl = parsed.hostedAppUrl;
           if (parsed.customDayTimes) state.customDayTimes = parsed.customDayTimes;
+          if (Array.isArray(parsed.confidentialNotes)) state.confidentialNotes = parsed.confidentialNotes;
         }
       } catch (e) {}
       purgeDemoItemsFromState();
@@ -2651,18 +2776,53 @@
       showToast('♻️ تم استرجاع "' + entry.title + '" وإعادة حساباته كما كانت بنجاح', false);
     }
 
-    function copyText(text, label) {
+    function performRawCopy(text) {
+      var copiedOk = false;
       try {
         var ta = document.createElement('textarea');
         ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '0';
+        ta.style.left = '0';
+        ta.style.width = '2em';
+        ta.style.height = '2em';
+        ta.style.opacity = '0';
+        ta.style.zIndex = '-1';
         document.body.appendChild(ta);
+        ta.focus();
         ta.select();
-        document.execCommand('copy');
+        ta.setSelectionRange(0, text.length);
+        copiedOk = document.execCommand('copy');
         document.body.removeChild(ta);
-        showToast('تم نسخ ' + label + ' بنجاح', false);
-      } catch (e) {
-        showToast('تم نسخ ' + label, false);
+      } catch (e) {}
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          navigator.clipboard.writeText(text).catch(function () {});
+        } catch (e2) {}
       }
+      return copiedOk;
+    }
+
+    function copyText(text, label) {
+      var cleanLabel = label || 'النص';
+      var ok = performRawCopy(text);
+
+      // فتح صندوق النسخ المضمون وتحديد النص بداخله تلقائياً ليتأكد المستخدم وينسخه بضغطة واحدة في كل البيئات
+      var modal = document.getElementById('instantCopyBoxModal');
+      var titleEl = document.getElementById('instantCopyBoxTitle');
+      var areaEl = document.getElementById('instantCopyTextarea');
+      if (modal && areaEl) {
+        if (titleEl) titleEl.textContent = '📋 ' + cleanLabel + (ok ? ' (تم النسخ للحافظة ✅)' : ' (اضغط نسخ أو Ctrl+C)');
+        areaEl.value = text;
+        modal.classList.remove('hidden');
+        setTimeout(function () {
+          areaEl.focus();
+          areaEl.select();
+          try { areaEl.setSelectionRange(0, text.length); } catch (e) {}
+        }, 60);
+      }
+      showToast('✅ تم تجهيز ونسخ: ' + cleanLabel, false);
     }
 
     function computeFinancials() {
@@ -2812,11 +2972,14 @@
           view_finance: true,
           edit_schedule: true,
           approve_today_lessons: true,
+          evaluate_quality: true,
+          add_confidential_note: true,
           add_lesson: true,
           edit_teachers: true,
           see_teacher_rates: true,
           edit_students: true,
           see_student_money: true,
+          view_unpaid_renewal_alert: true,
           delete_items: true,
           copy_whatsapp: true
         };
@@ -2837,12 +3000,15 @@
       { key: 'view_finance', label: '📊 رؤية الميزانية والأرباح' },
       { key: 'view_campaigns', label: '📢 رؤية الحملات الإعلانية' },
       { key: 'edit_schedule', label: '⏰ تعديل المواعيد والساعات' },
-      { key: 'approve_today_lessons', label: '✅ اعتماد حلقات اليوم (تمت / لم تتم)' },
+      { key: 'approve_today_lessons', label: '⚡ اعتماد تنفيذ حلقات اليوم والمالية' },
+      { key: 'evaluate_quality', label: '🌷 إصدار تقييم الجودة التربوية' },
+      { key: 'add_confidential_note', label: '🔒 كتابة ملاحظة سرية للإدارة' },
       { key: 'add_lesson', label: '➕ إضافة وتسجيل الحلقات' },
       { key: 'edit_teachers', label: '✏️ إضافة وتعديل المعلمين' },
       { key: 'see_teacher_rates', label: '💵 رؤية أسعار وأجور المعلمين' },
       { key: 'edit_students', label: '🎓 إضافة وتعديل الطلاب' },
       { key: 'see_student_money', label: '💰 رؤية مبالغ باقات الطلاب' },
+      { key: 'view_unpaid_renewal_alert', label: '🔔 إظهار تذكير الطلاب غير المجددين وغير المسددين' },
       { key: 'delete_items', label: '🗑️ الحذف والنقل للسلة' },
       { key: 'copy_whatsapp', label: '📲 نسخ رسائل الواتساب' }
     ];
@@ -3161,6 +3327,35 @@
         }
       }
 
+      // 3-ب. عرض السجل الرقابي والملاحظات السرية
+      var btnConfTab = document.getElementById('btnSubtabConfidential');
+      if (btnConfTab) btnConfTab.classList.toggle('hidden', !(perms.isAdmin || perms.view_all_reports || perms.add_confidential_note !== false));
+
+      var confContainer = document.getElementById('confidentialNotesListContainer');
+      if (confContainer) {
+        var visibleConfList = (state.confidentialNotes || []).filter(function (c) {
+          if (perms.isAdmin || perms.view_all_reports) return true;
+          return c.createdBySupervisorId === activeSup.id;
+        });
+        if (visibleConfList.length === 0) {
+          confContainer.innerHTML = '<div style="padding:20px; text-align:center; color:var(--slate-500); background:var(--slate-50); border-radius:10px;">لا توجد ملاحظات إشرافية سرية مسجلة حالياً.</div>';
+        } else {
+          confContainer.innerHTML = visibleConfList.map(function (c) {
+            return '<div class="card" style="margin-bottom:8px; padding:12px; background:#FFF1F2; border-color:#FECDD3;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' +
+                '<div>' +
+                  '<span class="status-pill pill-rose">' + escHtml(c.category || 'ملاحظة سرية') + '</span> ' +
+                  '<strong>الطالب: ' + escHtml(c.studentName || '—') + '</strong> | <strong>المعلم: ' + escHtml(c.teacherName || '—') + '</strong> (' + escHtml(c.date) + ')' +
+                  '<div style="font-size:0.82rem; color:#881337; font-weight:700; margin-top:4px;">🔒 ' + escHtml(c.text) + '</div>' +
+                  '<div style="font-size:0.72rem; color:var(--slate-500); margin-top:2px;">مسجلة بواسطة: ' + escHtml(c.createdByName) + ' (' + escHtml(c.createdAt) + ')</div>' +
+                '</div>' +
+                (perms.delete_items ? '<button type="button" class="btn btn-danger-soft" data-del-secret-note="' + c.id + '">حذف</button>' : '') +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
       // 4. تحليلات الأداء التاريخية التراكمية
       var analyticsContainer = document.getElementById('analyticsSummaryContainer');
       if (analyticsContainer) {
@@ -3248,6 +3443,173 @@
       }
 
       return false;
+    }
+
+
+    function computeStudentDropoutStats() {
+      var statsByStudent = {};
+
+      // فحص جميع تقارير التنفيذ التي لم تتم عبر كل التواريخ
+      (state.dailyReports || []).forEach(function (r) {
+        if (r.type !== 'EXECUTION' || r.status !== 'NOT_DONE') return;
+        var key = r.studentId || r.studentName || 'غير محدد';
+        if (!statsByStudent[key]) {
+          var stObj = state.students.find(function (s) { return s.id === r.studentId || s.name === r.studentName; });
+          var tObj = state.teachers.find(function (t) { return t.id === r.teacherId || t.name === r.teacherName; });
+          statsByStudent[key] = {
+            studentId: stObj ? stObj.id : (r.studentId || ''),
+            studentName: stObj ? stObj.name : (r.studentName || 'طالب'),
+            teacherName: tObj ? tObj.name : (r.teacherName || 'غير محدد'),
+            missedCount: 0,
+            reasons: [],
+            dates: []
+          };
+        }
+        statsByStudent[key].missedCount += 1;
+        var rText = r.note || REASON_LABELS[r.reasonCat] || 'لم تتم الحلقة';
+        if (statsByStudent[key].reasons.indexOf(rText) === -1) statsByStudent[key].reasons.push(rText);
+        if (r.date && statsByStudent[key].dates.indexOf(r.date) === -1) statsByStudent[key].dates.push(r.date);
+      });
+
+      // فحص سجل الحلقات المالي لحالات الغياب ABSENCE غير المكررة في نفس اليوم
+      (state.lessons || []).forEach(function (l) {
+        if (l.treatment !== 'ABSENCE') return;
+        var stObj = state.students.find(function (s) { return s.id === l.studentId; });
+        var key = l.studentId || (stObj ? stObj.name : '');
+        if (!key) return;
+        if (!statsByStudent[key]) {
+          var tObj = state.teachers.find(function (t) { return t.id === l.teacherId; });
+          statsByStudent[key] = {
+            studentId: l.studentId,
+            studentName: stObj ? stObj.name : 'طالب',
+            teacherName: tObj ? tObj.name : 'غير محدد',
+            missedCount: 0,
+            reasons: [],
+            dates: []
+          };
+        }
+        if (statsByStudent[key].dates.indexOf(l.date) === -1) {
+          statsByStudent[key].missedCount += 1;
+          statsByStudent[key].dates.push(l.date);
+          if (l.notes && statsByStudent[key].reasons.indexOf(l.notes) === -1) statsByStudent[key].reasons.push(l.notes);
+        }
+      });
+
+      var list = Object.keys(statsByStudent).map(function (k) { return statsByStudent[k]; });
+      list.sort(function (a, b) { return b.missedCount - a.missedCount; });
+      return list;
+    }
+
+    function renderExecutiveOverviewAndDropoutRadar(summary) {
+      var d = state.scheduleDateFilter || '2026-11-15';
+      var dayIdx = getDayIndexFromIsoDate(d);
+      var dayName = ARABIC_DAYS_MAP[dayIdx] || '';
+      var todayRows = buildCombinedTodayRows(d, 'TODAY_MATCH');
+
+      var doneToday = todayRows.filter(function (r) { return r.status === 'DONE'; });
+      var notDoneToday = todayRows.filter(function (r) { return r.status === 'NOT_DONE'; });
+      var pendingToday = todayRows.filter(function (r) { return r.status === 'PENDING'; });
+
+      var totalTeachers = state.teachers.length;
+      var idleTeachers = summary.idleTeachers || 0;
+      var activeTeachers = Math.max(0, totalTeachers - idleTeachers);
+
+      var totalStudents = state.students.length;
+      var paidStudents = state.students.filter(function (s) { return (s.paymentStatus || 'PAID') === 'PAID'; }).length;
+      var unpaidOrCreditStudents = totalStudents - paidStudents;
+      var nearRenewalStudents = state.students.filter(function (s) { return (s.totalLessons - s.consumedLessons) <= 1; }).length;
+
+      // 1. تحديث العدادات الثلاثة الكبرى في الصفحة الرئيسية
+      var topGrid = document.getElementById('execTopCountersGrid');
+      if (topGrid) {
+        topGrid.innerHTML =
+          '<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:12px; padding:12px;">' +
+            '<div style="font-size:0.78rem; color:#1E3A8A; font-weight:700;">👤 إجمالي معلمي الأكاديمية</div>' +
+            '<div style="font-size:1.55rem; font-weight:900; color:#1E3A8A; margin:4px 0;">' + totalTeachers + ' معلماً ومعلمة</div>' +
+            '<div style="font-size:0.75rem; color:#1E40AF;">✅ مكلفون بطلاب: <strong>' + activeTeachers + '</strong> • ⚠️ جاهزون لطلاب جدد: <strong>' + idleTeachers + '</strong></div>' +
+          '</div>' +
+          '<div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:12px; padding:12px;">' +
+            '<div style="font-size:0.78rem; color:#065F46; font-weight:700;">🎓 إجمالي طلاب الأكاديمية المسجلين</div>' +
+            '<div style="font-size:1.55rem; font-weight:900; color:#065F46; margin:4px 0;">' + totalStudents + ' طالباً وطالبة</div>' +
+            '<div style="font-size:0.75rem; color:#047857;">💳 مسدد: <strong>' + paidStudents + '</strong> • 🚨 آجل/لم يدفع: <strong>' + unpaidOrCreditStudents + '</strong> • 🔔 وشيك التجديد: <strong>' + nearRenewalStudents + '</strong></div>' +
+          '</div>' +
+          '<div style="background:#F5F3FF; border:1px solid #DDD6FE; border-radius:12px; padding:12px;">' +
+            '<div style="font-size:0.78rem; color:#4C1D95; font-weight:700;">📅 ملخص حلقات يوم ' + dayName + ' (' + d + ')</div>' +
+            '<div style="font-size:1.45rem; font-weight:900; color:#4C1D95; margin:4px 0;">إجمالي اليوم: ' + todayRows.length + ' حلقة</div>' +
+            '<div style="font-size:0.76rem; font-weight:800;">' +
+              '<span style="color:#059669;">✅ تمت: ' + doneToday.length + '</span> • ' +
+              '<span style="color:#E11D48;">⭕ اعتذر/لم تتم: ' + notDoneToday.length + '</span> • ' +
+              '<span style="color:#D97706;">⏳ بالانتظار: ' + pendingToday.length + '</span>' +
+            '</div>' +
+          '</div>';
+      }
+
+      // 2. تحديث صندوق أسباب عدم إتمام حلقات اليوم وما يحتاج توضيحاً
+      var reasonsBox = document.getElementById('execTodayReasonsBox');
+      if (reasonsBox) {
+        if (notDoneToday.length === 0 && pendingToday.length === 0) {
+          reasonsBox.innerHTML = '<div style="font-size:0.78rem; color:#065F46; font-weight:700; padding:6px 0;">🎉 جميع حلقات هذا اليوم تمت بنجاح ولا توجد أي اعتذارات أو حلقات معلقة!</div>';
+        } else {
+          var itemsHtml = '';
+          notDoneToday.forEach(function (r) {
+            var hasClearReason = r.reasonNote && r.reasonNote.trim().length > 3 && r.reasonNote !== 'لم تتم الحلقة';
+            itemsHtml += '<div style="padding:6px 8px; background:#FFFFFF; border:1px solid #FDE68A; border-radius:8px; margin-bottom:6px; font-size:0.76rem; display:flex; justify-content:space-between; align-items:center; gap:6px;">' +
+              '<div>⭕ <strong>' + escHtml(r.studentName) + '</strong> (مع ' + escHtml(r.teacherName) + ') — ' +
+                (hasClearReason
+                  ? ('<span style="color:#92400E; font-weight:700;">السبب: ' + escHtml(r.reasonNote) + '</span>')
+                  : '<span class="status-pill pill-rose" style="font-size:0.68rem;">⚠️ السبب غير موضح — يحتاج توضيحاً من الإشراف</span>') +
+              '</div>' +
+              '<span style="font-size:0.7rem; color:var(--slate-500);">' + r.time + '</span>' +
+            '</div>';
+          });
+          if (pendingToday.length > 0) {
+            itemsHtml += '<div style="font-size:0.75rem; color:#B45309; font-weight:700; margin-top:4px;">⏳ يوجد (' + pendingToday.length + ') حلقات مجدولة اليوم لم يسجل الإشراف نتيجتها بعد: ' +
+              pendingToday.map(function (p) { return escHtml(p.studentName) + ' (' + p.time + ')'; }).join('، ') +
+            '</div>';
+          }
+          reasonsBox.innerHTML = itemsHtml;
+        }
+      }
+
+      // 3. تحديث رادار التنبيه بتكرار انقطاع الطلاب (في الصفحة الرئيسية وفي أعلى جدول اليوم)
+      var dropoutList = computeStudentDropoutStats();
+      var radarBox = document.getElementById('execDropoutRadarBox');
+      var todayDropoutBanner = document.getElementById('todayDropoutBannerBox');
+
+      if (radarBox) {
+        if (dropoutList.length === 0) {
+          radarBox.innerHTML = '<div style="font-size:0.78rem; color:#065F46; font-weight:700; padding:6px 0;">✅ لا يوجد أي طالب مسجل عليه انقطاع أو اعتذار في السجلات الحالية.</div>';
+        } else {
+          radarBox.innerHTML = dropoutList.map(function (item) {
+            var isRepeated = item.missedCount >= 2;
+            return '<div style="padding:7px 10px; background:#FFFFFF; border:1px solid ' + (isRepeated ? '#F43F5E' : '#FECDD3') + '; border-radius:8px; margin-bottom:6px; font-size:0.76rem;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                '<strong>' + (isRepeated ? '🚨 تكرار انقطاع خطير: ' : '⚠️ انقطاع مسجل: ') + escHtml(item.studentName) + ' (مع ' + escHtml(item.teacherName) + ')</strong>' +
+                '<span class="status-pill ' + (isRepeated ? 'pill-rose' : 'pill-amber') + '">' + item.missedCount + ' مرات لم تتم</span>' +
+              '</div>' +
+              '<div style="font-size:0.72rem; color:#881337; margin-top:3px;">الأسباب: ' + escHtml(item.reasons.join(' | ')) + ' (' + escHtml(item.dates.join('، ')) + ')</div>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
+      if (todayDropoutBanner) {
+        var highRiskList = dropoutList.filter(function (x) { return x.missedCount >= 1; });
+        if (highRiskList.length > 0) {
+          todayDropoutBanner.classList.remove('hidden');
+          todayDropoutBanner.innerHTML = '<div style="font-size:0.78rem; color:#881337;">' +
+            '<strong>🔔 رادار متابعة انقطاع الطلاب:</strong> ' +
+            highRiskList.map(function (x) {
+              return '<span class="status-pill pill-rose" style="margin:2px 4px; border:1px solid #F43F5E;">' +
+                (x.missedCount >= 2 ? '🚨 تكرار انقطاع (' + x.missedCount + '): ' : '⚠️ لم تتم سابقاً (' + x.missedCount + '): ') +
+                escHtml(x.studentName) + ' — ' + escHtml(x.reasons[0] || '') +
+              '</span>';
+            }).join('') +
+          '</div>';
+        } else {
+          todayDropoutBanner.classList.add('hidden');
+        }
+      }
     }
 
     function renderSupervisorsTab() {
@@ -3401,6 +3763,7 @@
 
       // منع المشرف تماماً من الاحتفاظ بأي نسخة جوجل شيت أو CSV أو JSON على جهازه
       var allExportAndSheetButtons = [
+        'btnToggleExportMenu',
         'btnDownloadAdminAppDirect',
         'btnDownloadOwnerAppDirect',
         'btnDownloadSupAppDirect',
@@ -3533,7 +3896,8 @@
         supervisorHideFinance: state.supervisorHideFinance,
         adminAccessCode: state.adminAccessCode,
         hostedAppUrl: state.hostedAppUrl,
-        customDayTimes: state.customDayTimes
+        customDayTimes: state.customDayTimes,
+        confidentialNotes: state.confidentialNotes
       };
 
       fetch(url, {
@@ -3607,6 +3971,7 @@
             if (sh.adminAccessCode) state.adminAccessCode = sh.adminAccessCode;
             if (sh.hostedAppUrl) state.hostedAppUrl = sh.hostedAppUrl;
             if (sh.customDayTimes) state.customDayTimes = Object.assign({}, state.customDayTimes, sh.customDayTimes);
+            if (Array.isArray(sh.confidentialNotes)) state.confidentialNotes = mergeArraysById(sh.confidentialNotes, state.confidentialNotes, 'id');
             purgeDemoItemsFromState();
             state.lastUpdatedBy = data.updatedBy || 'الفريق';
             state.lastUpdatedAt = data.updatedAt || new Date().toLocaleString('ar-EG');
@@ -3670,7 +4035,7 @@
       document.getElementById('kpiPendingWages').textContent = summary.totalTeacherPending.toFixed(2) + ' ' + cur;
       document.getElementById('kpiCharity').textContent = summary.charityAmount.toFixed(2) + ' ' + cur;
       document.getElementById('kpiAdminShare').textContent = summary.adminShare.toFixed(2) + ' ' + cur;
-      document.getElementById('kpiAcademySub').textContent = 'نصيب الأكاديمية (الثلثين): ' + summary.academyShare.toFixed(2) + ' ' + cur;
+      document.getElementById('kpiAcademySub').textContent = 'نسبة الأكاديمية (الثلثين): ' + summary.academyShare.toFixed(2) + ' ' + cur;
 
       // تحديث الشارات في التبويبات
       document.getElementById('badgeLessonsCount').textContent = String(state.lessons.length);
@@ -3710,7 +4075,7 @@
         '<div class="matrix-box"><span>📣 مبلغ الإعلانات المحتجز للشهر:</span><strong>' + summary.adBudget.toFixed(2) + ' جنيه</strong></div>',
         '<div class="matrix-box"><span>🔄 الصافي النهائي القابل للتوزيع:</span><strong>' + summary.distributableProfit.toFixed(2) + ' جنيه</strong></div>',
         '<div class="matrix-box emerald"><span>🕊️ مخصص الصدقة المباركة (5%):</span><strong>' + summary.charityAmount.toFixed(2) + ' جنيه</strong></div>',
-        '<div class="matrix-box indigo"><span>🏛️ نصيب تطوير الأكاديمية (الثلثين):</span><strong>' + summary.academyShare.toFixed(2) + ' جنيه</strong></div>',
+        '<div class="matrix-box indigo"><span>🏛️ نسبة الأكاديمية (الثلثين):</span><strong>' + summary.academyShare.toFixed(2) + ' جنيه</strong></div>',
         '<div class="matrix-box amber span-2"><span>👔 أرباح الإدارة الصافية للسحب (الثلث):</span><strong style="font-size:1.1rem;">' + summary.adminShare.toFixed(2) + ' جنيه</strong></div>'
       ].join('');
       document.getElementById('matrixGridContainer').innerHTML = matrixHtml;
@@ -3720,7 +4085,7 @@
       var distItems = [
         { label: 'مخصص الإعلانات', val: summary.adBudget, color: '#2563EB' },
         { label: 'الصدقة المباركة (5%)', val: summary.charityAmount, color: '#059669' },
-        { label: 'تطوير الأكاديمية (الثلثين)', val: summary.academyShare, color: '#4F46E5' },
+        { label: 'نسبة الأكاديمية (الثلثين)', val: summary.academyShare, color: '#4F46E5' },
         { label: 'أرباح الإدارة الصافية (الثلث)', val: summary.adminShare, color: '#D97706' }
       ];
       var barsHtml = distItems.map(function (item) {
@@ -3764,6 +4129,7 @@
       renderTrashTab();
       renderSupervisorsTab();
       renderReportsTab();
+      renderExecutiveOverviewAndDropoutRadar(summary);
       updateLessonPreviewCost();
       
 
@@ -3847,67 +4213,60 @@
 
     // توليد نص رسالة جدول مواعيد اليوم المنسقة للواتساب
     function generateTodayWhatsAppAgenda() {
-      var d = state.scheduleDateFilter || '2026-11-09';
-      var lessonsToday = state.lessons.filter(function (l) { return l.date === d; });
-      lessonsToday.sort(function (a, b) {
-        return (a.time || '00:00').localeCompare(b.time || '00:00');
-      });
+      var d = state.scheduleDateFilter || '2026-11-15';
+      var dayName = ARABIC_DAYS_MAP[getDayIndexFromIsoDate(d)] || '';
+      var rows = buildCombinedTodayRows(d, state.todayRosterMode || 'TODAY_MATCH');
 
       var lines = [
-        '📅 *جدول مواعيد حلقات اليوم — مِحراب ERP*',
-        '📆 التاريخ: ' + d,
-        '⏰ إجمالي الحلقات: ' + lessonsToday.length + ' حلقة',
+        '📅 *جدول مواعيد حلقات يوم ' + dayName + ' (' + d + ') — مِحراب ERP*',
+        '⏰ إجمالي الحلقات: ' + rows.length + ' حلقة',
         '────────────────────'
       ];
 
-      if (lessonsToday.length === 0) {
+      if (rows.length === 0) {
         lines.push('لا توجد حلقات مجدولة في هذا التاريخ.');
       } else {
-        lessonsToday.forEach(function (l, idx) {
-          var s = state.students.find(function (x) { return x.id === l.studentId; });
-          var t = state.teachers.find(function (x) { return x.id === l.teacherId; });
-          var rule = TREATMENT_RULES[l.treatment] || TREATMENT_RULES.NORMAL_MAKEUP;
-          var timeStr = l.time || 'موعد غير محدد';
+        rows.forEach(function (r, idx) {
+          var stLabel = r.status === 'DONE' ? '✅ تمت الحلقة' : (r.status === 'NOT_DONE' ? ('⭕ لم تتم: ' + (r.reasonNote || '')) : '⏳ مجدولة');
           lines.push(
-            (idx + 1) + ') ⏰ *' + timeStr + '* | طالب: *' + (s ? s.name : 'غير محدد') + '* (' + (s ? s.country : '') + ')' +
-            '\n   معلم: ' + (t ? t.name : 'غير محدد') + ' (' + l.durationMin + ' دقيقة)' +
-            '\n   الحالة: ' + rule.label + (l.notes ? ' [' + l.notes + ']' : '')
+            (idx + 1) + ') ⏰ *' + r.time + '* | الطالب: *' + r.studentName + '* (' + r.studentCountry + ')' +
+            '\n   المعلم: ' + r.teacherName + ' (' + r.durationMin + ' دقيقة) — ' + stLabel
           );
         });
       }
 
       lines.push('────────────────────');
-      lines.push('✨ مع تمنياتنا بالتوفيق والبركة.');
       return lines.join('\n');
     }
 
-    // توليد كشف خاص بالمعلمين المكلفين اليوم
     function generateTodayTeachersBrief() {
-      var d = state.scheduleDateFilter || '2026-11-09';
-      var lessonsToday = state.lessons.filter(function (l) { return l.date === d; });
+      var d = state.scheduleDateFilter || '2026-11-15';
+      var dayName = ARABIC_DAYS_MAP[getDayIndexFromIsoDate(d)] || '';
+      var rows = buildCombinedTodayRows(d, state.todayRosterMode || 'TODAY_MATCH');
       var teacherGroups = {};
 
-      lessonsToday.forEach(function (l) {
-        if (!teacherGroups[l.teacherId]) teacherGroups[l.teacherId] = [];
-        teacherGroups[l.teacherId].push(l);
+      rows.forEach(function (r) {
+        var tKey = r.teacherId || r.teacherName || 'غير محدد';
+        if (!teacherGroups[tKey]) {
+          teacherGroups[tKey] = { teacherName: r.teacherName || 'معلم', list: [] };
+        }
+        teacherGroups[tKey].list.push(r);
       });
 
       var lines = [
-        '👥 *تكليفات المعلمين ليوم: ' + d + '*',
+        '👥 *تكليفات ومواعيد المعلمين ليوم ' + dayName + ' (' + d + ')*',
         '────────────────────'
       ];
 
-      var teacherIds = Object.keys(teacherGroups);
-      if (teacherIds.length === 0) {
-        lines.push('لا توجد تكليفات في هذا اليوم.');
+      var keys = Object.keys(teacherGroups);
+      if (keys.length === 0) {
+        lines.push('لا توجد تكليفات مجدولة في هذا اليوم.');
       } else {
-        teacherIds.forEach(function (tId) {
-          var t = state.teachers.find(function (x) { return x.id === tId; });
-          var list = teacherGroups[tId];
-          lines.push('👤 *' + (t ? t.name : 'معلم') + '* (' + list.length + ' حلقات):');
-          list.forEach(function (l) {
-            var s = state.students.find(function (x) { return x.id === l.studentId; });
-            lines.push('  • الساعة ' + (l.time || '--:--') + ' مع الطالب: ' + (s ? s.name : 'طالب') + ' (' + l.durationMin + ' د)');
+        keys.forEach(function (k) {
+          var grp = teacherGroups[k];
+          lines.push('👤 *' + grp.teacherName + '* (' + grp.list.length + ' حلقات):');
+          grp.list.forEach(function (r) {
+            lines.push('  • الساعة ' + (r.time || '--:--') + ' مع الطالب: ' + r.studentName + ' (' + r.durationMin + ' د)');
           });
           lines.push('');
         });
@@ -3963,31 +4322,46 @@
       var rows = [];
       var handledStudentIds = {};
 
-      // 1. الحلقات المسجلة بالفعل في هذا التاريخ
+      // 1. الحلقات المسجلة بالفعل في هذا التاريخ داخل state.lessons
       state.lessons.forEach(function (l) {
         if (l.date !== dateStr) return;
         var st = state.students.find(function (s) { return s.id === l.studentId; });
         var t = state.teachers.find(function (x) { return x.id === l.teacherId; });
         if (st) handledStudentIds[st.id] = true;
+
         var execRep = state.dailyReports.find(function (r) {
           return r.type === 'EXECUTION' && r.date === dateStr && (r.studentId === l.studentId || (st && r.studentName === st.name));
         });
+        var acadRep = state.dailyReports.find(function (r) {
+          return r.type === 'ACADEMIC' && r.date === dateStr && (r.studentId === l.studentId || (st && r.studentName === st.name));
+        });
+        var confList = (state.confidentialNotes || []).filter(function (c) {
+          return c.date === dateStr && (c.studentId === l.studentId || (st && c.studentName === st.name));
+        });
+
+        var execStatus = execRep ? execRep.status : (l.treatment === 'ABSENCE' ? 'NOT_DONE' : 'DONE');
         rows.push({
-          rowKey: 'les_' + l.id,
+          rowKey: 'stu_' + (l.studentId || l.id),
           isLoggedLesson: true,
           lessonId: l.id,
           studentId: l.studentId,
           studentName: st ? st.name : 'طالب',
           studentCountry: st ? st.country : '',
+          paymentStatus: st ? (st.paymentStatus || 'PAID') : 'PAID',
           scheduleText: st ? (st.scheduleText || '') : '',
           consumedLessons: st ? st.consumedLessons : 0,
           totalLessons: st ? st.totalLessons : 8,
           teacherId: l.teacherId,
           teacherName: t ? t.name : 'غير محدد',
           time: l.time || '17:00',
-          durationMin: l.durationMin || (st ? st.defaultDurationMin : 45) || 45,
-          status: (l.treatment === 'ABSENCE' || (execRep && execRep.status === 'NOT_DONE')) ? 'NOT_DONE' : 'DONE',
-          reasonNote: (execRep && execRep.note) ? execRep.note : (l.notes || '')
+          durationMin: l.durationMin || (st ? st.defaultDurationMin : 30) || 30,
+          rateTier: l.rateTier || 'RATE_1',
+          treatment: l.treatment || 'NORMAL_MAKEUP',
+          status: execStatus,
+          reasonCat: execRep ? (execRep.reasonCat || 'NONE') : 'NONE',
+          reasonNote: (execRep && execRep.note) ? execRep.note : (l.notes || ''),
+          acadRep: acadRep || null,
+          confNotes: confList
         });
       });
 
@@ -4006,6 +4380,12 @@
         var execRep = state.dailyReports.find(function (r) {
           return r.type === 'EXECUTION' && r.date === dateStr && (r.studentId === st.id || r.studentName === st.name);
         });
+        var acadRep = state.dailyReports.find(function (r) {
+          return r.type === 'ACADEMIC' && r.date === dateStr && (r.studentId === st.id || r.studentName === st.name);
+        });
+        var confList = (state.confidentialNotes || []).filter(function (c) {
+          return c.date === dateStr && (c.studentId === st.id || c.studentName === st.name);
+        });
 
         rows.push({
           rowKey: 'stu_' + st.id,
@@ -4014,6 +4394,7 @@
           studentId: st.id,
           studentName: st.name,
           studentCountry: st.country || '',
+          paymentStatus: st.paymentStatus || 'PAID',
           scheduleText: st.scheduleText || '',
           consumedLessons: st.consumedLessons,
           totalLessons: st.totalLessons,
@@ -4021,8 +4402,13 @@
           teacherName: t ? t.name : 'غير محدد',
           time: timeVal,
           durationMin: durVal,
+          rateTier: customEntry.rateTier || 'RATE_1',
+          treatment: customEntry.treatment || (execRep && execRep.status === 'NOT_DONE' ? 'DEFERRED_LATER' : 'NORMAL_MAKEUP'),
           status: execRep ? (execRep.status === 'NOT_DONE' ? 'NOT_DONE' : 'DONE') : 'PENDING',
-          reasonNote: execRep ? (execRep.note || REASON_LABELS[execRep.reasonCat] || '') : ''
+          reasonCat: execRep ? (execRep.reasonCat || 'NONE') : 'NONE',
+          reasonNote: execRep ? (execRep.note || REASON_LABELS[execRep.reasonCat] || '') : '',
+          acadRep: acadRep || null,
+          confNotes: confList
         });
       });
 
@@ -4035,18 +4421,28 @@
     function renderTodayScheduleView() {
       var d = state.scheduleDateFilter || '2026-11-15';
       var perms = getActivePermissions();
-      var canApproveToday = perms.isAdmin || (perms.approve_today_lessons !== false && !(!perms.isAdmin && !perms.edit_schedule && !perms.add_lesson && !perms.edit_teachers && !perms.edit_students && !perms.delete_items));
-      var canEditTime = perms.isAdmin || !!perms.edit_schedule;
+      var isPureReadOnly = !perms.isAdmin && !perms.edit_schedule && !perms.add_lesson && !perms.edit_teachers && !perms.edit_students && !perms.delete_items;
+
+      var canApproveToday = !isPureReadOnly && (perms.isAdmin || perms.approve_today_lessons !== false);
+      var canEvalQuality = !isPureReadOnly && (perms.isAdmin || perms.evaluate_quality !== false);
+      var canAddSecret = !isPureReadOnly && (perms.isAdmin || perms.add_confidential_note !== false);
+      var canSeeAllSecrets = perms.isAdmin || !!perms.view_all_reports;
+      var canEditTime = !isPureReadOnly && (perms.isAdmin || !!perms.edit_schedule);
+      var anyActionAllowed = canApproveToday || canEvalQuality || canAddSecret || canSeeAllSecrets;
 
       var quickAddBtn = document.getElementById('btnQuickAddScheduleLesson');
       if (quickAddBtn) quickAddBtn.classList.toggle('hidden', !perms.add_lesson);
       var waTodayBtn = document.getElementById('btnCopyTodayScheduleWhatsapp');
       if (waTodayBtn) waTodayBtn.classList.toggle('hidden', !perms.copy_whatsapp);
+      var waQualBtn = document.getElementById('btnQuickCopyQualityWaToday');
+      if (waQualBtn) waQualBtn.classList.toggle('hidden', !perms.copy_whatsapp);
       var waTeachersBtn = document.getElementById('btnCopyTeachersBriefToday');
       if (waTeachersBtn) waTeachersBtn.classList.toggle('hidden', !perms.copy_whatsapp);
+      var waSecretBtn = document.getElementById('btnQuickCopySecretWaToday');
+      if (waSecretBtn) waSecretBtn.classList.toggle('hidden', !canSeeAllSecrets);
 
       var thApp = document.getElementById('thTodayApprovalCol');
-      if (thApp) thApp.classList.toggle('hidden', !canApproveToday);
+      if (thApp) thApp.classList.toggle('hidden', !anyActionAllowed);
 
       var dateInput = document.getElementById('todayScheduleDateInput');
       if (dateInput && document.activeElement !== dateInput) {
@@ -4058,95 +4454,270 @@
       var dayLbl = document.getElementById('todayArabicDayNameLabel');
       if (dayLbl) dayLbl.textContent = 'يوم ' + dayName + ' ' + d;
 
+      // تحديث أزرار الفلتر السريع للحالة
+      var curFilter = state.todayStatusFilter || 'ALL';
+      document.querySelectorAll('.today-filter-pill').forEach(function (btn) {
+        var fVal = btn.getAttribute('data-tfilter');
+        btn.className = (fVal === curFilter) ? 'btn btn-primary today-filter-pill' : 'btn btn-soft today-filter-pill';
+      });
+
       var allTodayRows = buildCombinedTodayRows(d, state.todayRosterMode || 'TODAY_MATCH');
+      var doneCountAll = allTodayRows.filter(function (r) { return r.status === 'DONE'; }).length;
+      var notDoneCountAll = allTodayRows.filter(function (r) { return r.status === 'NOT_DONE'; }).length;
+      var pendingCountAll = allTodayRows.filter(function (r) { return r.status === 'PENDING'; }).length;
+      var qualCountAll = allTodayRows.filter(function (r) { return !!r.acadRep; }).length;
+
       var q = (state.todayScheduleSearch || '').trim();
       var filteredRows = allTodayRows.filter(function (r) {
+        if (curFilter !== 'ALL' && r.status !== curFilter) return false;
         if (!q) return true;
         return r.studentName.indexOf(q) !== -1 || r.teacherName.indexOf(q) !== -1 || r.scheduleText.indexOf(q) !== -1;
       });
 
       var totalMinutes = 0;
       var totalCost = 0;
-      var teachersMap = {};
-
       allTodayRows.forEach(function (r) {
         totalMinutes += Number(r.durationMin || 0);
-        if (r.teacherId) teachersMap[r.teacherId] = true;
         var t = state.teachers.find(function (x) { return x.id === r.teacherId; });
-        var rate = t ? t.rate1 : 0;
-        if (r.status !== 'NOT_DONE') {
+        var rate = t ? ((r.rateTier === 'RATE_2' && t.rate2 > 0) ? t.rate2 : t.rate1) : 0;
+        var rule = TREATMENT_RULES[r.treatment];
+        if (rule && rule.paysTeacher && r.status !== 'PENDING') {
           totalCost += (Number(r.durationMin || 0) / 60) * rate;
         }
       });
 
-      document.getElementById('statTodayTotalLessons').textContent = String(allTodayRows.length);
-      document.getElementById('statTodayTotalMinutes').textContent = totalMinutes + ' دقيقة (' + (totalMinutes / 60).toFixed(1) + ' س)';
-      document.getElementById('statTodayActiveTeachers').textContent = Object.keys(teachersMap).length + ' معلمين';
-      document.getElementById('statTodayEstimatedWages').textContent = (perms.see_teacher_rates ? (totalCost.toFixed(2) + ' جنيه') : 'معتمد');
+      document.getElementById('statTodayTotalLessons').textContent = allTodayRows.length + ' حلقة (' + pendingCountAll + ' بالانتظار)';
+      document.getElementById('statTodayTotalMinutes').textContent = '✅ ' + doneCountAll + ' تمت | ⭕ ' + notDoneCountAll + ' لم تتم';
+      document.getElementById('statTodayActiveTeachers').textContent = '🌷 ' + qualCountAll + ' من ' + allTodayRows.length + ' تم تقييمها';
+      document.getElementById('statTodayEstimatedWages').textContent = (totalMinutes / 60).toFixed(1) + ' س' + (perms.see_teacher_rates ? (' (' + totalCost.toFixed(0) + ' ج)') : '');
       document.getElementById('badgeTodayCount').textContent = String(allTodayRows.length);
 
       var tbody = document.getElementById('todayScheduleDedicatedBody');
       if (!tbody) return;
 
       if (filteredRows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:26px; color:var(--slate-500); background:#FAFAFA;">' +
-          'لا توجد حلقات مطابقة ليوم (' + dayName + ' ' + d + '). يمكنك تغيير القائمة أعلاه إلى "📚 عرض جميع الطلاب" لجدولة أي طالب في هذا اليوم.' +
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:26px; color:var(--slate-500); background:#FAFAFA;">' +
+          'لا توجد حلقات مطابقة للفلتر في يوم (' + dayName + ' ' + d + '). يمكنك التبديل إلى "📚 جميع الطلاب" أو اختيار "الكل".' +
           '</td></tr>';
       } else {
+        var activeSup = getActiveSupervisorObj();
         tbody.innerHTML = filteredRows.map(function (r) {
-          var statusPill = '<span class="status-pill pill-amber">⏳ مجدولة اليوم (بانتظار الاعتماد)</span>';
+          var ruleObj = TREATMENT_RULES[r.treatment] || null;
+          var treatLabel = ruleObj ? ruleObj.label : (r.treatment === 'DEFERRED_LATER' ? 'مؤجلة للتعويض لاحقاً' : 'حلقة عادية');
+          var statusPill = '<span class="status-pill pill-amber">⏳ بانتظار الاعتماد</span>';
           var rowBg = '#FFFFFF';
           if (r.status === 'DONE') {
-            statusPill = '<span class="status-pill pill-emerald">✅ تمت الحلقة واعتمدت</span>';
+            statusPill = '<span class="status-pill pill-emerald">✅ تمت (' + escHtml(treatLabel) + ')</span>';
             rowBg = '#F0FDF4';
           } else if (r.status === 'NOT_DONE') {
-            statusPill = '<span class="status-pill pill-rose">⭕ لم تتم (' + escHtml(r.reasonNote || 'اعتذار/غياب') + ')</span>';
+            statusPill = '<span class="status-pill pill-rose">⭕ لم تتم (' + escHtml(treatLabel) + ')</span>' +
+              (r.reasonNote ? '<div style="font-size:0.71rem; color:#9F1239; margin-top:2px;">السبب: ' + escHtml(r.reasonNote) + '</div>' : '');
             rowBg = '#FFF1F2';
           }
 
-          var isOpeningReason = (state.activeNotDoneRowKey === r.rowKey);
+          var isUnpaidAlert = (r.paymentStatus === 'CREDIT_ALLOWED' || r.paymentStatus === 'UNPAID');
+          var payTag = isUnpaidAlert ? ' <span class="status-pill pill-rose" style="font-size:0.66rem; padding:2px 6px;" title="يستكمل الحلقات لحين السداد">🚨 لم يدفع</span>' : '';
 
-          var approvalCellHtml = '';
-          if (canApproveToday) {
-            var reasonDrawer = '';
-            if (isOpeningReason) {
-              reasonDrawer = '<div style="margin-top:8px; padding:10px; background:#FFF1F2; border:1px solid #FECDD3; border-radius:10px;">' +
-                '<div style="font-size:0.74rem; font-weight:800; color:#9F1239; margin-bottom:5px;">حدد سبب عدم إتمام الحلقة (أو اكتبه):</div>' +
-                '<select id="notDoneCat_' + r.rowKey + '" class="form-select" style="padding:4px 8px; font-size:0.75rem; margin-bottom:6px;">' +
-                  '<option value="STUDENT_NO_REPLY">الطالب لم يرد (يُخصم أو يُسجل غياب)</option>' +
-                  '<option value="STUDENT_EXCUSE">ظروف / انقطاع نت عند الطالب</option>' +
-                  '<option value="TEACHER_NET">انقطاع نت / عذر عند المعلم</option>' +
-                  '<option value="SUPERVISOR_ERR">تأجيل / متابعة إشراف</option>' +
-                '</select>' +
-                '<input type="text" id="notDoneNote_' + r.rowKey + '" class="form-input" placeholder="اكتب السبب التفصيلي (مثال: النت فاصل عند المعلمة)..." value="' + escHtml(r.reasonNote || '') + '" style="padding:5px 8px; font-size:0.75rem; margin-bottom:6px;" />' +
-                '<div style="display:flex; gap:6px;">' +
-                  '<button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.74rem; background:#E11D48;" data-confirm-today-notdone="' + r.rowKey + '" data-stuid="' + r.studentId + '" data-teaid="' + r.teacherId + '" data-lesid="' + (r.lessonId || '') + '">حفظ سبب عدم الإتمام</button>' +
-                  '<button type="button" class="btn btn-soft" style="padding:4px 8px; font-size:0.74rem;" data-cancel-today-notdone="' + r.rowKey + '">إلغاء</button>' +
+          // فلترة الملاحظات السرية حسب الصلاحية (الإدارة ترى الكل، والمشرف يرى ما كتبه فقط)
+          var visibleSecrets = (r.confNotes || []).filter(function (c) {
+            if (canSeeAllSecrets) return true;
+            return c.createdBySupervisorId === activeSup.id;
+          });
+
+          var curDrawer = (state.activeRowDrawer && state.activeRowDrawer.rowKey === r.rowKey) ? state.activeRowDrawer.drawerType : null;
+
+          // أزرار الكشف التدريجي (Progressive Disclosure Buttons) في العمود الأخير
+          var actionsCellHtml = '';
+          if (anyActionAllowed) {
+            var execBtnLabel = (r.status === 'PENDING') ? '⚡ اعتماد التنفيذ' : '✏️ تعديل التنفيذ';
+            var qualBtnLabel = r.acadRep
+              ? (r.acadRep.evalStatus === 'SKIPPED_NOT_DONE' ? '🌷 جودة (لم تتم)' : '🌷 الجودة 🌟')
+              : '🌷 الجودة';
+            var secBtnLabel = visibleSecrets.length > 0 ? ('🔒 سري (' + visibleSecrets.length + ')') : '🔒 سري';
+
+            actionsCellHtml = '<td><div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;">' +
+              (canApproveToday ? '<button type="button" class="btn ' + (curDrawer === 'EXEC' ? 'btn-primary' : (r.status === 'PENDING' ? 'btn-emerald' : 'btn-soft')) + '" style="padding:4px 9px; font-size:0.74rem;" data-toggle-row-drawer="' + r.rowKey + '" data-dtype="EXEC">' + execBtnLabel + '</button>' : '') +
+              (canEvalQuality ? '<button type="button" class="btn ' + (curDrawer === 'QUALITY' ? 'btn-primary' : (r.acadRep ? 'btn-emerald' : 'btn-soft')) + '" style="padding:4px 9px; font-size:0.74rem;" data-toggle-row-drawer="' + r.rowKey + '" data-dtype="QUALITY">' + qualBtnLabel + '</button>' : '') +
+              ((canAddSecret || visibleSecrets.length > 0) ? '<button type="button" class="btn ' + (curDrawer === 'SECRET' ? 'btn-primary' : (visibleSecrets.length > 0 ? 'btn-danger-soft' : 'btn-soft')) + '" style="padding:4px 9px; font-size:0.74rem;" data-toggle-row-drawer="' + r.rowKey + '" data-dtype="SECRET">' + secBtnLabel + '</button>' : '') +
+            '</div></td>';
+          }
+
+          var mainRowHtml = '<tr style="background:' + rowBg + ';">' +
+            '<td><input type="time" class="form-input" data-flex-day-time="' + r.studentId + '" data-lesid="' + (r.lessonId || '') + '" value="' + r.time + '" ' + (canEditTime ? '' : 'disabled') + ' style="font-weight:800; font-size:0.84rem; color:#1E3A8A; background:#EFF6FF; border-color:#BFDBFE; padding:4px 7px; width:102px;" /></td>' +
+            '<td><strong>' + escHtml(r.studentName) + '</strong> <span style="font-size:0.74rem; color:var(--primary); font-weight:800;">(' + r.consumedLessons + '/' + r.totalLessons + ')</span>' + payTag + '<div style="font-size:0.71rem; color:var(--slate-500);">' + escHtml(r.studentCountry) + ' • ' + escHtml(r.scheduleText) + '</div></td>' +
+            '<td><strong>' + escHtml(r.teacherName) + '</strong></td>' +
+            '<td><input type="number" min="10" step="5" class="form-input" data-flex-day-dur="' + r.studentId + '" data-lesid="' + (r.lessonId || '') + '" value="' + r.durationMin + '" ' + (canEditTime ? '' : 'disabled') + ' style="width:64px; padding:4px 5px; font-weight:800; text-align:center;" /></td>' +
+            '<td>' + statusPill + '</td>' +
+            actionsCellHtml +
+          '</tr>';
+
+          // بناء الدرج المنسدل (Drawer Row) فقط للسطر المختار حالياً
+          var drawerRowHtml = '';
+          if (curDrawer === 'EXEC' && canApproveToday) {
+            var curStat = r.status === 'PENDING' ? 'DONE' : r.status;
+            var curTreat = r.treatment || 'NORMAL_MAKEUP';
+            var curReasonCat = r.reasonCat && r.reasonCat !== 'NONE' ? r.reasonCat : 'STUDENT_NO_REPLY';
+            drawerRowHtml = '<tr style="background:#F8FAFC;"><td colspan="6" style="padding:14px 18px; border-bottom:2px solid var(--primary);">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+                '<strong style="color:var(--primary); font-size:0.88rem;">⚡ اعتماد نتيجة الحلقة والمعالجة المالية: ' + escHtml(r.studentName) + ' (مع ' + escHtml(r.teacherName) + ')</strong>' +
+                '<button type="button" class="btn btn-soft" style="padding:3px 8px; font-size:0.72rem;" data-close-row-drawer="1">إغلاق ✕</button>' +
+              '</div>' +
+              '<div class="grid-3" style="gap:10px; margin-bottom:10px;">' +
+                '<div>' +
+                  '<label class="form-label">1️⃣ الحالة التشغيلية للحلقة (تظهر في التقرير):</label>' +
+                  '<select id="drw_exec_status_' + r.rowKey + '" class="form-select" data-drw-status-change="' + r.rowKey + '" style="font-weight:800;">' +
+                    '<option value="DONE" ' + (curStat === 'DONE' ? 'selected' : '') + '>✅ تمت الحلقة بنجاح</option>' +
+                    '<option value="PARTIAL" ' + (curStat === 'PARTIAL' ? 'selected' : '') + '>⏱️ تمت الحلقة (وقت جزئي)</option>' +
+                    '<option value="NOT_DONE" ' + (curStat === 'NOT_DONE' ? 'selected' : '') + '>⭕ لم تتم الحلقة</option>' +
+                  '</select>' +
                 '</div>' +
+                '<div>' +
+                  '<label class="form-label">2️⃣ المعالجة المالية في الباقة وأجر المعلم (القواعد الـ 4):</label>' +
+                  '<select id="drw_exec_treat_' + r.rowKey + '" class="form-select" style="font-weight:800; color:#065F46;">' +
+                    '<option value="NORMAL_MAKEUP" ' + (curTreat === 'NORMAL_MAKEUP' ? 'selected' : '') + '>1. حلقة عادية / تعويض رسمي (تُخصم من الطالب ✅ | أجر للمعلم ✅)</option>' +
+                    '<option value="ACADEMY_BEARING" ' + (curTreat === 'ACADEMY_BEARING' ? 'selected' : '') + '>2. تحمّل الأكاديمية / هدية (لا تُخصم من الطالب ❌ | أجر للمعلم ✅)</option>' +
+                    '<option value="ABSENCE" ' + (curTreat === 'ABSENCE' ? 'selected' : '') + '>3. غياب طالب يُخصم (تُخصم من الطالب ✅ | لا أجر للمعلم ❌)</option>' +
+                    '<option value="FREE_MAKEUP" ' + (curTreat === 'FREE_MAKEUP' ? 'selected' : '') + '>4. تعويض مجاني من المعلم (لا تُخصم من الطالب ❌ | لا أجر للمعلم ❌)</option>' +
+                    '<option value="DEFERRED_LATER" ' + (curTreat === 'DEFERRED_LATER' ? 'selected' : '') + '>5. مؤجلة لموعد آخر (لا تُخصم اليوم ولا تُحسب في الدقائق)</option>' +
+                  '</select>' +
+                '</div>' +
+                '<div>' +
+                  '<label class="form-label">شريحة سعر ساعة المعلم:</label>' +
+                  '<select id="drw_exec_tier_' + r.rowKey + '" class="form-select">' +
+                    '<option value="RATE_1" ' + (r.rateTier !== 'RATE_2' ? 'selected' : '') + '>سعر الساعة 1 (الأساسي)</option>' +
+                    '<option value="RATE_2" ' + (r.rateTier === 'RATE_2' ? 'selected' : '') + '>سعر الساعة 2 (الإضافي/لشقيقين)</option>' +
+                  '</select>' +
+                '</div>' +
+              '</div>' +
+              '<div class="grid-2" style="gap:10px; margin-bottom:10px;">' +
+                '<div>' +
+                  '<label class="form-label">السبب التشغيلي (عند اختيار لم تتم الحلقة):</label>' +
+                  '<select id="drw_exec_rcat_' + r.rowKey + '" class="form-select">' +
+                    '<option value="NONE" ' + (curStat !== 'NOT_DONE' ? 'selected' : '') + '>لا يوجد (تمت بنجاح)</option>' +
+                    '<option value="STUDENT_NO_REPLY" ' + (curReasonCat === 'STUDENT_NO_REPLY' && curStat === 'NOT_DONE' ? 'selected' : '') + '>الطالب لم يرد</option>' +
+                    '<option value="STUDENT_EXCUSE" ' + (curReasonCat === 'STUDENT_EXCUSE' && curStat === 'NOT_DONE' ? 'selected' : '') + '>ظروف / انقطاع نت عند الطالب</option>' +
+                    '<option value="TEACHER_NET" ' + (curReasonCat === 'TEACHER_NET' && curStat === 'NOT_DONE' ? 'selected' : '') + '>انقطاع نت / عذر عند المعلم</option>' +
+                    '<option value="SUPERVISOR_ERR" ' + (curReasonCat === 'SUPERVISOR_ERR' && curStat === 'NOT_DONE' ? 'selected' : '') + '>تأجيل / متابعة إشراف</option>' +
+                  '</select>' +
+                '</div>' +
+                '<div>' +
+                  '<label class="form-label">ملاحظة تقرير المتابعة العام (تظهر في تقرير الواتساب):</label>' +
+                  '<input type="text" id="drw_exec_note_' + r.rowKey + '" class="form-input" placeholder="مثال: أخذت نصف ساعة / النت فاصل عند المعلمة..." value="' + escHtml(r.reasonNote || '') + '" />' +
+                '</div>' +
+              '</div>' +
+              '<div style="display:flex; justify-content:flex-end; gap:8px;">' +
+                '<button type="button" class="btn btn-primary" data-save-drw-exec="' + r.rowKey + '" data-stuid="' + r.studentId + '" data-teaid="' + r.teacherId + '" data-time="' + r.time + '" data-dur="' + r.durationMin + '">💾 حفظ واعتماد القرار المالي والتنفيذي</button>' +
+                '<button type="button" class="btn btn-soft" data-close-row-drawer="1">إلغاء</button>' +
+              '</div>' +
+            '</td></tr>';
+          } else if (curDrawer === 'QUALITY' && canEvalQuality) {
+            var qRep = r.acadRep || {};
+            var qMode = qRep.evalStatus || (r.status === 'NOT_DONE' ? 'SKIPPED_NOT_DONE' : 'EVALUATED');
+            var qGroup = qRep.ageGroup || 'صغار';
+            var qCam = qRep.camera || 'مفتوحة';
+            var qPpt = qRep.ppt || 'يوجد';
+            var qWait = qRep.waiting || 'لا يوجد';
+            var qInter = qRep.interaction || 'ممتاز';
+            var qQuran = qRep.quranPerf || 'ممتاز';
+            var qNote = qRep.note || '';
+            var qSkipReason = qRep.skipReason || 'المعلم لم يدخل / لم تتم الحلقة';
+            var defaultCriteria = ['الالتزام بوقت الحلقة ووقت الحضور', 'ضبط الحلقة وحسن إدارتها', 'استخدام الوسائل التعليمية والأنشطة المحفزة', 'شرح الآيات وتفسيرها', 'تصحيح الجديد والاختبار على الماضي', 'درس تربوي', 'حرصه على التطوير'];
+            var activeCrit = Array.isArray(qRep.criteria) ? qRep.criteria : defaultCriteria;
+
+            var allCritOptions = [
+              'الالتزام بوقت الحلقة ووقت الحضور',
+              'ضبط الحلقة وحسن إدارتها',
+              'استخدام الوسائل التعليمية والأنشطة المحفزة',
+              'شرح الآيات وتفسيرها',
+              'تصحيح الجديد والاختبار على الماضي',
+              'درس تربوي',
+              'كتابة الأخطاء على السبورة',
+              'حرصه على التطوير'
+            ];
+
+            drawerRowHtml = '<tr style="background:#FAFDFB;"><td colspan="6" style="padding:14px 18px; border-bottom:2px solid var(--emerald);">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+                '<strong style="color:#065F46; font-size:0.88rem;">🌷 التقييم الأكاديمي والجودة (مستقل عن السجل المالي): ' + escHtml(r.teacherName) + ' — الطالب: ' + escHtml(r.studentName) + '</strong>' +
+                '<button type="button" class="btn btn-soft" style="padding:3px 8px; font-size:0.72rem;" data-close-row-drawer="1">إغلاق ✕</button>' +
+              '</div>' +
+              '<div class="grid-3" style="gap:10px; margin-bottom:10px;">' +
+                '<div>' +
+                  '<label class="form-label">حالة إصدار تقييم الجودة:</label>' +
+                  '<select id="drw_qual_mode_' + r.rowKey + '" class="form-select" style="font-weight:800;">' +
+                    '<option value="EVALUATED" ' + (qMode !== 'SKIPPED_NOT_DONE' ? 'selected' : '') + '>🌟 تم تقييم الحلقة (مكتملة)</option>' +
+                    '<option value="SKIPPED_NOT_DONE" ' + (qMode === 'SKIPPED_NOT_DONE' ? 'selected' : '') + '>⭕ تعذر إصدار التقييم (الحلقة لم تتم)</option>' +
+                  '</select>' +
+                '</div>' +
+                '<div>' +
+                  '<label class="form-label">الفئة (صغار / كبار):</label>' +
+                  '<select id="drw_qual_group_' + r.rowKey + '" class="form-select">' +
+                    '<option value="صغار" ' + (qGroup === 'صغار' ? 'selected' : '') + '>صغار</option>' +
+                    '<option value="كبار" ' + (qGroup === 'كبار' ? 'selected' : '') + '>كبار</option>' +
+                  '</select>' +
+                '</div>' +
+                '<div>' +
+                  '<label class="form-label">سبب عدم إصدار التقييم (إن لم تتم):</label>' +
+                  '<input type="text" id="drw_qual_skip_' + r.rowKey + '" class="form-input" value="' + escHtml(qSkipReason) + '" placeholder="مثال: المعلم لم يدخل / لم تتم الحلقة" />' +
+                '</div>' +
+              '</div>' +
+              '<div class="grid-4" style="gap:8px; margin-bottom:10px;">' +
+                '<div><label class="form-label">📷 الكاميرا</label><select id="drw_qual_cam_' + r.rowKey + '" class="form-select"><option value="مفتوحة" ' + (qCam === 'مفتوحة' ? 'selected' : '') + '>مفتوحة</option><option value="مغلقة" ' + (qCam === 'مغلقة' ? 'selected' : '') + '>مغلقة</option></select></div>' +
+                '<div><label class="form-label">📊 البوربوينت</label><select id="drw_qual_ppt_' + r.rowKey + '" class="form-select"><option value="يوجد" ' + (qPpt === 'يوجد' ? 'selected' : '') + '>يوجد</option><option value="لا يوجد" ' + (qPpt === 'لا يوجد' ? 'selected' : '') + '>لا يوجد</option></select></div>' +
+                '<div><label class="form-label">⏳ الانتظار</label><select id="drw_qual_wait_' + r.rowKey + '" class="form-select"><option value="لا يوجد" ' + (qWait === 'لا يوجد' ? 'selected' : '') + '>لا يوجد</option><option value="يوجد" ' + (qWait === 'يوجد' ? 'selected' : '') + '>يوجد</option></select></div>' +
+                '<div><label class="form-label">💬 التفاعل</label><select id="drw_qual_inter_' + r.rowKey + '" class="form-select"><option value="ممتاز" ' + (qInter === 'ممتاز' ? 'selected' : '') + '>ممتاز</option><option value="جيد جداً" ' + (qInter === 'جيد جداً' ? 'selected' : '') + '>جيد جداً</option><option value="جيد" ' + (qInter === 'جيد' ? 'selected' : '') + '>جيد</option><option value="ضعيف" ' + (qInter === 'ضعيف' ? 'selected' : '') + '>ضعيف</option></select></div>' +
+              '</div>' +
+              '<div style="background:#FFFFFF; border:1px solid var(--slate-200); border-radius:8px; padding:8px; margin-bottom:10px;">' +
+                '<div style="font-size:0.74rem; font-weight:800; color:var(--primary); margin-bottom:5px;">معايير الجودة المحققة في الحلقة:</div>' +
+                '<div class="grid-4" style="font-size:0.73rem; gap:6px;">' +
+                  allCritOptions.map(function (cText) {
+                    var isChk = activeCrit.indexOf(cText) !== -1 ? 'checked' : '';
+                    return '<label style="display:flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="drw-crit-chk-' + r.rowKey + '" value="' + escHtml(cText) + '" ' + isChk + ' /> <span>' + escHtml(cText) + '</span></label>';
+                  }).join('') +
+                '</div>' +
+              '</div>' +
+              '<div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">' +
+                '<input type="text" id="drw_qual_note_' + r.rowKey + '" class="form-input" placeholder="توصية عامة للتقرير (مثال: يرجى متابعة الطالب من ولي الأمر)..." value="' + escHtml(qNote) + '" style="flex:1; min-width:240px;" />' +
+                '<div style="display:flex; gap:6px;">' +
+                  '<button type="button" class="btn btn-emerald" data-save-drw-qual="' + r.rowKey + '" data-stuid="' + r.studentId + '" data-teaid="' + r.teacherId + '">💾 حفظ تقييم الجودة</button>' +
+                  '<button type="button" class="btn btn-soft" data-close-row-drawer="1">إغلاق</button>' +
+                '</div>' +
+              '</div>' +
+            '</td></tr>';
+          } else if (curDrawer === 'SECRET' && (canAddSecret || visibleSecrets.length > 0)) {
+            var existingSecretsHtml = '';
+            if (visibleSecrets.length > 0) {
+              existingSecretsHtml = '<div style="margin-bottom:10px;">' +
+                visibleSecrets.map(function (sec) {
+                  return '<div style="padding:8px 10px; background:#FFFFFF; border:1px solid #FECDD3; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">' +
+                    '<div style="font-size:0.76rem;"><span class="status-pill pill-rose" style="font-size:0.68rem;">' + escHtml(sec.category || 'ملاحظة رقابية') + '</span> <strong>' + escHtml(sec.text) + '</strong> <span style="color:var(--slate-400); font-size:0.7rem;">— بواسطة: ' + escHtml(sec.createdByName) + ' (' + escHtml(sec.createdAt) + ')</span></div>' +
+                    (perms.delete_items ? '<button type="button" class="btn btn-danger-soft" style="padding:2px 7px; font-size:0.7rem;" data-del-secret-note="' + sec.id + '">حذف</button>' : '') +
+                  '</div>';
+                }).join('') +
               '</div>';
             }
 
-            approvalCellHtml = '<td>' +
-              '<div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">' +
-                (r.status !== 'DONE'
-                  ? '<button type="button" class="btn btn-emerald" style="padding:5px 10px; font-size:0.75rem;" data-approve-today-done="' + r.rowKey + '" data-stuid="' + r.studentId + '" data-teaid="' + r.teacherId + '" data-time="' + r.time + '" data-dur="' + r.durationMin + '">✅ تمت الحلقة</button>'
-                  : '<span style="font-size:0.74rem; font-weight:800; color:#065F46;">✔️ معتمدة في الباقة والمالية</span>') +
-                '<button type="button" class="btn btn-danger-soft" style="padding:5px 10px; font-size:0.75rem;" data-open-today-notdone="' + r.rowKey + '">⭕ لم تتم (كتابة السبب)</button>' +
-                (perms.copy_whatsapp ? '<button type="button" class="btn btn-soft" style="padding:5px 8px; font-size:0.74rem;" data-wa-today-row="' + r.studentId + '" data-time="' + r.time + '">📲</button>' : '') +
+            drawerRowHtml = '<tr style="background:#FFF1F2;"><td colspan="6" style="padding:14px 18px; border-bottom:2px solid #E11D48;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                '<strong style="color:#9F1239; font-size:0.86rem;">🔒 ملاحظات إشرافية سرية للإدارة فقط (لا تظهر أبداً في تقارير الواتساب العامة للمعلمين): ' + escHtml(r.studentName) + ' / ' + escHtml(r.teacherName) + '</strong>' +
+                '<button type="button" class="btn btn-soft" style="padding:3px 8px; font-size:0.72rem;" data-close-row-drawer="1">إغلاق ✕</button>' +
               '</div>' +
-              reasonDrawer +
-            '</td>';
+              existingSecretsHtml +
+              (canAddSecret ? (
+                '<div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">' +
+                  '<select id="drw_sec_cat_' + r.rowKey + '" class="form-select" style="width:185px; font-weight:700;">' +
+                    '<option value="تنبيه تأخر / التزام معلم">تنبيه تأخر / التزام معلم</option>' +
+                    '<option value="ملاحظة من ولي الأمر">ملاحظة من ولي الأمر</option>' +
+                    '<option value="متابعة سداد واشتراك">متابعة سداد واشتراك</option>' +
+                    '<option value="خطأ متابعة إشراف">خطأ متابعة إشراف</option>' +
+                  '</select>' +
+                  '<input type="text" id="drw_sec_txt_' + r.rowKey + '" class="form-input" placeholder="اكتب الملاحظة السرية للإدارة فقط..." style="flex:1; min-width:230px;" />' +
+                  '<button type="button" class="btn btn-primary" style="background:#E11D48;" data-save-drw-secret="' + r.rowKey + '" data-stuid="' + r.studentId + '" data-teaid="' + r.teacherId + '">🔒 حفظ الملاحظة السرية</button>' +
+                '</div>'
+              ) : '') +
+            '</td></tr>';
           }
 
-          return '<tr style="background:' + rowBg + ';">' +
-            '<td><input type="time" class="form-input" data-flex-day-time="' + r.studentId + '" data-lesid="' + (r.lessonId || '') + '" value="' + r.time + '" ' + (canEditTime ? '' : 'disabled') + ' style="font-weight:800; font-size:0.86rem; color:#1E3A8A; background:#EFF6FF; border-color:#BFDBFE; padding:5px 8px;" title="تعديل التوقيت بمرونة لهذا اليوم" /></td>' +
-            '<td><strong>' + escHtml(r.studentName) + '</strong> <span class="status-pill pill-blue" style="font-size:0.68rem;">' + escHtml(r.studentCountry) + '</span><div style="font-size:0.73rem; color:var(--slate-500); margin-top:2px;">📌 الموعد الثابت: ' + escHtml(r.scheduleText || 'غير محدد') + '</div></td>' +
-            '<td><strong>' + escHtml(r.teacherName) + '</strong></td>' +
-            '<td><input type="number" min="15" step="5" class="form-input" data-flex-day-dur="' + r.studentId + '" data-lesid="' + (r.lessonId || '') + '" value="' + r.durationMin + '" ' + (canEditTime ? '' : 'disabled') + ' style="width:72px; padding:4px 6px; font-weight:800; text-align:center;" title="تعديل مدة حلقة اليوم بالدقائق" /></td>' +
-            '<td><strong style="font-size:0.86rem; color:var(--primary);">' + r.consumedLessons + ' / ' + r.totalLessons + '</strong><div style="font-size:0.7rem; color:var(--slate-500);">متبقي: ' + Math.max(0, r.totalLessons - r.consumedLessons) + '</div></td>' +
-            '<td>' + statusPill + '</td>' +
-            approvalCellHtml +
-          '</tr>';
+          return mainRowHtml + drawerRowHtml;
         }).join('');
       }
 
@@ -4272,23 +4843,50 @@
       var container = document.getElementById('studentsListContainer');
       var perms = getActivePermissions();
 
-      // تحديث شريط التذكير الدائم أعلى المنصة للطلاب الذين لم يدفعوا أو المسموح لهم بالاستكمال الآجل
-      var unpaidStudents = state.students.filter(function (s) {
-        return s.paymentStatus === 'CREDIT_ALLOWED' || s.paymentStatus === 'UNPAID';
+      // تحديث شريط التذكير بالطلاب الذين لم يجددوا أو لم يسددوا (قابل للطي في حساب الإدارة، وثابت للإشراف المصرح له فقط)
+      var nonRenewedOrUnpaid = state.students.filter(function (s) {
+        var notPaid = (s.paymentStatus === 'CREDIT_ALLOWED' || s.paymentStatus === 'UNPAID');
+        var notRenewed = (s.renewalStatus === 'PENDING_RENEWAL' || s.consumedLessons >= s.totalLessons);
+        return notPaid || notRenewed;
       });
+      var canSeeRenewalAlert = perms.isAdmin || state.userRole === 'OWNER_VIEWER' || !!perms.view_unpaid_renewal_alert;
+      var isCollapsibleForAdmin = perms.isAdmin || state.userRole === 'OWNER_VIEWER';
+
       var globalBanner = document.getElementById('unpaidStudentsGlobalAlert');
       if (globalBanner) {
-        if (unpaidStudents.length > 0) {
+        if (nonRenewedOrUnpaid.length > 0 && canSeeRenewalAlert) {
           globalBanner.classList.remove('hidden');
-          globalBanner.innerHTML = '<div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;">' +
-            '<div>' +
-              '<strong>🚨 تذكير دائم باشتراكات لم يتم دفعها (' + unpaidStudents.length + ' طلاب يستكملون الحلقات لحين السداد):</strong> ' +
-              unpaidStudents.map(function (st) {
-                return '<span class="status-pill pill-rose" style="margin:2px 4px; border:1px solid #F43F5E;">⚠️ ' + escHtml(st.name) + ' (' + st.consumedLessons + '/' + st.totalLessons + ' حلقات — ' + escHtml(st.foreignPackageText || '') + ')</span>';
-              }).join('') +
-            '</div>' +
-            '<button type="button" class="btn btn-danger-soft" id="btnJumpToUnpaidStudents" style="background:#FFFFFF; font-weight:800;">عرض الطلاب غير المسددين ←</button>' +
+          var pillsHtml = nonRenewedOrUnpaid.map(function (st) {
+            var isDonePkg = st.consumedLessons >= st.totalLessons;
+            var tagTxt = isDonePkg ? '🔔 انتهت الباقة ولم يجدد' : (st.paymentStatus === 'CREDIT_ALLOWED' ? '🚨 يستكمل ولم يدفع' : '⭕ لم يدفع');
+            var moneyInfo = perms.see_student_money && st.foreignPackageText ? (' — ' + escHtml(st.foreignPackageText)) : '';
+            return '<span class="status-pill pill-rose" style="margin:3px 4px; border:1px solid #F43F5E; background:#FFFFFF;">' +
+              '<strong>' + escHtml(st.name) + '</strong> (' + st.consumedLessons + '/' + st.totalLessons + ' • ' + tagTxt + moneyInfo + ')' +
+            '</span>';
+          }).join('');
+
+          var innerContentHtml = '<div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin-top:8px;">' +
+            '<div style="line-height:1.8;">' + pillsHtml + '</div>' +
+            (perms.view_students ? '<button type="button" class="btn btn-danger-soft" id="btnJumpToUnpaidStudents" style="background:#FFFFFF; font-weight:800;">فتح قائمة التجديد والدفع ←</button>' : '') +
           '</div>';
+
+          if (isCollapsibleForAdmin) {
+            globalBanner.innerHTML = '<details id="adminUnpaidDetailsToggle" ' + (state.adminUnpaidBannerOpen ? 'open' : '') + ' style="cursor:pointer;">' +
+              '<summary style="font-size:0.86rem; font-weight:800; color:#881337; list-style:none; display:flex; justify-content:space-between; align-items:center;">' +
+                '<span>🚨 تذكير الطلاب الذين لم يجددوا الباقة أو لم يسددوا (' + nonRenewedOrUnpaid.length + ' طلاب) — (قابل للطي للإدارة)</span>' +
+                '<span class="status-pill pill-rose" style="background:#FFFFFF; border:1px solid #F43F5E;">اضغط للعرض / الطي ▾</span>' +
+              '</summary>' +
+              innerContentHtml +
+            '</details>';
+          } else {
+            // ثابت ومفتوح دائماً للمشرف المصرح له بمتابعة التجديد والدفع
+            globalBanner.innerHTML = '<div>' +
+              '<div style="font-size:0.86rem; font-weight:800; color:#881337; margin-bottom:4px;">' +
+                '🚨 تذكير دائم للمتابعة: طلاب لم يجددوا الباقة أو لم يسددوا الاشتراك بعد (' + nonRenewedOrUnpaid.length + ' طلاب):' +
+              '</div>' +
+              innerContentHtml +
+            '</div>';
+          }
         } else {
           globalBanner.classList.add('hidden');
         }
@@ -4485,7 +5083,7 @@
         csv += '"مخصص الإعلانات",' + summary.adBudget.toFixed(2) + ',"جنيه مصري"\n';
         csv += '"الصافي القابل للتوزيع",' + summary.distributableProfit.toFixed(2) + ',"جنيه مصري"\n';
         csv += '"الصدقة المباركة (5%)",' + summary.charityAmount.toFixed(2) + ',"جنيه مصري"\n';
-        csv += '"نصيب تطوير الأكاديمية (الثلثين)",' + summary.academyShare.toFixed(2) + ',"جنيه مصري"\n';
+        csv += '"نسبة الأكاديمية (الثلثين)",' + summary.academyShare.toFixed(2) + ',"جنيه مصري"\n';
         csv += '"أرباح الإدارة الصافية (الثلث)",' + summary.adminShare.toFixed(2) + ',"جنيه مصري"\n';
       }
 
@@ -4684,6 +5282,25 @@
           });
           renderAll();
           showToast('تم تحديث ما يعادل الباقة بالمصري وتحديث الميزانية', false);
+          return;
+        }
+
+        var drwStatRowKey = e.target.getAttribute && e.target.getAttribute('data-drw-status-change');
+        if (drwStatRowKey) {
+          var newStVal = e.target.value;
+          var treatSel = document.getElementById('drw_exec_treat_' + drwStatRowKey);
+          var rcatSel = document.getElementById('drw_exec_rcat_' + drwStatRowKey);
+          if (treatSel) {
+            if (newStVal === 'NOT_DONE' && treatSel.value === 'NORMAL_MAKEUP') {
+              treatSel.value = 'DEFERRED_LATER';
+            } else if (newStVal !== 'NOT_DONE' && treatSel.value === 'DEFERRED_LATER') {
+              treatSel.value = 'NORMAL_MAKEUP';
+            }
+          }
+          if (rcatSel) {
+            if (newStVal === 'NOT_DONE' && rcatSel.value === 'NONE') rcatSel.value = 'STUDENT_NO_REPLY';
+            if (newStVal !== 'NOT_DONE') rcatSel.value = 'NONE';
+          }
           return;
         }
 
@@ -5012,6 +5629,236 @@
           state.currentUserName = supObj.name;
           renderAll(true);
           showToast('👁️ أنت الآن تعاين الواجهة بصلاحيات: ' + supObj.name + ' (يمكنك العودة للإدارة من القائمة العلوية)', false);
+          return;
+        }
+
+        // فتح أو إغلاق درج الكشف التدريجي (EXEC | QUALITY | SECRET) لصف معين في جدول اليوم
+        var toggleDrwKey = target.getAttribute('data-toggle-row-drawer');
+        if (toggleDrwKey) {
+          var dType = target.getAttribute('data-dtype') || 'EXEC';
+          if (state.activeRowDrawer && state.activeRowDrawer.rowKey === toggleDrwKey && state.activeRowDrawer.drawerType === dType) {
+            state.activeRowDrawer = null;
+          } else {
+            state.activeRowDrawer = { rowKey: toggleDrwKey, drawerType: dType };
+          }
+          renderTodayScheduleView();
+          return;
+        }
+
+        if (target.getAttribute('data-close-row-drawer')) {
+          state.activeRowDrawer = null;
+          renderTodayScheduleView();
+          return;
+        }
+
+        // حفظ واعتماد درج التنفيذ والمعالجة المالية (القواعد الـ 4 الأصلية + منع الخصم المكرر)
+        var saveExecRowKey = target.getAttribute('data-save-drw-exec');
+        if (saveExecRowKey) {
+          var stuIdE = target.getAttribute('data-stuid');
+          var teaIdE = target.getAttribute('data-teaid');
+          var timeValE = target.getAttribute('data-time') || '17:00';
+          var durValE = Number(target.getAttribute('data-dur')) || 30;
+          var dE = state.scheduleDateFilter || '2026-11-15';
+
+          var statusE = (document.getElementById('drw_exec_status_' + saveExecRowKey) || {}).value || 'DONE';
+          var treatE = (document.getElementById('drw_exec_treat_' + saveExecRowKey) || {}).value || 'NORMAL_MAKEUP';
+          var tierE = (document.getElementById('drw_exec_tier_' + saveExecRowKey) || {}).value || 'RATE_1';
+          var rcatE = (document.getElementById('drw_exec_rcat_' + saveExecRowKey) || {}).value || 'NONE';
+          var noteE = ((document.getElementById('drw_exec_note_' + saveExecRowKey) || {}).value || '').trim();
+
+          if (statusE === 'NOT_DONE' && rcatE === 'NONE') {
+            rcatE = 'STUDENT_NO_REPLY';
+          }
+
+          var stObjE = state.students.find(function (s) { return s.id === stuIdE; });
+          var tObjE = state.teachers.find(function (t) { return t.id === teaIdE; });
+          var activeSupE = getActiveSupervisorObj();
+
+          // حساب فرق خصم الباقة (Delta Deduction) لمنع أي خصم مكرر أو خطأ عند تعديل القرار
+          var existingLessonE = state.lessons.find(function (l) { return l.date === dE && l.studentId === stuIdE; });
+          var prevDeducted = false;
+          if (existingLessonE) {
+            var prevRule = TREATMENT_RULES[existingLessonE.treatment];
+            prevDeducted = !!(prevRule && prevRule.deductsStudent);
+          }
+
+          var newRule = TREATMENT_RULES[treatE];
+          var newDeducted = !!(newRule && newRule.deductsStudent && treatE !== 'DEFERRED_LATER');
+
+          if (treatE === 'DEFERRED_LATER') {
+            // إذا كانت مؤجلة لموعد آخر، لا ننشئ سجل دقائق مالي اليوم، ونزيل أي سجل سابق لهذا اليوم
+            if (existingLessonE) {
+              state.lessons = state.lessons.filter(function (l) { return l.id !== existingLessonE.id; });
+            }
+          } else {
+            if (!existingLessonE) {
+              state.lessons.unshift({
+                id: 'l_day_' + Date.now(),
+                date: dE,
+                time: timeValE,
+                studentId: stuIdE,
+                teacherId: teaIdE,
+                durationMin: durValE,
+                rateTier: tierE,
+                treatment: treatE,
+                notes: noteE || (statusE === 'DONE' ? 'تمت الحلقة' : (REASON_LABELS[rcatE] || 'لم تتم'))
+              });
+            } else {
+              state.lessons = state.lessons.map(function (l) {
+                return l.id === existingLessonE.id
+                  ? Object.assign({}, l, { time: timeValE, durationMin: durValE, rateTier: tierE, treatment: treatE, notes: noteE || l.notes })
+                  : l;
+              });
+            }
+          }
+
+          // تطبيق فرق خصم الباقة بدقة (+1 أو -1 أو 0)
+          var deductDelta = (newDeducted ? 1 : 0) - (prevDeducted ? 1 : 0);
+          if (deductDelta !== 0) {
+            state.students = state.students.map(function (s) {
+              return s.id === stuIdE
+                ? Object.assign({}, s, { consumedLessons: Math.max(0, s.consumedLessons + deductDelta) })
+                : s;
+            });
+          }
+
+          // حفظ المعالجة المختارة في customDayTimes أيضاً
+          var cKeyE = dE + '__' + stuIdE;
+          state.customDayTimes[cKeyE] = Object.assign({}, state.customDayTimes[cKeyE] || {}, { treatment: treatE, rateTier: tierE });
+
+          // تحديث سجل تقرير التنفيذ اليومي بدون تكرار (Upsert)
+          state.dailyReports = state.dailyReports.filter(function (r) {
+            return !(r.type === 'EXECUTION' && r.date === dE && (r.studentId === stuIdE || (stObjE && r.studentName === stObjE.name)));
+          });
+          state.dailyReports.unshift({
+            id: 'rep_exec_' + Date.now(),
+            type: 'EXECUTION',
+            date: dE,
+            studentId: stuIdE,
+            teacherId: teaIdE,
+            teacherName: tObjE ? tObjE.name : '',
+            studentName: stObjE ? stObjE.name : '',
+            status: statusE,
+            reasonCat: statusE === 'NOT_DONE' ? rcatE : 'NONE',
+            note: noteE || (statusE === 'NOT_DONE' ? (REASON_LABELS[rcatE] || 'لم تتم الحلقة') : 'تمت الحلقة'),
+            createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : activeSupE.id,
+            createdByName: state.currentUserName || activeSupE.name,
+            createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+          });
+
+          state.activeRowDrawer = null;
+          renderAll();
+          showToast('✅ تم حفظ قرار التنفيذ والمعالجة المالية وتحديث الباقة والتقرير بنجاح', false);
+          return;
+        }
+
+        // حفظ درج التقييم الأكاديمي والجودة (مستقل تماماً عن السجل المالي)
+        var saveQualRowKey = target.getAttribute('data-save-drw-qual');
+        if (saveQualRowKey) {
+          var stuIdQ = target.getAttribute('data-stuid');
+          var teaIdQ = target.getAttribute('data-teaid');
+          var dQ = state.scheduleDateFilter || '2026-11-15';
+          var stObjQ = state.students.find(function (s) { return s.id === stuIdQ; });
+          var tObjQ = state.teachers.find(function (t) { return t.id === teaIdQ; });
+          var activeSupQ = getActiveSupervisorObj();
+
+          var qModeVal = (document.getElementById('drw_qual_mode_' + saveQualRowKey) || {}).value || 'EVALUATED';
+          var qGroupVal = (document.getElementById('drw_qual_group_' + saveQualRowKey) || {}).value || 'صغار';
+          var qSkipVal = ((document.getElementById('drw_qual_skip_' + saveQualRowKey) || {}).value || '').trim();
+          var qCamVal = (document.getElementById('drw_qual_cam_' + saveQualRowKey) || {}).value || 'مفتوحة';
+          var qPptVal = (document.getElementById('drw_qual_ppt_' + saveQualRowKey) || {}).value || 'يوجد';
+          var qWaitVal = (document.getElementById('drw_qual_wait_' + saveQualRowKey) || {}).value || 'لا يوجد';
+          var qInterVal = (document.getElementById('drw_qual_inter_' + saveQualRowKey) || {}).value || 'ممتاز';
+          var qNoteVal = ((document.getElementById('drw_qual_note_' + saveQualRowKey) || {}).value || '').trim();
+
+          var chosenCrit = [];
+          document.querySelectorAll('.drw-crit-chk-' + saveQualRowKey + ':checked').forEach(function (chk) {
+            chosenCrit.push(chk.value);
+          });
+
+          state.dailyReports = state.dailyReports.filter(function (r) {
+            return !(r.type === 'ACADEMIC' && r.date === dQ && (r.studentId === stuIdQ || (stObjQ && r.studentName === stObjQ.name)));
+          });
+
+          state.dailyReports.unshift({
+            id: 'rep_acad_' + Date.now(),
+            type: 'ACADEMIC',
+            evalStatus: qModeVal,
+            skipReason: qModeVal === 'SKIPPED_NOT_DONE' ? (qSkipVal || 'لم تتم الحلقة') : '',
+            date: dQ,
+            studentId: stuIdQ,
+            teacherId: teaIdQ,
+            teacherName: tObjQ ? tObjQ.name : '',
+            studentName: stObjQ ? stObjQ.name : '',
+            ageGroup: qGroupVal,
+            camera: qCamVal,
+            ppt: qPptVal,
+            waiting: qWaitVal,
+            interaction: qInterVal,
+            quranPerf: 'ممتاز',
+            delivery: 'ممتاز',
+            criteria: qModeVal === 'SKIPPED_NOT_DONE' ? [] : chosenCrit,
+            note: qNoteVal,
+            createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : activeSupQ.id,
+            createdByName: state.currentUserName || activeSupQ.name,
+            createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+          });
+
+          state.activeRowDrawer = null;
+          renderAll();
+          showToast('🌷 تم حفظ التقييم الأكاديمي للحلقة في سجل الجودة بنجاح', false);
+          return;
+        }
+
+        // حفظ ملاحظة إشرافية سرية للإدارة فقط (منفصلة تماماً عن تقارير الواتساب العامة)
+        var saveSecRowKey = target.getAttribute('data-save-drw-secret');
+        if (saveSecRowKey) {
+          var stuIdS = target.getAttribute('data-stuid');
+          var teaIdS = target.getAttribute('data-teaid');
+          var dS = state.scheduleDateFilter || '2026-11-15';
+          var catS = (document.getElementById('drw_sec_cat_' + saveSecRowKey) || {}).value || 'ملاحظة رقابية';
+          var txtElS = document.getElementById('drw_sec_txt_' + saveSecRowKey);
+          var txtS = txtElS ? txtElS.value.trim() : '';
+          if (!txtS) {
+            showToast('يرجى كتابة نص الملاحظة السرية أولاً', false);
+            return;
+          }
+          var stObjS = state.students.find(function (s) { return s.id === stuIdS; });
+          var tObjS = state.teachers.find(function (t) { return t.id === teaIdS; });
+          var activeSupS = getActiveSupervisorObj();
+
+          state.confidentialNotes.unshift({
+            id: 'sec_' + Date.now(),
+            date: dS,
+            studentId: stuIdS,
+            studentName: stObjS ? stObjS.name : '',
+            teacherId: teaIdS,
+            teacherName: tObjS ? tObjS.name : '',
+            category: catS,
+            text: txtS,
+            createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : activeSupS.id,
+            createdByName: state.currentUserName || activeSupS.name,
+            createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+          });
+
+          renderAll();
+          showToast('🔒 تم حفظ الملاحظة السرية في السجل الرقابي الخاص بالإدارة', false);
+          return;
+        }
+
+        var delSecId = target.getAttribute('data-del-secret-note');
+        if (delSecId) {
+          state.confidentialNotes = (state.confidentialNotes || []).filter(function (c) { return c.id !== delSecId; });
+          renderAll();
+          showToast('تم حذف الملاحظة السرية', false);
+          return;
+        }
+
+        // فلتر حالة حلقات اليوم السريع (ALL | PENDING | DONE | NOT_DONE)
+        var tFilterVal = target.getAttribute('data-tfilter');
+        if (tFilterVal) {
+          state.todayStatusFilter = tFilterVal;
+          renderTodayScheduleView();
           return;
         }
 
@@ -5458,19 +6305,22 @@
 
         var renewStudentId = target.getAttribute('data-renew-student');
         if (renewStudentId) {
+          var todayIso = new Date().toISOString().slice(0, 10);
+          var nextMonthDate = new Date();
+          nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+          var nextMonthIso = nextMonthDate.toISOString().slice(0, 10);
+
           state.students = state.students.map(function (s) {
             if (s.id !== renewStudentId) return s;
-            var orig = typeof s.tuitionOriginal === 'number' ? s.tuitionOriginal : 100;
-            var newOrig = orig * 2;
-            var rate = s.exchangeRate || 1;
             return Object.assign({}, s, {
-              totalLessons: s.totalLessons + 8,
-              tuitionOriginal: newOrig,
-              tuitionReceived: Math.round(newOrig * rate * 100) / 100
+              consumedLessons: 0,
+              subStartDate: todayIso,
+              renewalDate: nextMonthIso,
+              renewalStatus: 'RENEWED'
             });
           });
           renderAll();
-          showToast('🔄 تم تجديد باقة الطالب (+8 حلقات جديدة بعملته)', false);
+          showToast('🔄 تم تجديد باقة الطالب بنجاح وبدء دورة حلقات جديدة مع الحفاظ على قيمة باقته', false);
           return;
         }
 
@@ -5530,7 +6380,7 @@
           '• الربح الصافي الأولي: ' + s.initialNetProfit.toFixed(2) + ' جنيه',
           '• مخصص الإعلانات: ' + s.adBudget.toFixed(2) + ' جنيه',
           '• الصدقة المباركة (5%): ' + s.charityAmount.toFixed(2) + ' جنيه',
-          '• نصيب الأكاديمية (الثلثين): ' + s.academyShare.toFixed(2) + ' جنيه',
+          '• نسبة الأكاديمية (الثلثين): ' + s.academyShare.toFixed(2) + ' جنيه',
           '• أرباح الإدارة الصافية (الثلث): ' + s.adminShare.toFixed(2) + ' جنيه'
         ].join('\n');
         copyText(report, 'تقرير الواتساب الشامل');
@@ -5798,6 +6648,31 @@
         copyText(lines.join('\n'), 'التقييم الأكاديمي للواتساب');
       });
 
+      function copyConfidentialAdminReport() {
+        var d = state.scheduleDateFilter || '2026-11-15';
+        var notesToday = (state.confidentialNotes || []).filter(function (c) { return c.date === d; });
+        var lines = [
+          '🔒 *التقرير الرقابي السري الخاص بالإدارة (' + d + ')*',
+          'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ'
+        ];
+        if (notesToday.length === 0) {
+          lines.push('لا توجد ملاحظات سرية مسجلة في هذا اليوم.');
+        } else {
+          notesToday.forEach(function (c, idx) {
+            lines.push((idx + 1) + '• [' + c.category + '] الطالب: ' + c.studentName + ' | المعلم: ' + c.teacherName + '\n🔒 الملاحظة: ' + c.text + '\n👤 بواسطة: ' + c.createdByName + ' (' + c.createdAt + ')\nــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ');
+          });
+        }
+        copyText(lines.join('\n'), 'التقرير الرقابي السري للإدارة');
+      }
+
+      document.getElementById('btnQuickCopyQualityWaToday').addEventListener('click', function () {
+        state.reportsDateFilter = state.scheduleDateFilter || '2026-11-15';
+        document.getElementById('btnCopyAcadReportWa').click();
+      });
+
+      document.getElementById('btnQuickCopySecretWaToday').addEventListener('click', copyConfidentialAdminReport);
+      document.getElementById('btnCopyConfidentialReportWa').addEventListener('click', copyConfidentialAdminReport);
+
       document.getElementById('btnCopyTrialsWa').addEventListener('click', function () {
         var lines = ['🌸 حلقات التجريبي 🌸', (state.reportsDateFilter || ''), 'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ'];
         state.trialStudents.forEach(function (tr, idx) {
@@ -5831,11 +6706,14 @@
             view_finance: document.getElementById('perm_view_finance').checked,
             edit_schedule: document.getElementById('perm_edit_schedule').checked,
             approve_today_lessons: document.getElementById('perm_approve_today').checked,
+            evaluate_quality: document.getElementById('perm_evaluate_quality').checked,
+            add_confidential_note: document.getElementById('perm_add_confidential').checked,
             add_lesson: document.getElementById('perm_add_lesson').checked,
             edit_teachers: document.getElementById('perm_edit_teachers').checked,
             see_teacher_rates: document.getElementById('perm_see_teacher_rates').checked,
             edit_students: document.getElementById('perm_edit_students').checked,
             see_student_money: document.getElementById('perm_see_student_money').checked,
+            view_unpaid_renewal_alert: document.getElementById('perm_view_unpaid_alert').checked,
             delete_items: document.getElementById('perm_delete_items').checked,
             copy_whatsapp: document.getElementById('perm_copy_whatsapp').checked
           }
@@ -5950,6 +6828,119 @@
           document.getElementById('accessCodeLoginModal').classList.remove('hidden');
         }
       } catch (err) {}
+
+      var btnGoToday = document.getElementById('btnExecGoToday');
+      if (btnGoToday) btnGoToday.addEventListener('click', function () { switchTab('today-schedule'); });
+      var btnGoTea = document.getElementById('btnExecGoTeachers');
+      if (btnGoTea) btnGoTea.addEventListener('click', function () { switchTab('teachers'); });
+      var btnGoStu = document.getElementById('btnExecGoStudents');
+      if (btnGoStu) btnGoStu.addEventListener('click', function () { switchTab('students'); });
+
+      // إعداد وتفعيل تثبيت المنصة كتطبيق مستقل (PWA) مجاناً وبملف واحد
+      var deferredPwaPrompt = null;
+      try {
+        var iconCanvas = document.createElement('canvas');
+        iconCanvas.width = 192;
+        iconCanvas.height = 192;
+        var ctx = iconCanvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#0F172A';
+          ctx.fillRect(0, 0, 192, 192);
+          ctx.fillStyle = '#10B981';
+          ctx.beginPath();
+          ctx.arc(96, 96, 76, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 78px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('مِحراب', 96, 102);
+        }
+        var iconDataUrl = iconCanvas.toDataURL('image/png');
+        var manifestObj = {
+          name: 'نظام مِحراب ERP لإدارة الأكاديمية',
+          short_name: 'مِحراب ERP',
+          description: 'منصة إدارة الحلقات والمعلمين والطلاب والميزانية',
+          start_url: window.location.href.split('?')[0],
+          display: 'standalone',
+          background_color: '#0F172A',
+          theme_color: '#0F172A',
+          dir: 'rtl',
+          lang: 'ar',
+          icons: [
+            { src: iconDataUrl, sizes: '192x192', type: 'image/png' },
+            { src: iconDataUrl, sizes: '512x512', type: 'image/png' }
+          ]
+        };
+        var manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        var manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = URL.createObjectURL(manifestBlob);
+        document.head.appendChild(manifestLink);
+      } catch (e) {}
+
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+      });
+
+      document.getElementById('btnInstallPwaApp').addEventListener('click', function () {
+        if (deferredPwaPrompt) {
+          deferredPwaPrompt.prompt();
+          deferredPwaPrompt.userChoice.then(function () {
+            deferredPwaPrompt = null;
+          });
+        } else {
+          document.getElementById('pwaInstallGuideModal').classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('btnClosePwaModal').addEventListener('click', function () {
+        document.getElementById('pwaInstallGuideModal').classList.add('hidden');
+      });
+
+      document.getElementById('btnConfirmPwaModal').addEventListener('click', function () {
+        document.getElementById('pwaInstallGuideModal').classList.add('hidden');
+      });
+
+      // تفعيل قائمة التصدير والنسخ في الشريط العلوي
+      var btnToggleExp = document.getElementById('btnToggleExportMenu');
+      var expMenu = document.getElementById('headerExportMenu');
+      if (btnToggleExp && expMenu) {
+        btnToggleExp.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          expMenu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function (ev) {
+          if (!expMenu.classList.contains('hidden') && !expMenu.contains(ev.target) && ev.target !== btnToggleExp) {
+            expMenu.classList.add('hidden');
+          }
+        });
+      }
+
+      // تفعيل أزرار صندوق النسخ الفوري المضمون
+      var closeCopyModal = function () {
+        var m = document.getElementById('instantCopyBoxModal');
+        if (m) m.classList.add('hidden');
+      };
+      document.getElementById('btnCloseInstantCopyModal').addEventListener('click', closeCopyModal);
+      document.getElementById('btnCloseInstantCopyModal2').addEventListener('click', closeCopyModal);
+      document.getElementById('btnExecModalCopyNow').addEventListener('click', function () {
+        var area = document.getElementById('instantCopyTextarea');
+        if (area) {
+          performRawCopy(area.value);
+          area.focus();
+          area.select();
+          showToast('✅ تم نسخ النص إلى الحافظة بنجاح!', false);
+        }
+      });
+
+      // حفظ حالة فتح/طي شريط تذكير التجديد والدفع في حساب الإدارة
+      document.body.addEventListener('toggle', function (ev) {
+        if (ev.target && ev.target.id === 'adminUnpaidDetailsToggle') {
+          state.adminUnpaidBannerOpen = ev.target.open;
+        }
+      }, true);
 
       renderAll(true);
       if (state.webhookUrl) {
