@@ -669,6 +669,14 @@
       display: none !important;
     }
 
+    body.readonly-viewer-mode [data-toggle-edit-student],
+    body.readonly-viewer-mode [data-inc-total-lessons],
+    body.readonly-viewer-mode [data-dec-total-lessons],
+    body.readonly-viewer-mode input[data-edit-total-lessons],
+    body.readonly-viewer-mode input[data-edit-consumed-lessons],
+    body.readonly-viewer-mode input[data-edit-lesson-dur],
+    body.readonly-viewer-mode select[data-edit-lesson-teacher],
+    body.readonly-viewer-mode select[data-edit-lesson-treat],
     body.readonly-viewer-mode input[data-edit-lesson-time],
     body.readonly-viewer-mode input[data-edit-lesson-date],
     body.readonly-viewer-mode input[data-edit-schedule],
@@ -758,6 +766,78 @@
     </div>
   </div>
 
+  <!-- 🤖 المساعد الذكي الهجين لنظام مِحراب ERP (محرك محلي فائق + ربط اختياري مجاني بـ Gemini API + حارس RBAC) -->
+  <div id="smartAssistantModal" class="hidden" style="position:fixed; inset:0; z-index:9997; background:rgba(15,23,42,0.75); display:flex; align-items:center; justify-content:center; padding:14px;">
+    <div class="card" style="max-width:780px; width:100%; max-height:92vh; display:flex; flex-direction:column; padding:18px; border-radius:20px; box-shadow:0 24px 60px rgba(0,0,0,0.45); border:2px solid var(--primary); background:#FFFFFF;">
+      <!-- الشريط العلوي للمساعد -->
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; padding-bottom:10px; border-bottom:1px solid var(--slate-200); margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, #1E3A8A, #2563EB); color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:1.35rem;">🤖</div>
+          <div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <strong style="font-size:1.05rem; color:var(--slate-900);">المساعد الذكي الهجين — مِحراب ERP</strong>
+              <span id="smartAssistantRoleBadge" class="status-pill pill-blue" style="font-size:0.69rem;"></span>
+              <span id="smartAssistantEngineBadge" class="status-pill pill-emerald" style="font-size:0.69rem;">⚡ محلي فائق</span>
+            </div>
+            <span style="font-size:0.73rem; color:var(--slate-500);">يفهم الفصحى والعامية وينفذ الاستعلامات والإضافة والتعديل بدقة وفق صلاحيات حسابك فقط</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" id="btnToggleSmartAiSettings" class="btn btn-soft" style="padding:5px 10px; font-size:0.74rem;" title="إعدادات الذكاء الاصطناعي الاختيارية (Gemini API المجاني)">⚙️ ربط Gemini</button>
+          <button type="button" id="btnClearSmartChat" class="btn btn-soft" style="padding:5px 10px; font-size:0.74rem;" title="بدء محادثة جديدة">🧹 مسح</button>
+          <button type="button" id="btnCloseSmartAssistant" class="btn btn-soft" style="padding:5px 12px;">إغلاق ✕</button>
+        </div>
+      </div>
+
+      <!-- لوحة إعدادات ربط Gemini API الاختيارية (مخفية افتراضياً، محفوظة محلياً في جهازك فقط) -->
+      <div id="smartAiSettingsPanel" class="hidden" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:12px; padding:12px; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="font-size:0.82rem; color:#1E3A8A;">🧠 تفعيل الوضع الهجين (ربط اختياري بمفتاح Gemini API المجاني من Google AI Studio)</strong>
+          <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="font-size:0.74rem; font-weight:800; color:#2563EB; text-decoration:underline;">احصل على مفتاح مجاني ↗</a>
+        </div>
+        <div style="font-size:0.73rem; color:var(--slate-600); margin-bottom:8px;">
+          • يُحفظ المفتاح محلياً على متصفحك فقط (لا يُرفع لجدول البيانات أبداً).<br/>
+          • عند تفعيله، يُرسل للنموذج <strong>فقط</strong> البيانات المسموحة لصلاحيات حسابك الحالي، وكل تعديل يمر بحارس الصلاحيات (RBAC) وبطاقة تأكيد آمنة.
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <input type="password" id="smartGeminiKeyInput" class="form-input" dir="ltr" placeholder="AIzaSy..." style="flex:1; min-width:210px; font-size:0.78rem; padding:6px 10px;" />
+          <label style="display:flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:700; cursor:pointer;">
+            <input type="checkbox" id="chkSmartUseGemini" />
+            <span>تفعيل Gemini الهجين</span>
+          </label>
+          <button type="button" id="btnSaveSmartGeminiKey" class="btn btn-primary" style="padding:6px 12px; font-size:0.75rem;">💾 حفظ الإعدادات</button>
+        </div>
+      </div>
+
+      <!-- أزرار الاستعلامات والأوامر السريعة (تتكيّف تلقائياً مع صلاحيات الدور الحالي) -->
+      <div id="smartQuickChipsRow" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;"></div>
+
+      <!-- سجل المحادثة التفاعلية -->
+      <div id="smartAssistantResponseBox" style="flex:1; overflow-y:auto; background:var(--slate-50); border:1px solid var(--slate-200); border-radius:14px; padding:12px; font-size:0.84rem; line-height:1.7; min-height:250px; display:flex; flex-direction:column; gap:10px;">
+      </div>
+
+      <!-- شريط الكتابة + الإكمال التلقائي الذكي -->
+      <div style="position:relative; margin-top:10px;">
+        <div id="smartAutocompleteList" class="hidden" style="position:absolute; bottom:100%; left:0; right:0; margin-bottom:6px; background:#FFFFFF; border:2px solid var(--blue-border); border-radius:12px; box-shadow:0 12px 30px rgba(15,23,42,0.18); max-height:190px; overflow-y:auto; z-index:20; padding:6px;"></div>
+        <form id="formSmartAssistantAsk" style="display:flex; gap:8px;">
+          <input type="text" id="smartAssistantInput" class="form-input" placeholder="اسأل بأي أسلوب (مثال: مين الطلبة اللي عند سها؟ | كم باقي في باقة رنيم؟ | زد باقة حنان لـ 12 | عدل سعر سلمى)..." style="flex:1; font-weight:700; border:2px solid var(--blue-border);" autocomplete="off" />
+          <button type="submit" class="btn btn-primary" style="padding:8px 18px; font-weight:800;">⚡ إرسال</button>
+        </form>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-top:8px; padding-top:8px; border-top:1px solid var(--slate-200);">
+        <button type="button" id="btnCopySmartAssistantReply" class="btn btn-emerald" style="font-size:0.75rem; padding:5px 12px;">📋 نسخ آخر إجابة</button>
+        <span style="font-size:0.71rem; color:var(--slate-500);">🔒 حارس الصلاحيات (RBAC) مفعل دائماً • اكتب حرفين لعرض الاقتراحات التلقائية</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- زر عائم سريع لفتح المساعد الذكي من أي شاشة -->
+  <button type="button" id="btnFloatingSmartAssistant" title="افتح المساعد الذكي لمِحراب" style="position:fixed; bottom:20px; left:20px; z-index:9990; background:linear-gradient(135deg, #1E3A8A, #2563EB); color:#FFFFFF; border:2px solid #93C5FD; border-radius:999px; padding:10px 18px; font-family:'Tajawal',sans-serif; font-size:0.86rem; font-weight:800; cursor:pointer; box-shadow:0 10px 25px rgba(30,58,138,0.45); display:flex; align-items:center; gap:8px;">
+    <span style="font-size:1.15rem;">🤖</span>
+    <span>المساعد الذكي</span>
+  </button>
+
   <!-- الهيدر الرئيسي -->
   <header class="app-header">
     <div class="container">
@@ -771,6 +851,9 @@
         </div>
 
         <div class="header-actions">
+          <button type="button" id="btnOpenSmartAssistantHeader" class="btn btn-primary" style="background: linear-gradient(135deg, #2563EB, #1D4ED8); border: 1px solid #93C5FD; font-weight:800;" title="اسأل المساعد الذكي عن أي طالب أو معلم أو موعد أو تقرير">
+            <span>🤖 المساعد الذكي</span>
+          </button>
           <button type="button" id="btnInstallPwaApp" class="btn btn-emerald" style="background: linear-gradient(135deg, #059669, #10B981); border-color: #34D399;" title="تثبيت المنصة كتطبيق مستقل على شاشة الهاتف أو الكمبيوتر مجاناً">
             <span>📲 تثبيت كتطبيق</span>
           </button>
@@ -1685,7 +1768,10 @@
               <div class="section-title">📡 كشف رادار المعلمين والأجور (بالجنيه المصري)</div>
               <div class="section-desc">يمكنك نسخ كشف حساب واتساب بالجنيه لأي معلم بضغطة زر</div>
             </div>
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+              <div style="position:relative; display:flex; align-items:center;">
+                <input type="text" id="teacherSearchInput" class="form-input" placeholder="🔍 ابحث عن معلم بالاسم أو التخصص أو الرقم..." style="width: 240px; padding: 6px 10px; font-size: 0.78rem; font-weight: 700; border: 2px solid var(--blue-border);" />
+              </div>
               <select id="teacherFilterSelect" class="form-select" style="width: auto; padding: 6px 10px; font-size: 0.78rem;">
                 <option value="ALL">جميع المعلمين</option>
                 <option value="UNASSIGNED">⚠️ بلا طلاب (جاهز)</option>
@@ -1815,6 +1901,9 @@
               <div class="section-desc">يظهر الطلاب غير المسددين أو المسموح لهم باستكمال الحلقات لحين السداد باللون الأحمر التحذيري، ويتحول للأخضر فور ضغط "تأكيد الدفع"</div>
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+              <div style="position:relative; display:flex; align-items:center;">
+                <input type="text" id="studentSearchInput" class="form-input" placeholder="🔍 ابحث عن طالب بالاسم أو المعلم أو الموعد أو الدولة..." style="width: 265px; padding: 6px 10px; font-size: 0.78rem; font-weight: 700; border: 2px solid var(--blue-border);" />
+              </div>
               <select id="studentPayFilterSelect" class="form-select" style="width:auto; padding:5px 10px; font-size:0.78rem; font-weight:700;">
                 <option value="ALL">جميع الطلاب</option>
                 <option value="UNPAID_OR_CREDIT">🚨 لم يدفع / مسموح بالاستكمال (آجل)</option>
@@ -2424,8 +2513,12 @@
       includeHistoricalGap: true,
       adMode: 'PERCENTAGE',
       teacherFilter: 'ALL',
+      teacherSearchQuery: '',
       studentPayFilter: 'ALL',
+      studentSearchQuery: '',
       editingTeacherId: null,
+      editingStudentId: null,
+      lastSmartAssistantText: '',
       scheduleDateFilter: '2026-11-15',
       todayRosterMode: 'TODAY_MATCH',
       todayScheduleSearch: '',
@@ -4589,6 +4682,16 @@
                   '</select>' +
                 '</div>' +
               '</div>' +
+              '<div class="grid-4" style="gap:8px; margin-bottom:10px; padding:10px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px;">' +
+                '<div><label class="form-label" style="color:#1E3A8A;">⏰ تعديل موعد (ساعة) اليوم:</label><input type="time" id="drw_exec_time_' + r.rowKey + '" class="form-input" value="' + r.time + '" style="font-weight:800;" /></div>' +
+                '<div><label class="form-label" style="color:#1E3A8A;">⏱️ تعديل مدة الحلقة (د):</label><input type="number" min="10" step="5" id="drw_exec_dur_' + r.rowKey + '" class="form-input" value="' + r.durationMin + '" style="font-weight:800;" /></div>' +
+                '<div><label class="form-label" style="color:#1E3A8A;">👤 تعديل معلم الحلقة:</label><select id="drw_exec_teacher_' + r.rowKey + '" class="form-select" style="font-weight:700;">' +
+                  state.teachers.map(function (tch) {
+                    return '<option value="' + tch.id + '" ' + (tch.id === r.teacherId ? 'selected' : '') + '>' + escHtml(tch.name) + '</option>';
+                  }).join('') +
+                '</select></div>' +
+                '<div><label class="form-label" style="color:#1E3A8A;">📅 تعديل الموعد الثابت للطالب:</label><input type="text" id="drw_exec_sched_' + r.rowKey + '" class="form-input" value="' + escHtml(r.scheduleText || '') + '" placeholder="مثال: السبت والثلاثاء 5:00 م" style="font-weight:700;" /></div>' +
+              '</div>' +
               '<div class="grid-2" style="gap:10px; margin-bottom:10px;">' +
                 '<div>' +
                   '<label class="form-label">السبب التشغيلي (عند اختيار لم تتم الحلقة):</label>' +
@@ -4730,8 +4833,8 @@
             '<td><strong>' + escHtml(s.name) + '</strong></td>' +
             '<td>' + escHtml(s.country) + '</td>' +
             '<td>' + escHtml(t ? t.name : 'غير محدد') + '</td>' +
-            '<td><input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + escHtml(s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="padding:4px 8px; font-size:0.78rem; font-weight:700; color:var(--primary); width:240px;" /></td>' +
-            '<td><strong>' + s.consumedLessons + ' / ' + s.totalLessons + '</strong> حلقات</td>' +
+            '<td><input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + escHtml(s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="padding:4px 8px; font-size:0.78rem; font-weight:700; color:var(--primary); width:240px;" title="تعديل الموعد مباشرة دون إضافة موعد جديد" /></td>' +
+            '<td><div style="display:flex; align-items:center; gap:4px;"><input type="number" min="0" class="form-input" data-edit-consumed-lessons="' + s.id + '" value="' + s.consumedLessons + '" style="width:52px; padding:3px 5px; font-weight:800; text-align:center;" title="الحلقات المستهلكة" /><span>/</span><input type="number" min="1" class="form-input" data-edit-total-lessons="' + s.id + '" value="' + s.totalLessons + '" style="width:54px; padding:3px 5px; font-weight:800; text-align:center; color:var(--primary); background:#EFF6FF;" title="تعديل إجمالي حلقات الباقة زيادة أو نقصاناً" /> <span style="font-size:0.72rem;">حلقة</span></div></td>' +
             '<td><span class="status-pill pill-purple">' + escHtml(s.foreignPackageText || '—') + '</span></td>' +
             '<td><strong style="color:var(--emerald);">' + (perms.see_student_money ? (Number(s.tuitionReceived || 0).toFixed(2) + ' جنيه') : '—') + '</strong></td>' +
             '</tr>';
@@ -4759,13 +4862,20 @@
           var isCompleted = student ? (student.consumedLessons >= student.totalLessons) : false;
           var timeVal = l.time || '17:00';
 
+          var teacherOpts = state.teachers.map(function (tc) {
+            return '<option value="' + tc.id + '" ' + (tc.id === l.teacherId ? 'selected' : '') + '>' + escHtml(tc.name) + '</option>';
+          }).join('');
+          var treatOpts = Object.keys(TREATMENT_RULES).map(function (tk) {
+            return '<option value="' + tk + '" ' + (tk === l.treatment ? 'selected' : '') + '>' + escHtml(TREATMENT_RULES[tk].label) + '</option>';
+          }).join('');
+
           return '<tr>' +
-            '<td><input type="date" class="form-input" data-edit-lesson-date="' + l.id + '" value="' + l.date + '" style="padding:4px 7px; font-size:0.78rem; width:132px;" title="تغيير تاريخ الحلقة" /></td>' +
-            '<td><input type="time" class="form-input" data-edit-lesson-time="' + l.id + '" value="' + timeVal + '" style="padding:4px 7px; font-size:0.78rem; width:105px; font-weight:700; color:var(--primary);" title="تغيير موعد/ساعة الحلقة" /></td>' +
+            '<td><input type="date" class="form-input" data-edit-lesson-date="' + l.id + '" value="' + l.date + '" style="padding:4px 7px; font-size:0.78rem; width:132px;" title="تعديل تاريخ الموعد مباشرة دون إضافة موعد جديد" /></td>' +
+            '<td><input type="time" class="form-input" data-edit-lesson-time="' + l.id + '" value="' + timeVal + '" style="padding:4px 7px; font-size:0.78rem; width:105px; font-weight:700; color:var(--primary);" title="تعديل ساعة الموعد مباشرة دون إضافة موعد جديد" /></td>' +
             '<td><strong>' + (student ? student.name : 'غير معروف') + '</strong></td>' +
-            '<td>' + (teacher ? teacher.name : 'غير معروف') + '</td>' +
-            '<td><strong>' + l.durationMin + ' د</strong></td>' +
-            '<td><span class="status-pill ' + rule.pillClass + '">' + rule.label + '</span>' +
+            '<td><select class="form-select" data-edit-lesson-teacher="' + l.id + '" style="padding:4px 6px; font-size:0.76rem; width:145px; font-weight:700;">' + teacherOpts + '</select></td>' +
+            '<td><div style="display:flex; align-items:center; gap:3px;"><input type="number" min="10" step="5" class="form-input" data-edit-lesson-dur="' + l.id + '" value="' + l.durationMin + '" style="width:62px; padding:4px 5px; font-weight:800; text-align:center;" title="تعديل مدة الحلقة بالدقائق" /> <span style="font-size:0.74rem;">د</span></div></td>' +
+            '<td><select class="form-select" data-edit-lesson-treat="' + l.id + '" style="padding:4px 6px; font-size:0.75rem; font-weight:700; width:175px;">' + treatOpts + '</select>' +
             (l.notes ? '<div style="font-size:0.72rem; color:var(--slate-500); margin-top:2px;">' + l.notes + '</div>' : '') + '</td>' +
             '<td><strong>' + cost.toFixed(2) + ' جنيه</strong></td>' +
             '<td>' + (isCompleted ? '<span style="color:var(--blue); font-weight:700;">مكتملة (محول)</span>' : '<span style="color:var(--amber); font-weight:700;">جارية (منتظر)</span>') + '</td>' +
@@ -4780,13 +4890,27 @@
     function renderTeachersTab(summary) {
       var container = document.getElementById('teachersListContainer');
       var perms = getActivePermissions();
+      var tSearchInput = document.getElementById('teacherSearchInput');
+      if (tSearchInput && document.activeElement !== tSearchInput) {
+        tSearchInput.value = state.teacherSearchQuery || '';
+      }
+      var qTeacher = (state.teacherSearchQuery || '').trim().toLowerCase();
       var filtered = state.teachers.filter(function (t) {
         var st = summary.teacherStats[t.id];
         var cnt = st ? st.assignedCount : 0;
-        if (state.teacherFilter === 'UNASSIGNED') return cnt === 0;
-        if (state.teacherFilter === 'ACTIVE') return cnt > 0;
+        if (state.teacherFilter === 'UNASSIGNED' && cnt !== 0) return false;
+        if (state.teacherFilter === 'ACTIVE' && cnt <= 0) return false;
+        if (qTeacher) {
+          var hay = ((t.name || '') + ' ' + (t.specialization || '') + ' ' + (t.phone || '') + ' ' + (st && st.studentNames ? st.studentNames.join(' ') : '')).toLowerCase();
+          if (hay.indexOf(qTeacher) === -1) return false;
+        }
         return true;
       });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:28px; color:var(--slate-500); background:var(--slate-50); border-radius:12px; border:1px dashed var(--slate-300);">🔍 لا يوجد معلم مطابق لبحثك حالياً — جرب كتابة جزء من الاسم أو التخصص أو اختر "جميع المعلمين".</div>';
+        return;
+      }
 
       container.innerHTML = filtered.map(function (t) {
         var st = summary.teacherStats[t.id] || { assignedCount: 0, studentNames: [], minutes: 0, paidWage: 0, pendingWage: 0 };
@@ -4892,13 +5016,29 @@
         }
       }
 
+      var sSearchInput = document.getElementById('studentSearchInput');
+      if (sSearchInput && document.activeElement !== sSearchInput) {
+        sSearchInput.value = state.studentSearchQuery || '';
+      }
+      var qStudent = (state.studentSearchQuery || '').trim().toLowerCase();
+
       var filteredStudents = state.students.filter(function (s) {
         var paySt = s.paymentStatus || 'PAID';
-        if (state.studentPayFilter === 'UNPAID_OR_CREDIT') return paySt === 'CREDIT_ALLOWED' || paySt === 'UNPAID';
-        if (state.studentPayFilter === 'PAID') return paySt === 'PAID';
-        if (state.studentPayFilter === 'NEEDS_RENEWAL') return s.consumedLessons >= s.totalLessons || s.renewalStatus === 'PENDING_RENEWAL';
+        if (state.studentPayFilter === 'UNPAID_OR_CREDIT' && !(paySt === 'CREDIT_ALLOWED' || paySt === 'UNPAID')) return false;
+        if (state.studentPayFilter === 'PAID' && paySt !== 'PAID') return false;
+        if (state.studentPayFilter === 'NEEDS_RENEWAL' && !(s.consumedLessons >= s.totalLessons || s.renewalStatus === 'PENDING_RENEWAL')) return false;
+        if (qStudent) {
+          var tObj = state.teachers.find(function (t) { return t.id === s.teacherId; });
+          var hay = ((s.name || '') + ' ' + (s.country || '') + ' ' + (tObj ? tObj.name : '') + ' ' + (s.scheduleText || '') + ' ' + (s.adCampaign || '')).toLowerCase();
+          if (hay.indexOf(qStudent) === -1) return false;
+        }
         return true;
       });
+
+      if (filteredStudents.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:28px; color:var(--slate-500); background:var(--slate-50); border-radius:12px; border:1px dashed var(--slate-300);">🔍 لا يوجد طالب مطابق لبحثك حالياً — جرب كتابة جزء من اسم الطالب أو المعلم أو الموعد أو اختر "جميع الطلاب".</div>';
+        return;
+      }
 
       container.innerHTML = filteredStudents.map(function (s) {
         var teacher = state.teachers.find(function (t) { return t.id === s.teacherId; });
@@ -4910,6 +5050,7 @@
         var subStart = s.subStartDate || '2026-11-01';
         var renDate = s.renewalDate || '2026-12-01';
         var isUnpaidOrCredit = (payStatus === 'CREDIT_ALLOWED' || payStatus === 'UNPAID');
+        var isEditingStu = state.editingStudentId === s.id;
 
         var cardBg = isUnpaidOrCredit ? '#FFF1F2' : '#FFFFFF';
         var cardBorder = isUnpaidOrCredit ? '2px solid #F43F5E' : '1px solid var(--slate-200)';
@@ -4925,6 +5066,31 @@
           ? '<span class="status-pill pill-emerald">🔄 تم التجديد</span>'
           : (renStatus === 'PENDING_RENEWAL' ? '<span class="status-pill pill-amber">🔔 في انتظار التجديد</span>' : '<span class="status-pill pill-blue">🆕 اشتراك جديد</span>');
 
+        var stuEditDrawerHtml = '';
+        if (isEditingStu && perms.edit_students) {
+          var teacherSelectOpts = state.teachers.map(function (tc) {
+            return '<option value="' + tc.id + '" ' + (tc.id === s.teacherId ? 'selected' : '') + '>' + escHtml(tc.name) + '</option>';
+          }).join('');
+          stuEditDrawerHtml = '<div style="margin-top:10px; padding:14px; background:var(--blue-bg); border:1px solid var(--blue-border); border-radius:12px;">' +
+            '<div style="font-size:0.82rem; font-weight:800; color:#1E3A8A; margin-bottom:10px;">✏️ تعديل بيانات الطالب وموعده الثابت وحلقات باقته (مباشرة دون إضافة سجل جديد):</div>' +
+            '<div class="grid-3" style="gap:10px; margin-bottom:10px;">' +
+              '<div><label class="form-label">اسم الطالب</label><input type="text" id="edit_s_name_' + s.id + '" class="form-input" value="' + escHtml(s.name || '') + '" /></div>' +
+              '<div><label class="form-label">الدولة</label><input type="text" id="edit_s_country_' + s.id + '" class="form-input" value="' + escHtml(s.country || '') + '" /></div>' +
+              '<div><label class="form-label">المعلم المسؤول</label><select id="edit_s_teacher_' + s.id + '" class="form-select">' + teacherSelectOpts + '</select></div>' +
+            '</div>' +
+            '<div class="grid-4" style="gap:10px; margin-bottom:10px;">' +
+              '<div><label class="form-label">📅 الموعد الثابت (تعديل على الموعد الحالي)</label><input type="text" id="edit_s_sched_' + s.id + '" class="form-input" value="' + escHtml(s.scheduleText || '') + '" style="font-weight:800; color:var(--primary);" /></div>' +
+              '<div><label class="form-label">⏱️ مدة الحلقة الافتراضية (د)</label><input type="number" min="10" step="5" id="edit_s_dur_' + s.id + '" class="form-input" value="' + (s.defaultDurationMin || 45) + '" /></div>' +
+              '<div><label class="form-label">الحلقات المستهلكة حالياً</label><input type="number" min="0" id="edit_s_consumed_' + s.id + '" class="form-input" value="' + s.consumedLessons + '" /></div>' +
+              '<div><label class="form-label">📦 إجمالي حلقات الباقة (زيادة/نقصان)</label><input type="number" min="1" id="edit_s_total_' + s.id + '" class="form-input" value="' + s.totalLessons + '" style="font-weight:800; color:#065F46;" /></div>' +
+            '</div>' +
+            '<div style="display:flex; gap:8px; justify-content:flex-end;">' +
+              '<button type="button" class="btn btn-primary" data-save-edit-student="' + s.id + '">💾 حفظ تعديلات الطالب والموعد والباقة</button>' +
+              '<button type="button" class="btn btn-soft" data-cancel-edit-student="' + s.id + '">إغلاق</button>' +
+            '</div>' +
+          '</div>';
+        }
+
         return '<div class="card" style="margin-bottom: 14px; background:' + cardBg + '; border:' + cardBorder + ';">' +
           '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">' +
           '<div>' +
@@ -4934,19 +5100,30 @@
           '<span class="status-pill ' + (isCompleted ? 'pill-emerald' : 'pill-amber') + '">' +
           (isCompleted ? '✅ باقة مكتملة' : '⏳ باقة جارية') + '</span>' +
           '<div style="font-size:0.78rem; color:var(--slate-600); margin-top:6px; display:flex; flex-wrap:wrap; align-items:center; gap:8px;">' +
-          '<span>المعلم: <strong>' + (teacher ? teacher.name : 'غير محدد') + '</strong> • الحملة: ' + s.adCampaign + ' • الموعد:</span>' +
-          '<input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + (s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="width:180px; padding:3px 8px; font-size:0.75rem; font-weight:700; color:var(--primary);" title="تغيير موعد الطالب الثابت" />' +
+          '<span>المعلم: <strong>' + (teacher ? teacher.name : 'غير محدد') + '</strong> • الحملة: ' + s.adCampaign + ' • 📅 الموعد (عدّل مباشرة):</span>' +
+          '<input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + (s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="width:195px; padding:4px 8px; font-size:0.76rem; font-weight:800; color:var(--primary); background:#EFF6FF; border-color:#BFDBFE;" title="تعديل موعد الطالب مباشرة دون إضافة موعد جديد" />' +
           '</div>' +
           '</div>' +
           '<div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">' +
           (isUnpaidOrCredit && perms.edit_students ? '<button type="button" class="btn btn-emerald" data-mark-paid="' + s.id + '" title="تحويل الحالة إلى تم الدفع وتغيير اللون للأخضر">💳 تأكيد الدفع الآن</button>' : '') +
           (isCompleted && perms.edit_students ? '<button type="button" class="btn btn-primary" data-renew-student="' + s.id + '">🔄 تجديد الباقة</button>' : '') +
-          (perms.edit_students ? '<button type="button" class="btn btn-soft" data-dec-student="' + s.id + '">-</button>' : '') +
-          '<strong style="padding:0 8px; font-size:0.85rem;">' + s.consumedLessons + ' / ' + s.totalLessons + '</strong>' +
-          (perms.edit_students ? '<button type="button" class="btn btn-soft" data-inc-student="' + s.id + '">+</button>' : '') +
+          '<div style="display:flex; align-items:center; gap:3px; background:#F8FAFC; border:1px solid var(--slate-200); border-radius:10px; padding:3px 7px;" title="تعديل الحلقات المستهلكة">' +
+            '<span style="font-size:0.71rem; color:var(--slate-500); font-weight:700;">المستهلك:</span>' +
+            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-dec-student="' + s.id + '">-</button>' : '') +
+            '<input type="number" min="0" class="form-input" data-edit-consumed-lessons="' + s.id + '" value="' + s.consumedLessons + '" style="width:46px; padding:2px 4px; font-size:0.8rem; font-weight:800; text-align:center;" />' +
+            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-inc-student="' + s.id + '">+</button>' : '') +
+          '</div>' +
+          '<div style="display:flex; align-items:center; gap:3px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:3px 7px;" title="تعديل إجمالي حلقات الباقة زيادة أو نقصاناً">' +
+            '<span style="font-size:0.71rem; color:#1E3A8A; font-weight:800;">الباقة:</span>' +
+            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-dec-total-lessons="' + s.id + '" title="تقليل عدد حلقات الباقة">-</button>' : '') +
+            '<input type="number" min="1" class="form-input" data-edit-total-lessons="' + s.id + '" value="' + s.totalLessons + '" style="width:48px; padding:2px 4px; font-size:0.8rem; font-weight:800; color:#1E3A8A; text-align:center; background:#FFFFFF;" />' +
+            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-inc-total-lessons="' + s.id + '" title="زيادة عدد حلقات الباقة">+</button>' : '') +
+          '</div>' +
+          (perms.edit_students ? '<button type="button" class="btn btn-soft" data-toggle-edit-student="' + s.id + '" title="تعديل شامل لبيانات وموعد ومعلم الطالب بدون إضافة طالب جديد">✏️ تعديل شامل</button>' : '') +
           (perms.delete_items ? '<button type="button" class="btn btn-danger-soft" data-delete-student="' + s.id + '">🗑️ نقل للسلة</button>' : '') +
           '</div>' +
           '</div>' +
+          stuEditDrawerHtml +
 
           '<!-- شريط الاشتراكات والدفع وموعد التجديد لكل طالب -->' +
           '<div class="grid-4" style="margin-top:10px; padding:10px; background:#FFFFFF; border:1px solid var(--slate-200); border-radius:10px; gap:8px;">' +
@@ -5402,6 +5579,76 @@
           showToast('⏰ تم تغيير موعد (ساعة) الحلقة بنجاح', false);
           return;
         }
+
+        var editLessonDurId = e.target.getAttribute && e.target.getAttribute('data-edit-lesson-dur');
+        if (editLessonDurId) {
+          var newDurVal = Math.max(10, Number(e.target.value) || 30);
+          state.lessons = state.lessons.map(function (l) {
+            return l.id === editLessonDurId ? Object.assign({}, l, { durationMin: newDurVal }) : l;
+          });
+          renderAll();
+          showToast('⏱️ تم تعديل مدة الحلقة إلى ' + newDurVal + ' دقيقة وتحديث الأجر تلقائياً', false);
+          return;
+        }
+
+        var editLessonTeacherId = e.target.getAttribute && e.target.getAttribute('data-edit-lesson-teacher');
+        if (editLessonTeacherId) {
+          var newTeaId = e.target.value;
+          state.lessons = state.lessons.map(function (l) {
+            return l.id === editLessonTeacherId ? Object.assign({}, l, { teacherId: newTeaId }) : l;
+          });
+          renderAll();
+          showToast('👤 تم تعديل معلم الحلقة في السجل دون إضافة موعد جديد', false);
+          return;
+        }
+
+        var editLessonTreatId = e.target.getAttribute && e.target.getAttribute('data-edit-lesson-treat');
+        if (editLessonTreatId) {
+          var newTreatVal = e.target.value;
+          var targetLesson = state.lessons.find(function (l) { return l.id === editLessonTreatId; });
+          if (targetLesson) {
+            var oldRule = TREATMENT_RULES[targetLesson.treatment] || TREATMENT_RULES.NORMAL_MAKEUP;
+            var nextRule = TREATMENT_RULES[newTreatVal] || TREATMENT_RULES.NORMAL_MAKEUP;
+            var deltaDeduct = (nextRule.deductsStudent ? 1 : 0) - (oldRule.deductsStudent ? 1 : 0);
+            state.lessons = state.lessons.map(function (l) {
+              return l.id === editLessonTreatId ? Object.assign({}, l, { treatment: newTreatVal }) : l;
+            });
+            if (deltaDeduct !== 0) {
+              state.students = state.students.map(function (s) {
+                return s.id === targetLesson.studentId ? Object.assign({}, s, { consumedLessons: Math.max(0, s.consumedLessons + deltaDeduct) }) : s;
+              });
+            }
+            renderAll();
+            showToast('⚡ تم تعديل المعالجة المالية للحلقة وتحديث رصيد الباقة تلقائياً', false);
+          }
+          return;
+        }
+
+        var editConsumedStudentId = e.target.getAttribute && e.target.getAttribute('data-edit-consumed-lessons');
+        if (editConsumedStudentId) {
+          var newConsumed = Math.max(0, Number(e.target.value) || 0);
+          state.students = state.students.map(function (s) {
+            if (s.id !== editConsumedStudentId) return s;
+            var nextRen = newConsumed >= s.totalLessons ? 'PENDING_RENEWAL' : (s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus);
+            return Object.assign({}, s, { consumedLessons: newConsumed, renewalStatus: nextRen });
+          });
+          renderAll();
+          showToast('✅ تم تعديل عدد الحلقات المستهلكة للطالب إلى ' + newConsumed, false);
+          return;
+        }
+
+        var editTotalLessonsStudentId = e.target.getAttribute && e.target.getAttribute('data-edit-total-lessons');
+        if (editTotalLessonsStudentId) {
+          var newTotal = Math.max(1, Number(e.target.value) || 8);
+          state.students = state.students.map(function (s) {
+            if (s.id !== editTotalLessonsStudentId) return s;
+            var nextRen2 = s.consumedLessons >= newTotal ? 'PENDING_RENEWAL' : (s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus);
+            return Object.assign({}, s, { totalLessons: newTotal, renewalStatus: nextRen2 });
+          });
+          renderAll();
+          showToast('📦 تم تعديل إجمالي حلقات باقة الطالب إلى ' + newTotal + ' حلقة وتحديث الحسابات!', false);
+          return;
+        }
       });
 
 // فلاتر جدول المواعيد وسجل الحلقات
@@ -5481,10 +5728,26 @@
         renderAll(true);
       });
 
+      var stuSearchEl = document.getElementById('studentSearchInput');
+      if (stuSearchEl) {
+        stuSearchEl.addEventListener('input', function (e) {
+          state.studentSearchQuery = e.target.value;
+          renderStudentsTab();
+        });
+      }
+
       document.getElementById('teacherFilterSelect').addEventListener('change', function (e) {
         state.teacherFilter = e.target.value;
         renderAll();
       });
+
+      var teaSearchEl = document.getElementById('teacherSearchInput');
+      if (teaSearchEl) {
+        teaSearchEl.addEventListener('input', function (e) {
+          state.teacherSearchQuery = e.target.value;
+          renderTeachersTab(computeFinancials());
+        });
+      }
 
       // إضافة طالب جديد بالخانتين اليدويتين (باقة الطالب بعملته + ما يعادلها بالمصري)
       document.getElementById('formAddStudent').addEventListener('submit', function (e) {
@@ -5655,10 +5918,21 @@
         var saveExecRowKey = target.getAttribute('data-save-drw-exec');
         if (saveExecRowKey) {
           var stuIdE = target.getAttribute('data-stuid');
-          var teaIdE = target.getAttribute('data-teaid');
-          var timeValE = target.getAttribute('data-time') || '17:00';
-          var durValE = Number(target.getAttribute('data-dur')) || 30;
+          var teaIdE = (document.getElementById('drw_exec_teacher_' + saveExecRowKey) || {}).value || target.getAttribute('data-teaid');
+          var timeValE = (document.getElementById('drw_exec_time_' + saveExecRowKey) || {}).value || target.getAttribute('data-time') || '17:00';
+          var durValE = Math.max(10, Number((document.getElementById('drw_exec_dur_' + saveExecRowKey) || {}).value || target.getAttribute('data-dur')) || 30);
+          var schedTextE = ((document.getElementById('drw_exec_sched_' + saveExecRowKey) || {}).value || '').trim();
           var dE = state.scheduleDateFilter || '2026-11-15';
+
+          if (schedTextE || teaIdE) {
+            state.students = state.students.map(function (s) {
+              if (s.id !== stuIdE) return s;
+              return Object.assign({}, s, {
+                teacherId: teaIdE || s.teacherId,
+                scheduleText: schedTextE || s.scheduleText
+              });
+            });
+          }
 
           var statusE = (document.getElementById('drw_exec_status_' + saveExecRowKey) || {}).value || 'DONE';
           var treatE = (document.getElementById('drw_exec_treat_' + saveExecRowKey) || {}).value || 'NORMAL_MAKEUP';
@@ -5706,7 +5980,7 @@
             } else {
               state.lessons = state.lessons.map(function (l) {
                 return l.id === existingLessonE.id
-                  ? Object.assign({}, l, { time: timeValE, durationMin: durValE, rateTier: tierE, treatment: treatE, notes: noteE || l.notes })
+                  ? Object.assign({}, l, { time: timeValE, teacherId: teaIdE, durationMin: durValE, rateTier: tierE, treatment: treatE, notes: noteE || l.notes })
                   : l;
               });
             }
@@ -5724,7 +5998,7 @@
 
           // حفظ المعالجة المختارة في customDayTimes أيضاً
           var cKeyE = dE + '__' + stuIdE;
-          state.customDayTimes[cKeyE] = Object.assign({}, state.customDayTimes[cKeyE] || {}, { treatment: treatE, rateTier: tierE });
+          state.customDayTimes[cKeyE] = Object.assign({}, state.customDayTimes[cKeyE] || {}, { time: timeValE, durationMin: durValE, treatment: treatE, rateTier: tierE });
 
           // تحديث سجل تقرير التنفيذ اليومي بدون تكرار (Upsert)
           state.dailyReports = state.dailyReports.filter(function (r) {
@@ -6265,11 +6539,14 @@
           return;
         }
 
-        // زيادة/نقصان/تجديد/حذف طالب
+        // زيادة/نقصان/تجديد/تعديل شامل/حذف طالب
         var incStudentId = target.getAttribute('data-inc-student');
         if (incStudentId) {
           state.students = state.students.map(function (s) {
-            return s.id === incStudentId ? Object.assign({}, s, { consumedLessons: s.consumedLessons + 1 }) : s;
+            if (s.id !== incStudentId) return s;
+            var nextCons = s.consumedLessons + 1;
+            var nextRen = nextCons >= s.totalLessons ? 'PENDING_RENEWAL' : s.renewalStatus;
+            return Object.assign({}, s, { consumedLessons: nextCons, renewalStatus: nextRen });
           });
           renderAll();
           return;
@@ -6278,9 +6555,89 @@
         var decStudentId = target.getAttribute('data-dec-student');
         if (decStudentId) {
           state.students = state.students.map(function (s) {
-            return s.id === decStudentId ? Object.assign({}, s, { consumedLessons: Math.max(0, s.consumedLessons - 1) }) : s;
+            if (s.id !== decStudentId) return s;
+            var nextCons2 = Math.max(0, s.consumedLessons - 1);
+            var nextRen2 = nextCons2 < s.totalLessons && s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus;
+            return Object.assign({}, s, { consumedLessons: nextCons2, renewalStatus: nextRen2 });
           });
           renderAll();
+          return;
+        }
+
+        var incTotalStudentId = target.getAttribute('data-inc-total-lessons');
+        if (incTotalStudentId) {
+          var updatedTotalInc = 8;
+          state.students = state.students.map(function (s) {
+            if (s.id !== incTotalStudentId) return s;
+            updatedTotalInc = (Number(s.totalLessons) || 8) + 1;
+            var nextRen3 = s.consumedLessons < updatedTotalInc && s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus;
+            return Object.assign({}, s, { totalLessons: updatedTotalInc, renewalStatus: nextRen3 });
+          });
+          renderAll();
+          showToast('📦 تمت زيادة حلقات الباقة إلى ' + updatedTotalInc + ' حلقة', false);
+          return;
+        }
+
+        var decTotalStudentId = target.getAttribute('data-dec-total-lessons');
+        if (decTotalStudentId) {
+          var updatedTotalDec = 8;
+          state.students = state.students.map(function (s) {
+            if (s.id !== decTotalStudentId) return s;
+            updatedTotalDec = Math.max(1, (Number(s.totalLessons) || 8) - 1);
+            var nextRen4 = s.consumedLessons >= updatedTotalDec ? 'PENDING_RENEWAL' : s.renewalStatus;
+            return Object.assign({}, s, { totalLessons: updatedTotalDec, renewalStatus: nextRen4 });
+          });
+          renderAll();
+          showToast('📦 تم تقليل حلقات الباقة إلى ' + updatedTotalDec + ' حلقة', false);
+          return;
+        }
+
+        var toggleEditStuId = target.getAttribute('data-toggle-edit-student');
+        if (toggleEditStuId) {
+          state.editingStudentId = (state.editingStudentId === toggleEditStuId) ? null : toggleEditStuId;
+          renderAll(true);
+          return;
+        }
+
+        var cancelEditStuId = target.getAttribute('data-cancel-edit-student');
+        if (cancelEditStuId) {
+          state.editingStudentId = null;
+          renderAll(true);
+          return;
+        }
+
+        var saveEditStuId = target.getAttribute('data-save-edit-student');
+        if (saveEditStuId) {
+          var newStuName = ((document.getElementById('edit_s_name_' + saveEditStuId) || {}).value || '').trim();
+          var newStuCountry = ((document.getElementById('edit_s_country_' + saveEditStuId) || {}).value || '').trim();
+          var newStuTeacher = (document.getElementById('edit_s_teacher_' + saveEditStuId) || {}).value;
+          var newStuSched = ((document.getElementById('edit_s_sched_' + saveEditStuId) || {}).value || '').trim();
+          var newStuDur = Math.max(10, Number((document.getElementById('edit_s_dur_' + saveEditStuId) || {}).value) || 45);
+          var newStuCons = Math.max(0, Number((document.getElementById('edit_s_consumed_' + saveEditStuId) || {}).value) || 0);
+          var newStuTotal = Math.max(1, Number((document.getElementById('edit_s_total_' + saveEditStuId) || {}).value) || 8);
+
+          if (!newStuName) {
+            showToast('يرجى كتابة اسم الطالب', false);
+            return;
+          }
+
+          state.students = state.students.map(function (s) {
+            if (s.id !== saveEditStuId) return s;
+            var nextRen5 = newStuCons >= newStuTotal ? 'PENDING_RENEWAL' : (s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus);
+            return Object.assign({}, s, {
+              name: newStuName,
+              country: newStuCountry || s.country,
+              teacherId: newStuTeacher || s.teacherId,
+              scheduleText: newStuSched || s.scheduleText,
+              defaultDurationMin: newStuDur,
+              consumedLessons: newStuCons,
+              totalLessons: newStuTotal,
+              renewalStatus: nextRen5
+            });
+          });
+          state.editingStudentId = null;
+          renderAll();
+          showToast('✅ تم حفظ تعديلات الطالب "' + newStuName + '" وموعده وحلقات باقته بنجاح!', false);
           return;
         }
 
@@ -6941,6 +7298,1337 @@
           state.adminUnpaidBannerOpen = ev.target.open;
         }
       }, true);
+
+      // =========================================================
+      // 🤖 محرك المساعد الذكي الهجين (المسار الأول: محلي فائق + المسار الثاني: Gemini API الاختياري + RBAC Guard)
+      // =========================================================
+      var smartChatLog = [];
+      var smartContext = { lastStudentId: null, lastTeacherId: null };
+      var smartPendingActions = {};
+      var smartAiConfig = {
+        apiKey: (function () { try { return localStorage.getItem('mihrab_gemini_api_key') || ''; } catch (e) { return ''; } })(),
+        enabled: (function () { try { return localStorage.getItem('mihrab_gemini_enabled') === '1'; } catch (e) { return false; } })()
+      };
+
+      function normAr(str) {
+        if (!str) return '';
+        var s = String(str)
+          .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
+          .replace(/[أإآ]/g, 'ا')
+          .replace(/ة/g, 'ه')
+          .replace(/ى/g, 'ي')
+          .replace(/ؤ/g, 'و')
+          .replace(/ئ/g, 'ي');
+        var arDigits = '٠١٢٣٤٥٦٧٨٩';
+        for (var i = 0; i < 10; i++) {
+          s = s.split(arDigits[i]).join(String(i));
+        }
+        // تطبيع العامية المصرية والخليجية الشائعة للفصحى القياسية
+        s = ' ' + s.replace(/[،,.:؛؟?!]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase() + ' ';
+        var dialectMap = [
+          [' مين ', ' من '], [' كام ', ' كم '], [' ايش ', ' ما '], [' ايه ', ' ما '], [' شو ', ' ما '],
+          [' الطلبه ', ' الطلاب '], [' طلبه ', ' طلاب '], [' التلاميذ ', ' الطلاب '],
+          [' المدرسين ', ' المعلمين '], [' مدرسين ', ' معلمين '], [' المدرس ', ' المعلم '], [' مدرسه ', ' معلمه '], [' مس ', ' معلمه '], [' استاذه ', ' معلمه '],
+          [' فاضيين ', ' بلا طلاب '], [' الفاضيين ', ' بلا طلاب '], [' المتاحين ', ' بلا طلاب '], [' فاضي ', ' بلا طلاب '], [' فاضيه ', ' بلا طلاب '], [' متاحين ', ' بلا طلاب '],
+          [' قرب يخلص ', ' قارب انتهاء '], [' قربت تخلص ', ' قارب انتهاء '], [' هيخلص ', ' قارب انتهاء '], [' خلصت ', ' مكتمله '], [' خلص ', ' مكتمله '],
+          [' مدفعش ', ' لم يدفع '], [' مادفع ', ' لم يدفع '], [' مش دافع ', ' لم يدفع '], [' مفيش دفع ', ' لم يدفع '],
+          [' متاخرين ', ' لم يدفع '], [' فلوس ', ' ارباح '], [' مكسب ', ' ارباح '], [' دخل ', ' ايرادات '],
+          [' زود ', ' زد '], [' خلي ', ' اجعل '], [' خليه ', ' اجعل '], [' خليها ', ' اجعل '],
+          [' غيرلي ', ' غير '], [' عدلي ', ' عدل '], [' هاتلي ', ' اعرض '], [' وريني ', ' اعرض '], [' قولي ', ' اعرض ']
+        ];
+        for (var d = 0; d < dialectMap.length; d++) {
+          s = s.split(dialectMap[d][0]).join(dialectMap[d][1]);
+        }
+        return s.replace(/\s+/g, ' ').trim();
+      }
+
+      function hasArPhrase(normStr, list) {
+        var padded = ' ' + normStr.replace(/[،,.:؛؟?!]/g, ' ') + ' ';
+        for (var i = 0; i < list.length; i++) {
+          if (padded.indexOf(' ' + list[i] + ' ') !== -1) return true;
+        }
+        return false;
+      }
+
+      var AR_STOP_WORDS = {
+        'كم':1,'عدد':1,'ما':1,'من':1,'هل':1,'في':1,'على':1,'الي':1,'عن':1,'مع':1,'عند':1,'اللي':1,'التي':1,'الذي':1,
+        'هذا':1,'هذه':1,'اليوم':1,'طالب':1,'الطالب':1,'طلاب':1,'الطلاب':1,'معلم':1,'المعلم':1,
+        'معلمه':1,'المعلمه':1,'معلمين':1,'المعلمين':1,'شيخ':1,'الشيخ':1,'استاذ':1,'الاستاذ':1,
+        'باقه':1,'الباقه':1,'باقته':1,'باقتها':1,'موعد':1,'الموعد':1,'موعده':1,'موعدها':1,
+        'حلقه':1,'الحلقه':1,'حلقات':1,'الحلقات':1,'عدل':1,'تعديل':1,'غير':1,'تغيير':1,'اضف':1,
+        'اضافه':1,'زد':1,'قلل':1,'انقص':1,'اكد':1,'دفع':1,'الدفع':1,'جدد':1,'تجديد':1,
+        'احذف':1,'حذف':1,'انقل':1,'نقل':1,'السله':1,'سله':1,'استرجع':1,'اعرض':1,'هات':1,
+        'اريد':1,'ابحث':1,'تقرير':1,'واتساب':1,'جديد':1,'جديده':1,'اسمه':1,'اسمها':1,'الاسم':1,
+        'تمت':1,'تم':1,'لم':1,'غاب':1,'غياب':1,'سجل':1,'تسجيل':1,'اعتمد':1,'اعتماد':1,'كل':1,'جميع':1,
+        'باقي':1,'متبقي':1,'مكتمله':1,'جاريه':1,'سعر':1,'ساعه':1,'الساعه':1,'دوله':1,'بلد':1,'قارب':1,'انتهاء':1,
+        'اعلي':1,'اكثر':1,'اقل':1,'افضل':1,'ترتيب':1,'بيانات':1,'تفاصيل':1,'وضع':1,'حاله':1,'ملاحظه':1,'سريه':1
+      };
+
+      function extractQueryTokens(normStr) {
+        return normStr.split(/[\s،,.:؛؟?!]+/).filter(function (w) {
+          return w.length >= 2 && !AR_STOP_WORDS[w] && !/^\d+$/.test(w);
+        });
+      }
+
+      function matchEntities(normInput, list) {
+        var exact = [];
+        var partial = [];
+        var tokens = extractQueryTokens(normInput);
+        list.forEach(function (item) {
+          var nName = normAr(item.name || '');
+          if (!nName) return;
+          if ((' ' + normInput + ' ').indexOf(' ' + nName + ' ') !== -1 || normInput.indexOf(nName) !== -1) {
+            exact.push(item);
+            return;
+          }
+          var nameParts = nName.split(' ').filter(function (p) { return p.length >= 2 && !AR_STOP_WORDS[p]; });
+          var hits = 0;
+          nameParts.forEach(function (np) {
+            for (var i = 0; i < tokens.length; i++) {
+              var tk = tokens[i];
+              var tkNoAl = tk.indexOf('ال') === 0 && tk.length > 3 ? tk.slice(2) : tk;
+              var npNoAl = np.indexOf('ال') === 0 && np.length > 3 ? np.slice(2) : np;
+              if (npNoAl === tkNoAl || (tkNoAl.length >= 3 && npNoAl.indexOf(tkNoAl) !== -1) || (npNoAl.length >= 3 && tkNoAl.indexOf(npNoAl) !== -1)) {
+                hits++;
+                break;
+              }
+            }
+          });
+          if (hits > 0) partial.push({ item: item, score: hits });
+        });
+        if (exact.length > 0) return exact;
+        partial.sort(function (a, b) { return b.score - a.score; });
+        return partial.map(function (p) { return p.item; });
+      }
+
+      function extractNumbersFromText(normStr) {
+        var m = normStr.match(/\d+(\.\d+)?/g);
+        return m ? m.map(Number) : [];
+      }
+
+      function extractTime24FromText(normStr) {
+        var m1 = normStr.match(/(?:^|\s)(\d{1,2}):(\d{2})\s*(ص|م|صباحا|مساء|مساءا)?(?=$|\s)/);
+        if (m1) {
+          var hh = parseInt(m1[1], 10);
+          var mm = m1[2];
+          var per = m1[3] || '';
+          if ((per.indexOf('م') === 0) && hh < 12) hh += 12;
+          if ((per.indexOf('ص') === 0) && hh === 12) hh = 0;
+          return (hh < 10 ? '0' : '') + hh + ':' + mm;
+        }
+        var m2 = normStr.match(/(?:^|\s)(\d{1,2})\s*(ص|م|صباحا|مساء|مساءا)(?=$|\s)/);
+        if (m2) {
+          var h2 = parseInt(m2[1], 10);
+          var p2 = m2[2];
+          if (p2.indexOf('م') === 0 && h2 < 12) h2 += 12;
+          if (p2.indexOf('ص') === 0 && h2 === 12) h2 = 0;
+          return (h2 < 10 ? '0' : '') + h2 + ':00';
+        }
+        return null;
+      }
+
+      function smartPermDenied(reasonText) {
+        return {
+          plain: '🔒 هذا الإجراء أو البيان غير متاح لصلاحيات حسابك الحالي: ' + reasonText,
+          html: '<div style="padding:10px 12px; background:#FFF1F2; border:1px solid #FECDD3; border-radius:10px; color:#9F1239;">' +
+            '<strong>🔒 محمي بحارس الصلاحيات (RBAC):</strong> ' + escHtml(reasonText) +
+            '<div style="font-size:0.74rem; color:var(--slate-600); margin-top:4px;">يمكن للإدارة العامة تعديل صلاحيات أي حساب من تبويب "الصلاحيات والملف".</div>' +
+          '</div>'
+        };
+      }
+
+      function isUserReadOnlyMode() {
+        var perms = getActivePermissions();
+        if (state.userRole === 'OWNER_VIEWER') return true;
+        return !perms.isAdmin && !perms.edit_schedule && !perms.approve_today_lessons && !perms.evaluate_quality &&
+               !perms.add_confidential_note && !perms.add_lesson && !perms.edit_teachers && !perms.edit_students && !perms.delete_items;
+      }
+
+      function updateSmartEngineBadge() {
+        var b = document.getElementById('smartAssistantEngineBadge');
+        var btnGear = document.getElementById('btnToggleSmartAiSettings');
+        var perms = getActivePermissions();
+        if (btnGear) btnGear.classList.toggle('hidden', !perms.isAdmin);
+        if (!b) return;
+        if (smartAiConfig.enabled && smartAiConfig.apiKey) {
+          b.className = 'status-pill pill-purple';
+          b.textContent = '🧠 هجين (محلي + Gemini AI)';
+        } else {
+          b.className = 'status-pill pill-emerald';
+          b.textContent = '⚡ محلي فائق (مجاني 100%)';
+        }
+      }
+
+      function renderSmartQuickChips() {
+        var row = document.getElementById('smartQuickChipsRow');
+        var badge = document.getElementById('smartAssistantRoleBadge');
+        if (!row) return;
+        var perms = getActivePermissions();
+        var activeSup = getActiveSupervisorObj();
+        if (badge) {
+          if (perms.isAdmin) badge.textContent = '👑 الإدارة العامة (تحكم كامل)';
+          else if (state.userRole === 'OWNER_VIEWER') badge.textContent = '🏛️ ' + activeSup.name + ' (اطلاع شامل)';
+          else badge.textContent = '🛡️ ' + activeSup.name + ' (حسب الصلاحيات)';
+        }
+        updateSmartEngineBadge();
+
+        var chips = [
+          { show: true, cls: 'btn-soft', ask: 'كم عدد الطلاب والمعلمين؟', label: '📊 إحصائيات شاملة' },
+          { show: perms.view_today, cls: 'btn-soft', ask: 'ملخص حلقات اليوم', label: '📅 ملخص اليوم' },
+          { show: perms.view_unpaid_renewal_alert || perms.view_students, cls: 'btn-danger-soft', ask: 'من لم يدفع أو يحتاج تجديد؟', label: '🚨 التجديد والدفع' },
+          { show: perms.view_students, cls: 'btn-soft', ask: 'من قارب على إنهاء باقته؟', label: '⏳ أوشكوا على الانتهاء' },
+          { show: perms.view_reports || perms.view_today, cls: 'btn-soft', ask: 'الطلاب المتكرر غيابهم', label: '⚠️ الغياب' },
+          { show: perms.view_teachers, cls: 'btn-soft', ask: 'ترتيب التزام المعلمين', label: '🏆 ترتيب المعلمين' },
+          { show: perms.view_teachers, cls: 'btn-soft', ask: 'معلمون جاهزون بلا طلاب', label: '👤 المتاحون' },
+          { show: perms.view_finance, cls: 'btn-emerald', ask: 'صافي الربح ونسبة الأكاديمية', label: '💰 الأرباح والميزانية' },
+          { show: perms.edit_students && !isUserReadOnlyMode(), cls: 'btn-primary', ask: 'أضف طالب جديد', label: '➕ إضافة طالب' },
+          { show: perms.add_lesson && !isUserReadOnlyMode(), cls: 'btn-soft', ask: 'سجل حلقة جديدة', label: '⏱️ تسجيل حلقة' }
+        ];
+        row.innerHTML = chips.filter(function (c) { return c.show; }).map(function (c) {
+          return '<button type="button" class="btn ' + c.cls + '" data-smart-ask="' + escHtml(c.ask) + '" style="font-size:0.72rem; padding:4px 8px;">' + c.label + '</button>';
+        }).join('');
+      }
+
+      function renderSmartChatStream() {
+        var box = document.getElementById('smartAssistantResponseBox');
+        if (!box) return;
+        if (smartChatLog.length === 0) {
+          box.innerHTML = '<div style="text-align:center; padding:20px; color:var(--slate-500);">' +
+            'مرحباً بك في <strong>المساعد الذكي الهجين لنظام مِحراب ERP</strong> 👋<br/>' +
+            'اسألني بأي صيغة عربية أو عامية (مثل: <em>"مين الطلبة اللي عند سها؟"</em>، <em>"كم باقي في باقة رنيم؟"</em>، <em>"زد باقة حنان لـ 12"</em>، <em>"عدل سعر ساعة سلمى إلى 90"</em>).' +
+          '</div>';
+          return;
+        }
+        box.innerHTML = smartChatLog.map(function (entry) {
+          if (entry.role === 'user') {
+            return '<div style="align-self:flex-start; max-width:86%; background:linear-gradient(135deg,#1E3A8A,#2563EB); color:#FFFFFF; padding:8px 14px; border-radius:14px 14px 4px 14px; font-weight:700; box-shadow:0 2px 8px rgba(30,58,138,0.18);">' +
+              escHtml(entry.text) +
+            '</div>';
+          }
+          return '<div style="align-self:stretch; background:#FFFFFF; border:1px solid var(--slate-200); border-radius:14px 14px 14px 4px; padding:12px; box-shadow:0 2px 6px rgba(15,23,42,0.04);">' +
+            entry.html +
+          '</div>';
+        }).join('');
+        box.scrollTop = box.scrollHeight;
+      }
+
+      function buildStudentSmartCard(s, perms) {
+        var t = state.teachers.find(function (x) { return x.id === s.teacherId; });
+        var remaining = Math.max(0, (s.totalLessons || 0) - (s.consumedLessons || 0));
+        var isCompleted = s.consumedLessons >= s.totalLessons;
+        var payTxt = s.paymentStatus === 'PAID' ? '✅ تم الدفع' : (s.paymentStatus === 'CREDIT_ALLOWED' ? '🚨 يستكمل (آجل)' : '⭕ لم يدفع');
+        var moneyPart = perms.see_student_money ? (' • 💰 الباقة: <strong>' + escHtml(s.foreignPackageText || '—') + '</strong> (' + Number(s.tuitionReceived || 0).toFixed(0) + ' ج)') : '';
+        var plainMoney = perms.see_student_money ? (' | القيمة: ' + (s.foreignPackageText || '—') + ' (' + Number(s.tuitionReceived || 0).toFixed(0) + ' ج)') : '';
+
+        var actions = [];
+        if (perms.view_students) {
+          actions.push('<button type="button" class="btn btn-primary" data-smart-find-student="' + escHtml(s.name) + '" style="font-size:0.71rem; padding:3px 8px;">فتح البطاقة ←</button>');
+        }
+        if (perms.edit_students && !isUserReadOnlyMode()) {
+          if (s.paymentStatus !== 'PAID') {
+            actions.push('<button type="button" class="btn btn-emerald" data-smart-quick-paid="' + s.id + '" style="font-size:0.71rem; padding:3px 8px;">💳 تأكيد الدفع</button>');
+          }
+          if (isCompleted) {
+            actions.push('<button type="button" class="btn btn-soft" data-smart-quick-renew="' + s.id + '" style="font-size:0.71rem; padding:3px 8px;">🔄 تجديد الباقة</button>');
+          }
+        }
+
+        return {
+          plain: '• الطالب: ' + s.name + ' (' + s.country + ') | المعلم: ' + (t ? t.name : '—') + ' | الموعد: ' + (s.scheduleText || '—') + ' | الباقة: ' + s.consumedLessons + '/' + s.totalLessons + ' (متبقي ' + remaining + ') | ' + payTxt + plainMoney,
+          html: '<div style="padding:9px 11px; background:#F8FAFC; border:1px solid var(--slate-200); border-radius:10px; margin-bottom:6px;">' +
+            '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px;">' +
+              '<div><strong>' + escHtml(s.name) + '</strong> <span class="status-pill pill-blue">' + escHtml(s.country) + '</span> <span class="status-pill ' + (isCompleted ? 'pill-emerald' : 'pill-amber') + '">' + s.consumedLessons + '/' + s.totalLessons + ' (باقي ' + remaining + ')</span> <span class="status-pill ' + (s.paymentStatus === 'PAID' ? 'pill-emerald' : 'pill-rose') + '">' + payTxt + '</span></div>' +
+              '<div style="display:flex; gap:5px; flex-wrap:wrap;">' + actions.join('') + '</div>' +
+            '</div>' +
+            '<div style="font-size:0.75rem; color:var(--slate-600); margin-top:4px;">👤 المعلم: <strong>' + escHtml(t ? t.name : 'غير محدد') + '</strong> • 📅 الموعد: <strong>' + escHtml(s.scheduleText || '—') + '</strong>' + moneyPart + '</div>' +
+          '</div>'
+        };
+      }
+
+      function buildTeacherSmartCard(t, summary, perms) {
+        var st = summary.teacherStats[t.id] || { assignedCount: 0, studentNames: [], minutes: 0, paidWage: 0, pendingWage: 0 };
+        var ratePart = perms.see_teacher_rates ? (' • 💵 سعر الساعة: <strong>' + t.rate1 + ' / ' + (t.rate2 || t.rate1) + ' ج</strong> • المستحق: <strong>' + (st.paidWage + st.pendingWage).toFixed(1) + ' ج</strong>') : '';
+        var plainRate = perms.see_teacher_rates ? (' | سعر الساعة: ' + t.rate1 + ' ج | المستحق: ' + (st.paidWage + st.pendingWage).toFixed(1) + ' ج') : '';
+        return {
+          plain: '• المعلم: ' + t.name + ' (' + t.specialization + ') | الطلاب: ' + st.assignedCount + ' (' + (st.studentNames.join('، ') || 'بلا طلاب') + ') | الدقائق: ' + st.minutes + plainRate,
+          html: '<div style="padding:9px 11px; background:#F8FAFC; border:1px solid var(--slate-200); border-radius:10px; margin-bottom:6px;">' +
+            '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px;">' +
+              '<div><strong>' + escHtml(t.name) + '</strong> <span class="status-pill ' + (st.assignedCount > 0 ? 'pill-emerald' : 'pill-amber') + '">' + (st.assignedCount > 0 ? st.assignedCount + ' طلاب' : 'جاهز بلا طلاب') + '</span> <span class="status-pill pill-blue">' + st.minutes + ' دقيقة</span></div>' +
+              (perms.view_teachers ? '<button type="button" class="btn btn-emerald" data-smart-find-teacher="' + escHtml(t.name) + '" style="font-size:0.71rem; padding:3px 8px;">فتح البطاقة ←</button>' : '') +
+            '</div>' +
+            '<div style="font-size:0.75rem; color:var(--slate-600); margin-top:4px;">📚 التخصص: ' + escHtml(t.specialization) + ' • 🎓 طلابه: <strong>' + escHtml(st.studentNames.join('، ') || 'لا يوجد حالياً') + '</strong>' + ratePart + '</div>' +
+          '</div>'
+        };
+      }
+
+      function registerPendingSmartAction(actionObj) {
+        var aid = 'sa_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+        smartPendingActions[aid] = actionObj;
+        return aid;
+      }
+
+      // بناء بطاقة معاينة وتأكيد آمنة لأي إجراء (مشتركة بين المحرك المحلي وGemini AI)
+      function buildActionPreviewCard(act, perms) {
+        if (isUserReadOnlyMode()) {
+          return smartPermDenied('حسابك مخصص للاطلاع والمتابعة فقط ولا يسمح بالتعديل أو الإضافة.');
+        }
+        if (act.type === 'MARK_PAID' || act.type === 'RENEW_STUDENT') {
+          if (!perms.edit_students) return smartPermDenied('تأكيد الدفع أو تجديد الباقة يتطلب صلاحية "إضافة وتعديل الطلاب".');
+          var stP = state.students.find(function (s) { return s.id === act.studentId; });
+          if (!stP) return { plain: 'لم يتم العثور على الطالب.', html: '<div>لم يتم العثور على الطالب المطلوب.</div>' };
+          var aid = registerPendingSmartAction(act);
+          var isRen = act.type === 'RENEW_STUDENT';
+          return {
+            plain: (isRen ? 'معاينة تجديد باقة ' : 'معاينة تأكيد دفع ') + stP.name,
+            html: '<div style="padding:10px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:10px;">' +
+              '<div style="font-weight:800; color:#065F46; margin-bottom:5px;">⚡ معاينة آمنة قبل التنفيذ:</div>' +
+              '<div>' + (isRen ? '🔄 تجديد باقة الطالب (تصفير المستهلك لبدء دورة جديدة)' : '💳 تأكيد سداد الاشتراك') + ': <strong>' + escHtml(stP.name) + '</strong> (' + stP.consumedLessons + '/' + stP.totalLessons + ')</div>' +
+              '<button type="button" class="btn btn-emerald" style="margin-top:8px;" data-exec-smart-action="' + aid + '">✅ تأكيد وتنفيذ الآن</button>' +
+            '</div>'
+          };
+        }
+        if (act.type === 'SET_TOTAL_LESSONS' || act.type === 'SET_CONSUMED') {
+          if (!perms.edit_students) return smartPermDenied('تعديل حلقات الباقة يتطلب صلاحية "إضافة وتعديل الطلاب".');
+          var stL = state.students.find(function (s) { return s.id === act.studentId; });
+          if (!stL) return { plain: 'الطالب غير موجود.', html: '<div>الطالب غير موجود.</div>' };
+          var oldV = act.type === 'SET_CONSUMED' ? stL.consumedLessons : stL.totalLessons;
+          var aidL = registerPendingSmartAction(act);
+          return {
+            plain: 'تعديل ' + (act.type === 'SET_CONSUMED' ? 'المستهلك' : 'حلقات الباقة') + ' للطالب ' + stL.name + ' من ' + oldV + ' إلى ' + act.value,
+            html: '<div style="padding:10px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px;">' +
+              '<div style="font-weight:800; color:#1E3A8A; margin-bottom:5px;">📦 معاينة تعديل الباقة قبل التنفيذ:</div>' +
+              '<div>الطالب: <strong>' + escHtml(stL.name) + '</strong> • ' + (act.type === 'SET_CONSUMED' ? 'الحلقات المستهلكة' : 'إجمالي حلقات الباقة') + ': <strong>' + oldV + '</strong> ← <strong style="color:#065F46;">' + act.value + ' حلقة</strong></div>' +
+              '<button type="button" class="btn btn-primary" style="margin-top:8px;" data-exec-smart-action="' + aidL + '">✅ اعتماد التعديل الآن</button>' +
+            '</div>'
+          };
+        }
+        if (act.type === 'UPDATE_STUDENT_SCHED_TEACHER') {
+          if (!perms.edit_schedule && !perms.edit_students) return smartPermDenied('تعديل المواعيد يتطلب صلاحية "تعديل المواعيد والساعات" أو "إضافة وتعديل الطلاب".');
+          if (act.teacherId && !perms.edit_students) return smartPermDenied('نقل الطالب لمعلم آخر يتطلب صلاحية "إضافة وتعديل الطلاب".');
+          var stU = state.students.find(function (s) { return s.id === act.studentId; });
+          if (!stU) return { plain: 'الطالب غير موجود.', html: '<div>الطالب غير موجود.</div>' };
+          var tNew = act.teacherId ? state.teachers.find(function (t) { return t.id === act.teacherId; }) : null;
+          var aidU = registerPendingSmartAction(act);
+          return {
+            plain: 'معاينة تعديل موعد/معلم الطالب ' + stU.name + ' في مكانه دون إضافة سجل جديد',
+            html: '<div style="padding:10px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px;">' +
+              '<div style="font-weight:800; color:#1E3A8A; margin-bottom:5px;">📅 معاينة التعديل المباشر (دون إضافة موعد جديد):</div>' +
+              '<div>الطالب: <strong>' + escHtml(stU.name) + '</strong></div>' +
+              (act.scheduleText ? '<div>الموعد الثابت: <span style="text-decoration:line-through; color:var(--slate-400);">' + escHtml(stU.scheduleText || '—') + '</span> ← <strong style="color:#065F46;">' + escHtml(act.scheduleText) + '</strong></div>' : '') +
+              (tNew ? '<div>المعلم الجديد: <strong style="color:#065F46;">' + escHtml(tNew.name) + '</strong></div>' : '') +
+              '<button type="button" class="btn btn-primary" style="margin-top:8px;" data-exec-smart-action="' + aidU + '">✅ حفظ التعديل في مكانه الآن</button>' +
+            '</div>'
+          };
+        }
+        if (act.type === 'UPDATE_TEACHER_RATE') {
+          if (!perms.edit_teachers || !perms.see_teacher_rates) return smartPermDenied('تعديل سعر ساعة المعلم يتطلب صلاحية "إضافة وتعديل المعلمين" و"رؤية أسعار المعلمين".');
+          var tR = state.teachers.find(function (t) { return t.id === act.teacherId; });
+          if (!tR) return { plain: 'المعلم غير موجود.', html: '<div>المعلم غير موجود.</div>' };
+          var aidR = registerPendingSmartAction(act);
+          return {
+            plain: 'معاينة تعديل سعر ساعة المعلم ' + tR.name + ' من ' + tR.rate1 + ' إلى ' + act.rate1 + ' جنيه',
+            html: '<div style="padding:10px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px;">' +
+              '<div style="font-weight:800; color:#1E3A8A; margin-bottom:5px;">💵 معاينة تعديل سعر الساعة (بالجنيه المصري):</div>' +
+              '<div>المعلم: <strong>' + escHtml(tR.name) + '</strong> • سعر الساعة 1: <strong>' + tR.rate1 + ' ج</strong> ← <strong style="color:#065F46;">' + act.rate1 + ' ج</strong></div>' +
+              '<button type="button" class="btn btn-primary" style="margin-top:8px;" data-exec-smart-action="' + aidR + '">✅ حفظ سعر الساعة الآن</button>' +
+            '</div>'
+          };
+        }
+        if (act.type === 'EXEC_TODAY_LESSON') {
+          if (!perms.approve_today_lessons) return smartPermDenied('اعتماد حلقات اليوم يتطلب صلاحية "اعتماد تنفيذ حلقات اليوم والمالية".');
+          var stD = state.students.find(function (s) { return s.id === act.studentId; });
+          if (!stD) return { plain: 'الطالب غير موجود.', html: '<div>الطالب غير موجود.</div>' };
+          var aidD = registerPendingSmartAction(act);
+          return {
+            plain: 'معاينة اعتماد حلقة اليوم للطالب ' + stD.name,
+            html: '<div style="padding:10px; background:' + (act.isAbsence ? '#FFF1F2' : '#ECFDF5') + '; border:1px solid ' + (act.isAbsence ? '#FECDD3' : '#A7F3D0') + '; border-radius:10px;">' +
+              '<div style="font-weight:800; margin-bottom:5px;">⚡ معاينة اعتماد حلقة يوم (' + escHtml(state.scheduleDateFilter || '2026-11-15') + '):</div>' +
+              '<div>الطالب: <strong>' + escHtml(stD.name) + '</strong> — الحالة: <strong>' + (act.isAbsence ? '⭕ غياب طالب (يُخصم من الباقة بدون أجر للمعلم)' : '✅ تمت الحلقة (تُخصم + أجر للمعلم)') + '</strong></div>' +
+              '<button type="button" class="btn ' + (act.isAbsence ? 'btn-danger-soft' : 'btn-emerald') + '" style="margin-top:8px;" data-exec-smart-action="' + aidD + '">✅ اعتماد وحفظ الآن</button>' +
+            '</div>'
+          };
+        }
+        if (act.type === 'DELETE_STUDENT_TRASH') {
+          if (!perms.delete_items) return smartPermDenied('النقل إلى سلة المحذوفات يتطلب صلاحية "الحذف والنقل للسلة".');
+          var stDel = state.students.find(function (s) { return s.id === act.studentId; });
+          if (!stDel) return { plain: 'الطالب غير موجود.', html: '<div>الطالب غير موجود.</div>' };
+          var aidDel = registerPendingSmartAction(act);
+          return {
+            plain: 'تأكيد نقل الطالب ' + stDel.name + ' إلى سلة المحذوفات',
+            html: '<div style="padding:10px; background:#FFF1F2; border:1px solid #FECDD3; border-radius:10px;">' +
+              '<div style="font-weight:800; color:#9F1239;">🗑️ تأكيد النقل إلى سلة المحذوفات:</div>' +
+              '<div>سيتم نقل الطالب <strong>' + escHtml(stDel.name) + '</strong> وحلقاته إلى السلة (مع إمكانية الاسترجاع الفوري).</div>' +
+              '<button type="button" class="btn btn-danger-soft" style="margin-top:8px;" data-exec-smart-action="' + aidDel + '">🗑️ نعم، انقله للسلة الآن</button>' +
+            '</div>'
+          };
+        }
+        return null;
+      }
+
+      // =========================================================
+      // المسار الأول: المحرك المحلي الهيكلي الفائق (يعمل دائماً مجاناً 100%)
+      // =========================================================
+      function runLocalMihrabEngine(raw, forcedEntity) {
+        var q = normAr(raw);
+        var perms = getActivePermissions();
+        var summary = computeFinancials();
+        var dToday = state.scheduleDateFilter || '2026-11-15';
+        var todayRows = buildCombinedTodayRows(dToday, 'TODAY_MATCH');
+        var readOnly = isUserReadOnlyMode();
+
+        var stuMatches = forcedEntity && forcedEntity.kind === 'student'
+          ? state.students.filter(function (s) { return s.id === forcedEntity.id; })
+          : matchEntities(q, state.students);
+        var teaMatches = forcedEntity && forcedEntity.kind === 'teacher'
+          ? state.teachers.filter(function (t) { return t.id === forcedEntity.id; })
+          : matchEntities(q, state.teachers);
+
+        // ذاكرة السياق للضمائر
+        if (stuMatches.length === 0 && smartContext.lastStudentId && hasArPhrase(q, ['هو','هي','عنده','عندها','له','لها','موعده','موعدها','باقته','باقتها','دفعه','دفعها','معلمه','معلمها','حلقاته','حلقاتها'])) {
+          var ctxS = state.students.find(function (x) { return x.id === smartContext.lastStudentId; });
+          if (ctxS) stuMatches = [ctxS];
+        }
+        if (teaMatches.length === 0 && smartContext.lastTeacherId && hasArPhrase(q, ['هو','هي','طلابه','طلابها','اجره','اجرها','ساعاته','ساعاتها','راتبه','سعره','سعرها'])) {
+          var ctxT = state.teachers.find(function (x) { return x.id === smartContext.lastTeacherId; });
+          if (ctxT) teaMatches = [ctxT];
+        }
+
+        if (stuMatches.length === 1) smartContext.lastStudentId = stuMatches[0].id;
+        if (teaMatches.length === 1) smartContext.lastTeacherId = teaMatches[0].id;
+
+        var nums = extractNumbersFromText(q);
+        var time24 = extractTime24FromText(q);
+
+        var isAddVerb = hasArPhrase(q, ['اضف','اضافه','انشئ','انشاء','سجل','تسجيل','طالب جديد','معلم جديد','حلقه جديده']);
+        var isEditVerb = hasArPhrase(q, ['عدل','تعديل','غير','تغيير','تبديل','اجعل','زد','ارفع','قلل','انقص','خصم','نقص','حدث','تحديث']);
+        var isDeleteVerb = hasArPhrase(q, ['احذف','حذف','امسح','مسح','انقل للسله','للسله','ازل','ازاله']);
+        var isRestoreVerb = hasArPhrase(q, ['استرجع','استرجاع','استعاده','رجع']);
+        var isCountAsk = hasArPhrase(q, ['كم','عدد','كم عدد','احصائيات','احصاء','اجمالي']);
+        var isCopyVerb = hasArPhrase(q, ['انسخ','نسخ']);
+
+        // الاستيضاح الذكي عند تشابه أسماء الطلاب في أوامر التعديل/الحذف (مثلاً: "أحمد")
+        if (!forcedEntity && stuMatches.length > 1 && (isEditVerb || isDeleteVerb || q.indexOf('دفع') !== -1 || q.indexOf('جدد') !== -1 || q.indexOf('اعتمد') !== -1)) {
+          var disambBtns = stuMatches.map(function (st) {
+            return '<button type="button" class="btn btn-soft" data-smart-disamb-kind="student" data-smart-disamb-id="' + st.id + '" data-smart-disamb-raw="' + escHtml(raw) + '" style="font-size:0.76rem; padding:5px 10px;">🎓 ' + escHtml(st.name) + ' (' + escHtml(st.country) + ')</button>';
+          }).join('');
+          return {
+            matched: true,
+            plain: 'توجد أكثر من نتيجة مطابقة، يرجى اختيار الطالب المقصود.',
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:6px;">🤔 وجدتُ أكثر من طالب بهذا الاسم — أي طالب تقصد تحديداً؟</div><div style="display:flex; flex-wrap:wrap; gap:6px;">' + disambBtns + '</div>'
+          };
+        }
+
+        // 1. أوامر النسخ للواتساب
+        if (isCopyVerb && (q.indexOf('تقرير') !== -1 || q.indexOf('واتساب') !== -1 || q.indexOf('اليوم') !== -1 || q.indexOf('مالي') !== -1 || q.indexOf('جوده') !== -1 || q.indexOf('كشف') !== -1)) {
+          if (!perms.copy_whatsapp) return Object.assign({ matched: true }, smartPermDenied('نسخ رسائل وتقارير الواتساب يتطلب صلاحية "نسخ رسائل الواتساب".'));
+          if (teaMatches.length > 0 && (q.indexOf('كشف') !== -1 || q.indexOf('حساب') !== -1)) {
+            if (!perms.see_teacher_rates) return Object.assign({ matched: true }, smartPermDenied('نسخ كشف حساب المعلم يتطلب صلاحية "رؤية أسعار وأجور المعلمين".'));
+            var tW = teaMatches[0];
+            var stW = summary.teacherStats[tW.id] || { assignedCount: 0, minutes: 0, paidWage: 0, pendingWage: 0 };
+            var wMsg = 'السلام عليكم ' + tW.name + '،\nكشف حساب حلقات مِحراب (' + state.monthLabel + ' - بالجنيه المصري):\n• عدد الطلاب: ' + stW.assignedCount + '\n• إجمالي الدقائق: ' + stW.minutes + ' دقيقة\n• الأجر الجاهز للتحويل: ' + stW.paidWage.toFixed(2) + ' جنيه\n• الأجر المنتظر: ' + stW.pendingWage.toFixed(2) + ' جنيه';
+            copyText(wMsg, 'كشف واتساب ' + tW.name);
+            return { matched: true, plain: '✅ تم تجهيز ونسخ كشف واتساب ' + tW.name, html: '<div style="color:#065F46; font-weight:800;">✅ تم فتح صندوق النسخ الجاهز لكشف حساب ' + escHtml(tW.name) + '!</div>' };
+          }
+          if (q.indexOf('مالي') !== -1 || q.indexOf('ارباح') !== -1) {
+            if (!perms.view_finance) return Object.assign({ matched: true }, smartPermDenied('نسخ التقرير المالي يتطلب صلاحية "رؤية الميزانية والأرباح".'));
+            document.getElementById('btnCopyWhatsapp').click();
+            return { matched: true, plain: '✅ تم تجهيز التقرير المالي.', html: '<div style="color:#065F46; font-weight:800;">✅ تم فتح صندوق النسخ الجاهز للتقرير المالي الشامل!</div>' };
+          }
+          if (q.indexOf('جوده') !== -1 || q.indexOf('اكاديمي') !== -1) {
+            if (!perms.view_reports) return Object.assign({ matched: true }, smartPermDenied('نسخ تقرير الجودة يتطلب صلاحية التقارير والجودة.'));
+            document.getElementById('btnQuickCopyQualityWaToday').click();
+            return { matched: true, plain: '✅ تم تجهيز تقرير الجودة.', html: '<div style="color:#065F46; font-weight:800;">✅ تم فتح صندوق النسخ الجاهز لتقرير الجودة الأكاديمية!</div>' };
+          }
+          var bTodayWa = document.getElementById('btnCopyTodayScheduleWhatsapp');
+          if (bTodayWa) bTodayWa.click();
+          return { matched: true, plain: '✅ تم تجهيز جدول حلقات اليوم للواتساب.', html: '<div style="color:#065F46; font-weight:800;">✅ تم فتح صندوق النسخ الجاهز لجدول حلقات اليوم!</div>' };
+        }
+
+        // 2. إضافة طالب جديد
+        if (isAddVerb && q.indexOf('طالب') !== -1 && q.indexOf('حلقه') === -1 && q.indexOf('تجريبي') === -1) {
+          if (readOnly || !perms.edit_students) return Object.assign({ matched: true }, smartPermDenied('إضافة طالب جديد تتطلب صلاحية "إضافة وتعديل الطلاب".'));
+          var aidAddS = registerPendingSmartAction({ type: 'ADD_STUDENT_FORM' });
+          var teaOpts = state.teachers.map(function (t) {
+            var sel = (teaMatches[0] && teaMatches[0].id === t.id) ? ' selected' : '';
+            return '<option value="' + t.id + '"' + sel + '>' + escHtml(t.name) + '</option>';
+          }).join('');
+          var defLessons = nums.length > 0 ? Math.max(1, nums[0]) : 8;
+          return {
+            matched: true,
+            plain: '📝 نموذج إضافة طالب جديد جاهز.',
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:8px;">➕ إضافة طالب جديد مباشرة عبر المساعد الذكي:</div>' +
+              '<div class="grid-2" style="gap:8px; margin-bottom:8px;">' +
+                '<input type="text" id="sa_add_s_name_' + aidAddS + '" class="form-input" placeholder="اسم الطالب (مطلوب)" />' +
+                '<input type="text" id="sa_add_s_country_' + aidAddS + '" class="form-input" value="السعودية" placeholder="الدولة" />' +
+                '<select id="sa_add_s_teacher_' + aidAddS + '" class="form-select">' + teaOpts + '</select>' +
+                '<input type="number" min="1" id="sa_add_s_total_' + aidAddS + '" class="form-input" value="' + defLessons + '" placeholder="عدد حلقات الباقة" />' +
+                '<input type="text" id="sa_add_s_sched_' + aidAddS + '" class="form-input" value="السبت والثلاثاء 5:00 م" placeholder="الموعد الثابت" />' +
+                (perms.see_student_money ? '<input type="text" id="sa_add_s_pkg_' + aidAddS + '" class="form-input" value="15 دينار" placeholder="الباقة بعملته" />' : '<div></div>') +
+              '</div>' +
+              (perms.see_student_money ? '<div style="margin-bottom:8px;"><input type="number" step="0.01" id="sa_add_s_egp_' + aidAddS + '" class="form-input" value="1200" placeholder="المعادل بالمصري (جنيه)" /></div>' : '') +
+              '<button type="button" class="btn btn-emerald" data-exec-smart-action="' + aidAddS + '">✅ إضافة الطالب وتفعيل باقته الآن</button>'
+          };
+        }
+
+        // 3. تسجيل حلقة جديدة من المحادثة
+        if (isAddVerb && q.indexOf('حلقه') !== -1) {
+          if (readOnly || !perms.add_lesson) return Object.assign({ matched: true }, smartPermDenied('تسجيل حلقة جديدة يتطلب صلاحية "إضافة وتسجيل الحلقات".'));
+          var aidAddL = registerPendingSmartAction({ type: 'ADD_LESSON_FORM' });
+          var stuOpts = state.students.map(function (s) {
+            var sel = (stuMatches[0] && stuMatches[0].id === s.id) ? ' selected' : '';
+            return '<option value="' + s.id + '"' + sel + '>' + escHtml(s.name) + '</option>';
+          }).join('');
+          var defDur = (nums.length > 0 && nums[0] >= 15 && nums[0] <= 180) ? nums[0] : 45;
+          return {
+            matched: true,
+            plain: '⏱️ نموذج تسجيل حلقة جديدة جاهز.',
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:8px;">⏱️ تسجيل حلقة جديدة في السجل المالي والباقة:</div>' +
+              '<div class="grid-2" style="gap:8px; margin-bottom:8px;">' +
+                '<select id="sa_add_l_stu_' + aidAddL + '" class="form-select">' + stuOpts + '</select>' +
+                '<input type="date" id="sa_add_l_date_' + aidAddL + '" class="form-input" value="' + escHtml(dToday) + '" />' +
+                '<input type="time" id="sa_add_l_time_' + aidAddL + '" class="form-input" value="' + escHtml(time24 || '17:00') + '" />' +
+                '<input type="number" min="10" step="5" id="sa_add_l_dur_' + aidAddL + '" class="form-input" value="' + defDur + '" placeholder="المدة بالدقائق" />' +
+              '</div>' +
+              '<select id="sa_add_l_treat_' + aidAddL + '" class="form-select" style="margin-bottom:8px;">' +
+                '<option value="NORMAL_MAKEUP">1. حلقة عادية / تعويض رسمي (خصم ✅ | أجر ✅)</option>' +
+                '<option value="ACADEMY_BEARING">2. تحمّل الأكاديمية / هدية (خصم ❌ | أجر ✅)</option>' +
+                '<option value="ABSENCE">3. غياب طالب يُخصم (خصم ✅ | أجر ❌)</option>' +
+                '<option value="FREE_MAKEUP">4. تعويض مجاني من المعلم (خصم ❌ | أجر ❌)</option>' +
+              '</select>' +
+              '<button type="button" class="btn btn-emerald" data-exec-smart-action="' + aidAddL + '">✅ تسجيل الحلقة الآن</button>'
+          };
+        }
+
+        // 4. إضافة معلم جديد
+        if (isAddVerb && q.indexOf('معلم') !== -1) {
+          if (readOnly || !perms.edit_teachers) return Object.assign({ matched: true }, smartPermDenied('إضافة معلم جديد تتطلب صلاحية "إضافة وتعديل المعلمين".'));
+          var aidAddT = registerPendingSmartAction({ type: 'ADD_TEACHER_FORM' });
+          return {
+            matched: true,
+            plain: '📝 نموذج إضافة معلم جديد جاهز.',
+            html: '<div style="font-weight:800; color:#065F46; margin-bottom:8px;">➕ إضافة معلم جديد لرادار المعلمين:</div>' +
+              '<div class="grid-2" style="gap:8px; margin-bottom:8px;">' +
+                '<input type="text" id="sa_add_t_name_' + aidAddT + '" class="form-input" placeholder="اسم المعلم (مطلوب)" />' +
+                '<input type="text" id="sa_add_t_spec_' + aidAddT + '" class="form-input" value="تحفيظ وتجويد" placeholder="التخصص" />' +
+                '<input type="text" id="sa_add_t_phone_' + aidAddT + '" class="form-input" dir="ltr" value="+2010" placeholder="رقم الواتساب" />' +
+                (perms.see_teacher_rates ? '<input type="number" id="sa_add_t_rate_' + aidAddT + '" class="form-input" value="75" placeholder="سعر الساعة (جنيه)" />' : '<div></div>') +
+              '</div>' +
+              '<button type="button" class="btn btn-emerald" data-exec-smart-action="' + aidAddT + '">✅ إضافة المعلم الآن</button>'
+          };
+        }
+
+        // 5. تعديل سعر ساعة المعلم
+        if (teaMatches.length > 0 && isEditVerb && (q.indexOf('سعر') !== -1 || q.indexOf('اجر') !== -1 || q.indexOf('راتب') !== -1) && nums.length > 0) {
+          return Object.assign({ matched: true }, buildActionPreviewCard({ type: 'UPDATE_TEACHER_RATE', teacherId: teaMatches[0].id, rate1: nums[0] }, perms));
+        }
+
+        // 6. تأكيد الدفع أو تجديد الباقة لطالب
+        if (stuMatches.length > 0 && (q.indexOf('اكد دفع') !== -1 || q.indexOf('سدد') !== -1 || q.indexOf('تم الدفع') !== -1 || q.indexOf('جدد') !== -1 || q.indexOf('تجديد باق') !== -1)) {
+          var isRenewCmd = q.indexOf('جدد') !== -1 || q.indexOf('تجديد') !== -1;
+          return Object.assign({ matched: true }, buildActionPreviewCard({ type: isRenewCmd ? 'RENEW_STUDENT' : 'MARK_PAID', studentId: stuMatches[0].id }, perms));
+        }
+
+        // 7. تعديل عدد حلقات الباقة أو المستهلكة
+        if (stuMatches.length > 0 && (q.indexOf('باقه') !== -1 || q.indexOf('حلقات') !== -1 || q.indexOf('مستهلك') !== -1 || q.indexOf('لـ') !== -1) && isEditVerb && nums.length > 0) {
+          var stPkg = stuMatches[0];
+          var valNum = nums[0];
+          var isConsumedTarget = q.indexOf('مستهلك') !== -1;
+          var oldVal = isConsumedTarget ? stPkg.consumedLessons : stPkg.totalLessons;
+          var newVal = valNum;
+          if (hasArPhrase(q, ['زد','اضف']) && q.indexOf('الي') === -1 && (' ' + q + ' ').indexOf(' ل ') === -1 && valNum <= 6) {
+            newVal = oldVal + valNum;
+          } else if (hasArPhrase(q, ['قلل','انقص','نقص']) && q.indexOf('الي') === -1 && (' ' + q + ' ').indexOf(' ل ') === -1 && valNum < oldVal) {
+            newVal = Math.max(isConsumedTarget ? 0 : 1, oldVal - valNum);
+          }
+          return Object.assign({ matched: true }, buildActionPreviewCard({ type: isConsumedTarget ? 'SET_CONSUMED' : 'SET_TOTAL_LESSONS', studentId: stPkg.id, value: newVal }, perms));
+        }
+
+        // 8. تعديل موعد الطالب أو نقل معلمه في مكانه دون إضافة موعد جديد
+        if (stuMatches.length > 0 && isEditVerb && (q.indexOf('موعد') !== -1 || q.indexOf('وقت') !== -1 || q.indexOf('ساعه') !== -1 || q.indexOf('معلم') !== -1 || q.indexOf('شيخ') !== -1)) {
+          var stEd = stuMatches[0];
+          var newSchedStr = '';
+          var afterTo = raw.split(/(?:إلى|الى|لـ|ل)\s+/);
+          if (afterTo.length > 1 && (q.indexOf('موعد') !== -1 || q.indexOf('وقت') !== -1 || q.indexOf('ساعه') !== -1)) {
+            newSchedStr = afterTo[afterTo.length - 1].trim();
+          } else if (time24) {
+            newSchedStr = (stEd.scheduleText || '').replace(/\d{1,2}(:\d{2})?\s*(ص|م|صباحاً|مساءً)?/g, '').trim() + ' ' + time24;
+          }
+          var wantsTea = q.indexOf('معلم') !== -1 || q.indexOf('شيخ') !== -1 || q.indexOf('استاذ') !== -1 || q.indexOf('انقل') !== -1;
+          var targetT = null;
+          if (wantsTea) {
+            var qNoStu = q.split(normAr(stEd.name)).join(' ');
+            var fTea = matchEntities(qNoStu, state.teachers);
+            if (fTea.length > 0) targetT = fTea[0];
+          }
+          return Object.assign({ matched: true }, buildActionPreviewCard({
+            type: 'UPDATE_STUDENT_SCHED_TEACHER',
+            studentId: stEd.id,
+            scheduleText: newSchedStr.trim(),
+            teacherId: targetT ? targetT.id : null
+          }, perms));
+        }
+
+        // 9. اعتماد حلقة اليوم أو تسجيل غياب لطالب
+        if (stuMatches.length > 0 && (q.indexOf('اعتمد') !== -1 || q.indexOf('تمت الحلقه') !== -1 || q.indexOf('سجل غياب') !== -1 || (q.indexOf('غاب') !== -1 && !isCountAsk))) {
+          var isAbs = q.indexOf('غياب') !== -1 || q.indexOf('غاب') !== -1 || q.indexOf('لم تتم') !== -1;
+          return Object.assign({ matched: true }, buildActionPreviewCard({ type: 'EXEC_TODAY_LESSON', studentId: stuMatches[0].id, isAbsence: isAbs }, perms));
+        }
+
+        // 10. ملاحظة سرية
+        if (stuMatches.length > 0 && q.indexOf('ملاحظه سريه') !== -1) {
+          if (readOnly || !perms.add_confidential_note) return Object.assign({ matched: true }, smartPermDenied('إضافة ملاحظة سرية للإدارة تتطلب صلاحية "كتابة ملاحظة سرية للإدارة".'));
+          var stSec = stuMatches[0];
+          var noteSplit = raw.split(/[:\-]/);
+          var secTxt = noteSplit.length > 1 ? noteSplit.slice(1).join(':').trim() : raw;
+          var aidSec = registerPendingSmartAction({ type: 'ADD_SECRET_NOTE', studentId: stSec.id, text: secTxt });
+          return {
+            matched: true,
+            plain: 'معاينة حفظ ملاحظة سرية على ' + stSec.name,
+            html: '<div style="padding:10px; background:#FFF1F2; border:1px solid #FECDD3; border-radius:10px;"><strong style="color:#9F1239;">🔒 معاينة ملاحظة سرية للإدارة فقط:</strong><div>الطالب: <strong>' + escHtml(stSec.name) + '</strong> — "' + escHtml(secTxt) + '"</div><button type="button" class="btn btn-primary" style="background:#E11D48; margin-top:8px;" data-exec-smart-action="' + aidSec + '">🔒 حفظ الآن</button></div>'
+          };
+        }
+
+        // 11. حذف / استرجاع
+        if (stuMatches.length > 0 && isDeleteVerb) {
+          return Object.assign({ matched: true }, buildActionPreviewCard({ type: 'DELETE_STUDENT_TRASH', studentId: stuMatches[0].id }, perms));
+        }
+        if (isRestoreVerb && q.indexOf('سله') !== -1) {
+          if (readOnly || !perms.view_trash || !perms.delete_items) return Object.assign({ matched: true }, smartPermDenied('استرجاع المحذوفات يتطلب صلاحية سلة المحذوفات.'));
+          if (state.trash.length === 0) return { matched: true, plain: '🎉 سلة المحذوفات فارغة.', html: '<div>🎉 سلة المحذوفات فارغة حالياً.</div>' };
+          var aidRes = registerPendingSmartAction({ type: 'RESTORE_LATEST_TRASH', trashId: state.trash[0].trashId });
+          return { matched: true, plain: 'استرجاع ' + state.trash[0].title, html: '<div style="padding:10px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:10px;"><div>♻️ آخر عنصر في السلة: <strong>' + escHtml(state.trash[0].title) + '</strong></div><button type="button" class="btn btn-emerald" style="margin-top:8px;" data-exec-smart-action="' + aidRes + '">♻️ استرجاع الآن</button></div>' };
+        }
+
+        // 12. استعلام علائقي: "من طلاب المعلم X؟" أو "مين الطلبة اللي عند سها؟"
+        if (teaMatches.length > 0 && (q.indexOf('طلاب') !== -1 || q.indexOf('عند') !== -1 || q.indexOf('مع') !== -1) && stuMatches.length === 0) {
+          if (!perms.view_students && !perms.view_teachers) return Object.assign({ matched: true }, smartPermDenied('عرض طلاب المعلم يتطلب صلاحية الطلاب أو المعلمين.'));
+          var tRel = teaMatches[0];
+          var relStudents = state.students.filter(function (s) { return s.teacherId === tRel.id; });
+          if (relStudents.length === 0) {
+            return { matched: true, plain: 'المعلم ' + tRel.name + ' لا يوجد لديه طلاب حالياً (جاهز للاستقبال).', html: '<div style="padding:10px; background:#FFFBEB; border-radius:10px;">👤 <strong>' + escHtml(tRel.name) + '</strong> لا يوجد لديه طلاب مسجلون حالياً (جاهز لاستقبال طلاب جدد).</div>' };
+          }
+          var relCards = relStudents.map(function (s) { return buildStudentSmartCard(s, perms); });
+          return {
+            matched: true,
+            plain: '🎓 طلاب المعلم ' + tRel.name + ' (' + relStudents.length + '):\n' + relCards.map(function (c) { return c.plain; }).join('\n'),
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:6px;">🎓 طلاب ' + escHtml(tRel.name) + ' (' + relStudents.length + ' طلاب):</div>' + relCards.map(function (c) { return c.html; }).join('')
+          };
+        }
+
+        // 13. استعلام: "من قارب على إنهاء باقته؟" أو "الباقات المكتملة"
+        if (q.indexOf('قارب') !== -1 || q.indexOf('اوشك') !== -1 || q.indexOf('مكتمله') !== -1) {
+          if (!perms.view_students) return Object.assign({ matched: true }, smartPermDenied('عرض حالة الباقات يتطلب صلاحية "فتح الطلاب والباقات".'));
+          var nearDone = state.students.filter(function (s) {
+            var rem = (s.totalLessons || 0) - (s.consumedLessons || 0);
+            return rem <= 2;
+          });
+          var ndCards = nearDone.map(function (s) { return buildStudentSmartCard(s, perms); });
+          return {
+            matched: true,
+            plain: '⏳ طلاب أوشكوا على إنهاء الباقة أو أنهوها (' + nearDone.length + '):\n' + ndCards.map(function (c) { return c.plain; }).join('\n'),
+            html: '<div style="font-weight:800; color:#92400E; margin-bottom:6px;">⏳ طلاب أوشكوا على إنهاء الباقة (متبقي حلقتان فأقل) أو أنهوها (' + nearDone.length + '):</div>' +
+              (ndCards.length ? ndCards.map(function (c) { return c.html; }).join('') : '<div>جميع الباقات الجارية ما زال بها أكثر من حلقتين.</div>')
+          };
+        }
+
+        // 14. استعلام حسب الدولة (مثلاً: "كم طالب من السعودية / ليبيا / الكويت؟")
+        var matchedCountry = null;
+        var allCountries = {};
+        state.students.forEach(function (s) { if (s.country) allCountries[normAr(s.country)] = s.country; });
+        Object.keys(allCountries).forEach(function (nc) {
+          var cleanNc = nc.indexOf('ال') === 0 ? nc.slice(2) : nc;
+          if (q.indexOf(nc) !== -1 || (cleanNc.length >= 3 && q.indexOf(cleanNc) !== -1)) {
+            matchedCountry = allCountries[nc];
+          }
+        });
+        if (matchedCountry) {
+          if (!perms.view_students) return Object.assign({ matched: true }, smartPermDenied('تصفية الطلاب حسب الدولة تتطلب صلاحية "فتح الطلاب والباقات".'));
+          var cList = state.students.filter(function (s) { return normAr(s.country) === normAr(matchedCountry); });
+          var cCards = cList.map(function (s) { return buildStudentSmartCard(s, perms); });
+          return {
+            matched: true,
+            plain: '🌍 طلاب دولة ' + matchedCountry + ' (' + cList.length + '):\n' + cCards.map(function (c) { return c.plain; }).join('\n'),
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:6px;">🌍 طلاب دولة ' + escHtml(matchedCountry) + ' (' + cList.length + ' طلاب):</div>' + cCards.map(function (c) { return c.html; }).join('')
+          };
+        }
+
+        // 15. استعلام كم باقي في باقة طالب معين
+        if (stuMatches.length > 0 && (q.indexOf('باقي') !== -1 || q.indexOf('متبقي') !== -1 || q.indexOf('اخذ') !== -1)) {
+          if (!perms.view_students && !perms.view_today) return Object.assign({ matched: true }, smartPermDenied('عرض رصيد الباقة يتطلب صلاحية الطلاب أو جدول اليوم.'));
+          var sB = stuMatches[0];
+          var remB = Math.max(0, sB.totalLessons - sB.consumedLessons);
+          var cardB = buildStudentSmartCard(sB, perms);
+          return {
+            matched: true,
+            plain: '📦 رصيد باقة ' + sB.name + ': استهلك ' + sB.consumedLessons + ' من أصل ' + sB.totalLessons + ' حلقة (المتبقي: ' + remB + ' حلقة).',
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:6px;">📦 رصيد باقة ' + escHtml(sB.name) + ': استهلك <strong>' + sB.consumedLessons + '</strong> من <strong>' + sB.totalLessons + '</strong> (المتبقي: <strong style="color:#065F46;">' + remB + ' حلقة</strong>)</div>' + cardB.html
+          };
+        }
+
+        // 16. أسئلة الإحصائيات والعد الشاملة
+        if (isCountAsk && q.indexOf('ربح') === -1 && q.indexOf('ارباح') === -1 && q.indexOf('نسبه') === -1 && q.indexOf('باقي') === -1) {
+          var totalStu = state.students.length;
+          var completedStu = state.students.filter(function (s) { return s.consumedLessons >= s.totalLessons; }).length;
+          var activeStu = totalStu - completedStu;
+          var unpaidStu = state.students.filter(function (s) { return s.paymentStatus === 'CREDIT_ALLOWED' || s.paymentStatus === 'UNPAID'; }).length;
+          var totalTea = state.teachers.length;
+          var activeTea = state.teachers.filter(function (t) { return (summary.teacherStats[t.id] && summary.teacherStats[t.id].assignedCount > 0); }).length;
+          var idleTea = totalTea - activeTea;
+          var doneToday = todayRows.filter(function (r) { return r.status === 'DONE'; }).length;
+          var pendToday = todayRows.filter(function (r) { return r.status === 'PENDING'; }).length;
+          var notDoneToday = todayRows.filter(function (r) { return r.status === 'NOT_DONE'; }).length;
+
+          var byCountry = {};
+          state.students.forEach(function (s) { var c = s.country || 'أخرى'; byCountry[c] = (byCountry[c] || 0) + 1; });
+          var countryLine = Object.keys(byCountry).map(function (c) { return c + ': ' + byCountry[c]; }).join(' | ');
+
+          var pLines = [
+            '📊 إحصائيات منصة مِحراب ERP الحية:',
+            '• إجمالي الطلاب: ' + totalStu + ' طالب (' + activeStu + ' باقة جارية | ' + completedStu + ' باقة مكتملة)',
+            '• توزيع الدول: ' + countryLine,
+            '• إجمالي المعلمين: ' + totalTea + ' معلم (' + activeTea + ' نشط | ' + idleTea + ' جاهز بلا طلاب)',
+            '• حلقات اليوم (' + dToday + '): ' + todayRows.length + ' حلقة (✅ ' + doneToday + ' | ⏳ ' + pendToday + ' | ⭕ ' + notDoneToday + ')',
+            '• سجل الحلقات التراكمي: ' + state.lessons.length + ' حلقة | المشرفون: ' + state.supervisors.length
+          ];
+          if (perms.see_student_money || perms.view_unpaid_renewal_alert) pLines.push('• طلاب لم يسددوا / آجل: ' + unpaidStu + ' طلاب');
+
+          return {
+            matched: true,
+            plain: pLines.join('\n'),
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:8px;">📊 الإحصائيات الحية الدقيقة للمنصة:</div>' +
+              '<div class="grid-3" style="gap:8px; margin-bottom:10px;">' +
+                '<div style="background:#EFF6FF; border:1px solid #BFDBFE; padding:10px; border-radius:10px; text-align:center;"><div style="font-size:0.74rem; color:#1E3A8A;">🎓 إجمالي الطلاب</div><strong style="font-size:1.35rem; color:#1E3A8A;">' + totalStu + '</strong><div style="font-size:0.7rem; color:var(--slate-600);">' + activeStu + ' جارية • ' + completedStu + ' مكتملة</div></div>' +
+                '<div style="background:#ECFDF5; border:1px solid #A7F3D0; padding:10px; border-radius:10px; text-align:center;"><div style="font-size:0.74rem; color:#065F46;">👤 إجمالي المعلمين</div><strong style="font-size:1.35rem; color:#065F46;">' + totalTea + '</strong><div style="font-size:0.7rem; color:var(--slate-600);">' + activeTea + ' نشط • ' + idleTea + ' جاهز</div></div>' +
+                '<div style="background:#FFFBEB; border:1px solid #FDE68A; padding:10px; border-radius:10px; text-align:center;"><div style="font-size:0.74rem; color:#92400E;">📅 حلقات اليوم</div><strong style="font-size:1.35rem; color:#92400E;">' + todayRows.length + '</strong><div style="font-size:0.7rem; color:var(--slate-600);">✅ ' + doneToday + ' | ⏳ ' + pendToday + ' | ⭕ ' + notDoneToday + '</div></div>' +
+              '</div>' +
+              '<div style="font-size:0.77rem; color:var(--slate-700); background:#F8FAFC; padding:8px 10px; border-radius:8px; border:1px solid var(--slate-200);">' +
+                '🌍 <strong>الدول:</strong> ' + escHtml(countryLine) + '<br/>' +
+                '⏱️ <strong>السجل التراكمي:</strong> ' + state.lessons.length + ' حلقة مسجلة' +
+                ((perms.see_student_money || perms.view_unpaid_renewal_alert) ? (' • 🚨 <strong>طلاب لم يدفعوا / آجل:</strong> ' + unpaidStu + ' طلاب') : '') +
+              '</div>'
+          };
+        }
+
+        // 17. ملخص اليوم
+        if ((q.indexOf('ملخص') !== -1 && q.indexOf('اليوم') !== -1) || q === 'ملخص حلقات اليوم' || q === 'جدول اليوم') {
+          if (!perms.view_today) return Object.assign({ matched: true }, smartPermDenied('عرض جدول حلقات اليوم يتطلب صلاحية "فتح جدول مواعيد اليوم".'));
+          var doneR = todayRows.filter(function (r) { return r.status === 'DONE'; });
+          var notDoneR = todayRows.filter(function (r) { return r.status === 'NOT_DONE'; });
+          var pendR = todayRows.filter(function (r) { return r.status === 'PENDING'; });
+          var linesT = ['📅 ملخص حلقات يوم (' + dToday + '): ' + todayRows.length + ' حلقة (✅ ' + doneR.length + ' | ⏳ ' + pendR.length + ' | ⭕ ' + notDoneR.length + ')'];
+          todayRows.forEach(function (r) { linesT.push('• ' + r.time + ' | ' + r.studentName + ' (مع ' + r.teacherName + ')'); });
+          return {
+            matched: true,
+            plain: linesT.join('\n'),
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:8px;">📅 ملخص حلقات اليوم (' + escHtml(dToday) + ') — ' + todayRows.length + ' حلقة:</div>' +
+              todayRows.map(function (r) {
+                var b = r.status === 'DONE' ? '<span class="status-pill pill-emerald">✅ تمت</span>' : (r.status === 'NOT_DONE' ? '<span class="status-pill pill-rose">⭕ لم تتم</span>' : '<span class="status-pill pill-amber">⏳ بالانتظار</span>');
+                return '<div style="padding:6px 10px; background:#F8FAFC; border:1px solid var(--slate-200); border-radius:8px; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;"><span>⏰ <strong>' + escHtml(r.time) + '</strong> — ' + escHtml(r.studentName) + ' <span style="color:var(--slate-500);">(' + escHtml(r.teacherName) + ')</span></span>' + b + '</div>';
+              }).join('') +
+              '<button type="button" class="btn btn-primary" data-smart-go-tab="today-schedule" style="font-size:0.74rem; margin-top:6px;">فتح غرفة عمليات اليوم ←</button>'
+          };
+        }
+
+        // 18. غير المسددين والتجديد
+        if (q.indexOf('يدفع') !== -1 || q.indexOf('سداد') !== -1 || q.indexOf('تجديد') !== -1) {
+          if (!perms.view_unpaid_renewal_alert && !perms.view_students && !perms.isAdmin) return Object.assign({ matched: true }, smartPermDenied('الاطلاع على غير المسددين أو التجديد يتطلب صلاحية الطلاب أو تذكير التجديد.'));
+          var uList = state.students.filter(function (s) {
+            return s.paymentStatus === 'CREDIT_ALLOWED' || s.paymentStatus === 'UNPAID' || s.consumedLessons >= s.totalLessons || s.renewalStatus === 'PENDING_RENEWAL';
+          });
+          var cards = uList.map(function (s) { return buildStudentSmartCard(s, perms); });
+          return {
+            matched: true,
+            plain: '🚨 طلاب بحاجة لمتابعة التجديد أو السداد (' + uList.length + '):\n' + cards.map(function (c) { return c.plain; }).join('\n'),
+            html: '<div style="font-weight:800; color:#9F1239; margin-bottom:8px;">🚨 طلاب بحاجة لمتابعة السداد أو التجديد (' + uList.length + ' طلاب):</div>' + cards.map(function (c) { return c.html; }).join('')
+          };
+        }
+
+        // 19. الغياب والانقطاع
+        if (q.indexOf('غياب') !== -1 || q.indexOf('غاب') !== -1 || q.indexOf('انقطاع') !== -1) {
+          if (!perms.view_reports && !perms.view_today && !perms.isAdmin) return Object.assign({ matched: true }, smartPermDenied('عرض تقارير الغياب يتطلب صلاحية التقارير أو جدول اليوم.'));
+          var absRep = state.dailyReports.filter(function (r) {
+            if (r.type !== 'EXECUTION' || r.status !== 'NOT_DONE') return false;
+            if (perms.isAdmin || perms.view_all_reports) return true;
+            return r.createdBySupervisorId === getActiveSupervisorObj().id;
+          });
+          return {
+            matched: true,
+            plain: '⚠️ حالات الغياب وعدم إتمام الحلقات (' + absRep.length + ')',
+            html: '<div style="font-weight:800; color:#92400E; margin-bottom:8px;">⚠️ رادار الغياب والحلقات التي لم تتم (' + absRep.length + '):</div>' +
+              (absRep.length === 0 ? '<div style="color:#065F46;">🎉 لا توجد حالات غياب مسجلة في نطاق صلاحياتك.</div>' : absRep.map(function (r) {
+                return '<div style="padding:8px 10px; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; margin-bottom:5px;"><strong>' + escHtml(r.studentName) + '</strong> (مع ' + escHtml(r.teacherName) + ') — ' + escHtml(r.date) + '<div style="font-size:0.75rem; color:var(--slate-600);">السبب: ' + escHtml(r.note || REASON_LABELS[r.reasonCat] || 'لم تتم') + '</div></div>';
+              }).join(''))
+          };
+        }
+
+        // 20. ترتيب التزام المعلمين أو المتاحين بلا طلاب
+        if (q.indexOf('ترتيب') !== -1 || q.indexOf('التزام') !== -1 || q.indexOf('بلا طلاب') !== -1 || q.indexOf('جاهز') !== -1 || q.indexOf('اعلي معلم') !== -1 || q.indexOf('افضل معلم') !== -1) {
+          if (!perms.view_teachers) return Object.assign({ matched: true }, smartPermDenied('عرض بيانات المعلمين يتطلب صلاحية "فتح رادار المعلمين".'));
+          if (q.indexOf('بلا طلاب') !== -1 || q.indexOf('جاهز') !== -1) {
+            var idleList = state.teachers.filter(function (t) { return !summary.teacherStats[t.id] || summary.teacherStats[t.id].assignedCount === 0; });
+            var idleCards = idleList.map(function (t) { return buildTeacherSmartCard(t, summary, perms); });
+            return {
+              matched: true,
+              plain: '👤 المعلمون الجاهزون بلا طلاب (' + idleList.length + '):\n' + idleCards.map(function (c) { return c.plain; }).join('\n'),
+              html: '<div style="font-weight:800; color:#92400E; margin-bottom:8px;">👤 معلمون جاهزون لاستقبال طلاب جدد (' + idleList.length + '):</div>' + idleCards.map(function (c) { return c.html; }).join('')
+            };
+          }
+          var rankedT = state.teachers.slice().sort(function (a, b) {
+            var sA = summary.teacherStats[a.id] || { assignedCount: 0, minutes: 0 };
+            var sB = summary.teacherStats[b.id] || { assignedCount: 0, minutes: 0 };
+            return (sB.minutes - sA.minutes) || (sB.assignedCount - sA.assignedCount);
+          });
+          var rCards = rankedT.map(function (t) { return buildTeacherSmartCard(t, summary, perms); });
+          return {
+            matched: true,
+            plain: '🏆 ترتيب التزام ونشاط المعلمين:\n' + rCards.map(function (c) { return c.plain; }).join('\n'),
+            html: '<div style="font-weight:800; color:var(--primary); margin-bottom:8px;">🏆 ترتيب المعلمين حسب الدقائق وعدد الطلاب:</div>' + rCards.map(function (c) { return c.html; }).join('')
+          };
+        }
+
+        // 21. الموقف المالي ونسبة الأكاديمية
+        if (q.indexOf('ربح') !== -1 || q.indexOf('ارباح') !== -1 || q.indexOf('ميزانيه') !== -1 || q.indexOf('نسبه الاكاديميه') !== -1 || q.indexOf('صافي') !== -1 || q.indexOf('ايراد') !== -1 || q.indexOf('حملات') !== -1) {
+          if (!perms.view_finance) return Object.assign({ matched: true }, smartPermDenied('عرض الميزانية والأرباح ونسبة الأكاديمية محصور على الإدارة ومن يملك صلاحية "رؤية الميزانية والأرباح".'));
+          return {
+            matched: true,
+            plain: '💰 الملخص المالي (' + state.monthLabel + '): الإيرادات ' + summary.totalRevenue.toFixed(2) + ' ج | الربح الأولي ' + summary.initialNetProfit.toFixed(2) + ' ج | نسبة الأكاديمية (الثلثين) ' + summary.academyShare.toFixed(2) + ' ج | أرباح الإدارة (الثلث) ' + summary.adminShare.toFixed(2) + ' ج',
+            html: '<div style="font-weight:800; color:#065F46; margin-bottom:8px;">💰 الموقف المالي ومصفوفة الأرباح (' + escHtml(state.monthLabel) + '):</div>' +
+              '<div class="grid-2" style="gap:8px; margin-bottom:8px;">' +
+                '<div style="padding:8px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:8px;">الإيرادات: <strong>' + summary.totalRevenue.toFixed(2) + ' ج</strong></div>' +
+                '<div style="padding:8px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px;">الربح الأولي: <strong>' + summary.initialNetProfit.toFixed(2) + ' ج</strong></div>' +
+                '<div style="padding:8px; background:#F5F3FF; border:1px solid #DDD6FE; border-radius:8px;">نسبة الأكاديمية (الثلثين): <strong>' + summary.academyShare.toFixed(2) + ' ج</strong></div>' +
+                '<div style="padding:8px; background:#ECFDF5; border:2px solid #10B981; border-radius:8px;">أرباح الإدارة الصافية (الثلث): <strong>' + summary.adminShare.toFixed(2) + ' ج</strong></div>' +
+              '</div>' +
+              '<div style="font-size:0.76rem; color:var(--slate-600);">• الصدقة المباركة (5%): <strong>' + summary.charityAmount.toFixed(2) + ' ج</strong> | • مخصص الإعلانات: <strong>' + summary.adBudget.toFixed(2) + ' ج</strong> | • أجور المعلمين: <strong>' + (summary.totalTeacherPaid + summary.totalTeacherPending).toFixed(2) + ' ج</strong></div>'
+          };
+        }
+
+        // 22. استعلام مباشر عن طالب أو معلم
+        if (stuMatches.length > 0 || teaMatches.length > 0) {
+          var outHtml = '';
+          var outPlain = [];
+          if (stuMatches.length > 0) {
+            if (!perms.view_students && !perms.view_today) return Object.assign({ matched: true }, smartPermDenied('عرض تفاصيل الطلاب يتطلب صلاحية الطلاب أو جدول اليوم.'));
+            var sCards = stuMatches.map(function (s) { return buildStudentSmartCard(s, perms); });
+            outHtml += '<div style="font-weight:800; color:#1E3A8A; margin-bottom:6px;">🎓 بيانات الطالب (' + stuMatches.length + '):</div>' + sCards.map(function (c) { return c.html; }).join('');
+            sCards.forEach(function (c) { outPlain.push(c.plain); });
+          }
+          if (teaMatches.length > 0 && perms.view_teachers) {
+            var tCards = teaMatches.map(function (t) { return buildTeacherSmartCard(t, summary, perms); });
+            outHtml += '<div style="font-weight:800; color:#065F46; margin:8px 0 6px;">👤 بيانات المعلم (' + teaMatches.length + '):</div>' + tCards.map(function (c) { return c.html; }).join('');
+            tCards.forEach(function (c) { outPlain.push(c.plain); });
+          }
+          if (outHtml) return { matched: true, plain: outPlain.join('\n'), html: outHtml };
+        }
+
+        return { matched: false };
+      }
+
+      // =========================================================
+      // المسار الثاني: بناء سياق آمن محمي بـ RBAC والاتصال الاختياري بـ Gemini API
+      // =========================================================
+      function buildRbacSafeContextForAi(perms) {
+        var summary = computeFinancials();
+        var activeSup = getActiveSupervisorObj();
+        var ctx = {
+          role: perms.isAdmin ? 'ADMIN' : (state.userRole === 'OWNER_VIEWER' ? 'OWNER_VIEWER' : 'SUPERVISOR'),
+          userName: state.currentUserName || activeSup.name,
+          todayDate: state.scheduleDateFilter || '2026-11-15',
+          permissions: perms
+        };
+        if (perms.view_students || perms.view_today) {
+          ctx.students = state.students.map(function (s) {
+            var obj = {
+              id: s.id, name: s.name, country: s.country, teacherId: s.teacherId,
+              consumedLessons: s.consumedLessons, totalLessons: s.totalLessons,
+              scheduleText: s.scheduleText, paymentStatus: s.paymentStatus, renewalStatus: s.renewalStatus
+            };
+            if (perms.see_student_money) {
+              obj.foreignPackageText = s.foreignPackageText;
+              obj.tuitionReceivedEGP = s.tuitionReceived;
+            }
+            return obj;
+          });
+        }
+        if (perms.view_teachers || perms.view_today) {
+          ctx.teachers = state.teachers.map(function (t) {
+            var st = summary.teacherStats[t.id] || { assignedCount: 0, minutes: 0, paidWage: 0, pendingWage: 0 };
+            var obj = { id: t.id, name: t.name, specialization: t.specialization, assignedCount: st.assignedCount, minutes: st.minutes };
+            if (perms.see_teacher_rates) {
+              obj.rate1 = t.rate1;
+              obj.rate2 = t.rate2;
+              obj.paidWageEGP = Number(st.paidWage.toFixed(2));
+              obj.pendingWageEGP = Number(st.pendingWage.toFixed(2));
+            }
+            return obj;
+          });
+        }
+        if (perms.view_finance) {
+          ctx.finance = {
+            monthLabel: state.monthLabel,
+            totalRevenueEGP: Number(summary.totalRevenue.toFixed(2)),
+            staffSalaryEGP: state.staffSalary,
+            totalTeacherPaidEGP: Number(summary.totalTeacherPaid.toFixed(2)),
+            totalTeacherPendingEGP: Number(summary.totalTeacherPending.toFixed(2)),
+            initialNetProfitEGP: Number(summary.initialNetProfit.toFixed(2)),
+            adBudgetEGP: Number(summary.adBudget.toFixed(2)),
+            charityAmountEGP: Number(summary.charityAmount.toFixed(2)),
+            academyShareTwoThirdsEGP: Number(summary.academyShare.toFixed(2)),
+            adminShareOneThirdEGP: Number(summary.adminShare.toFixed(2))
+          };
+        }
+        return ctx;
+      }
+
+      function callGeminiHybridApi(rawQuestion, perms, onDone) {
+        var safeCtx = buildRbacSafeContextForAi(perms);
+        var sysPrompt = 'أنت المساعد الذكي المدمج في نظام "مِحراب ERP" لإدارة أكاديمية قرآن. ' +
+          'أجب بالعربية الواضحة والمختصرة بدقة 100% من البيانات المرفقة فقط ولا تخترع أي أرقام. ' +
+          'التزم بصلاحيات المستخدم المرفقة؛ إذا طلب شيئاً خارج صلاحياته اعتذر بلباقة. ' +
+          'أعد ردك بصيغة JSON صالحة فقط بدون Markdown بهذا الشكل: ' +
+          '{"reply":"نص الرد العربي المختصر","action":null أو {"type":"MARK_PAID|RENEW_STUDENT|SET_TOTAL_LESSONS|SET_CONSUMED|UPDATE_STUDENT_SCHED_TEACHER|UPDATE_TEACHER_RATE|EXEC_TODAY_LESSON|DELETE_STUDENT_TRASH","studentId":"...","teacherId":"...","value":12,"scheduleText":"...","rate1":80,"isAbsence":false}}.\n' +
+          'البيانات المسموحة للحساب الحالي:\n' + JSON.stringify(safeCtx);
+
+        var endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(smartAiConfig.apiKey);
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: sysPrompt + '\n\nسؤال أو أمر المستخدم: ' + rawQuestion }] }],
+            generationConfig: { temperature: 0.2, responseMimeType: 'application/json' }
+          })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var txt = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+          if (!txt) throw new Error('empty');
+          var parsed = JSON.parse(txt.replace(/```json|```/g, '').trim());
+          onDone(null, parsed);
+        })
+        .catch(function (err) {
+          onDone(err || new Error('api_error'), null);
+        });
+      }
+
+      function processSmartAssistantInput(rawInput, forcedEntity) {
+        var raw = (rawInput || '').trim();
+        if (!raw) return;
+        var acList = document.getElementById('smartAutocompleteList');
+        if (acList) acList.classList.add('hidden');
+
+        smartChatLog.push({ role: 'user', text: raw });
+        renderSmartChatStream();
+
+        var perms = getActivePermissions();
+        var localRes = runLocalMihrabEngine(raw, forcedEntity);
+
+        // إذا كان الوضع الهجين (Gemini API) مفعلاً والمحرك المحلي لم يطابق أو السؤال معقد ومفتوح
+        var useGemini = smartAiConfig.enabled && smartAiConfig.apiKey && (!localRes.matched || raw.split(/\s+/).length >= 8);
+        if (useGemini) {
+          var loadingIdx = smartChatLog.push({ role: 'assistant', html: '<div style="color:var(--primary); font-weight:700;">🧠 جاري التحليل عبر المساعد الهجين (Gemini AI + حارس الصلاحيات)...</div>' }) - 1;
+          renderSmartChatStream();
+
+          callGeminiHybridApi(raw, perms, function (err, aiData) {
+            if (err || !aiData) {
+              // ارتداد سلس للمحرك المحلي عند انقطاع الشبكة أو خطأ المفتاح
+              if (localRes.matched) {
+                state.lastSmartAssistantText = localRes.plain || '';
+                smartChatLog[loadingIdx] = { role: 'assistant', html: localRes.html };
+              } else {
+                smartChatLog[loadingIdx] = { role: 'assistant', html: '<div style="color:#92400E;">⚠️ تعذر الاتصال بـ Gemini API (تأكد من المفتاح أو الإنترنت) ولم يطابق السؤال قاعدة محلية. جرب صياغة أبسط أو اختر من الاقتراحات التلقائية.</div>' };
+              }
+              renderSmartChatStream();
+              return;
+            }
+            var replyHtml = '<div style="white-space:pre-line; line-height:1.75;">' + escHtml(aiData.reply || '') + '</div>';
+            if (aiData.action && aiData.action.type) {
+              var previewCard = buildActionPreviewCard(aiData.action, perms);
+              if (previewCard) replyHtml += '<div style="margin-top:8px;">' + previewCard.html + '</div>';
+            }
+            state.lastSmartAssistantText = aiData.reply || '';
+            smartChatLog[loadingIdx] = { role: 'assistant', html: replyHtml };
+            renderSmartChatStream();
+          });
+          return;
+        }
+
+        if (localRes.matched) {
+          state.lastSmartAssistantText = localRes.plain || '';
+          smartChatLog.push({ role: 'assistant', html: localRes.html });
+        } else {
+          var fallbackMsg = 'لم أتأكد من المقصود بدقة من "' + raw + '". اكتب اسم أي طالب أو معلم أو جرب أحد الأمثلة.';
+          state.lastSmartAssistantText = fallbackMsg;
+          smartChatLog.push({
+            role: 'assistant',
+            html: '<div style="color:var(--slate-700);">' +
+              '<strong>🤔 لم تتضح لي التفاصيل الكافية من:</strong> "' + escHtml(raw) + '"<br/>' +
+              '<div style="font-size:0.77rem; color:var(--slate-600); margin-top:6px;">يمكنك تجربة:<br/>' +
+              '• <em>"مين الطلبة اللي عند سها؟"</em> أو <em>"كم طالب من السعودية؟"</em><br/>' +
+              '• <em>"كم باقي في باقة رنيم؟"</em> أو <em>"من قارب على إنهاء باقته؟"</em><br/>' +
+              '• <em>"زد باقة حنان لـ 12"</em> أو <em>"عدل موعد أحمد تيبار إلى 7 م"</em><br/>' +
+              (perms.isAdmin ? '• أو فعّل <strong>"⚙️ ربط Gemini"</strong> بالأعلى بمفتاح مجاني لفهم أي سؤال حواري معقد!' : '') +
+              '</div></div>'
+          });
+        }
+        renderSmartChatStream();
+      }
+
+      // الإكمال التلقائي الذكي أثناء الكتابة (Smart Autocomplete)
+      function updateSmartAutocomplete(val) {
+        var listEl = document.getElementById('smartAutocompleteList');
+        if (!listEl) return;
+        var q = normAr(val);
+        if (q.length < 2) {
+          listEl.classList.add('hidden');
+          return;
+        }
+        var perms = getActivePermissions();
+        var items = [];
+        var templates = [
+          { show: true, txt: 'كم عدد الطلاب والمعلمين؟' },
+          { show: perms.view_today, txt: 'ملخص حلقات اليوم' },
+          { show: perms.view_students, txt: 'من قارب على إنهاء باقته؟' },
+          { show: perms.view_unpaid_renewal_alert || perms.view_students, txt: 'من لم يدفع أو يحتاج تجديد؟' },
+          { show: perms.view_teachers, txt: 'معلمون جاهزون بلا طلاب' },
+          { show: perms.view_teachers, txt: 'ترتيب التزام المعلمين' },
+          { show: perms.view_finance, txt: 'صافي الربح ونسبة الأكاديمية' },
+          { show: perms.edit_students && !isUserReadOnlyMode(), txt: 'أضف طالب جديد' },
+          { show: perms.add_lesson && !isUserReadOnlyMode(), txt: 'سجل حلقة جديدة' }
+        ];
+        templates.forEach(function (tp) {
+          if (tp.show && normAr(tp.txt).indexOf(q) !== -1) items.push({ label: '⚡ ' + tp.txt, fill: tp.txt });
+        });
+        if (perms.view_students || perms.view_today) {
+          state.students.forEach(function (s) {
+            if (normAr(s.name).indexOf(q) !== -1) {
+              items.push({ label: '🎓 بيانات الطالب: ' + s.name + ' (' + s.consumedLessons + '/' + s.totalLessons + ')', fill: 'بيانات الطالب ' + s.name });
+              if (perms.edit_students && !isUserReadOnlyMode()) {
+                items.push({ label: '📦 تعديل باقة ' + s.name + ' إلى 12 حلقة', fill: 'زد باقة ' + s.name + ' إلى 12' });
+              }
+            }
+          });
+        }
+        if (perms.view_teachers) {
+          state.teachers.forEach(function (t) {
+            if (normAr(t.name).indexOf(q) !== -1) {
+              items.push({ label: '👤 بيانات وطلاب المعلم: ' + t.name, fill: 'من طلاب ' + t.name + '؟' });
+            }
+          });
+        }
+        if (items.length === 0) {
+          listEl.classList.add('hidden');
+          return;
+        }
+        listEl.innerHTML = items.slice(0, 7).map(function (it) {
+          return '<button type="button" class="btn btn-soft" data-smart-ac-fill="' + escHtml(it.fill) + '" style="width:100%; justify-content:flex-start; text-align:right; margin-bottom:4px; padding:6px 10px; font-size:0.78rem; background:#F8FAFC;">' + escHtml(it.label) + '</button>';
+        }).join('');
+        listEl.classList.remove('hidden');
+      }
+
+      function openSmartAssistantModal() {
+        var m = document.getElementById('smartAssistantModal');
+        if (!m) return;
+        m.classList.remove('hidden');
+        renderSmartQuickChips();
+        var kInp = document.getElementById('smartGeminiKeyInput');
+        var kChk = document.getElementById('chkSmartUseGemini');
+        if (kInp) kInp.value = smartAiConfig.apiKey || '';
+        if (kChk) kChk.checked = !!smartAiConfig.enabled;
+        if (smartChatLog.length === 0) {
+          processSmartAssistantInput('كم عدد الطلاب والمعلمين؟');
+        } else {
+          renderSmartChatStream();
+        }
+        var inp = document.getElementById('smartAssistantInput');
+        if (inp) setTimeout(function () { inp.focus(); }, 60);
+      }
+
+      var btnOpenSmartHeader = document.getElementById('btnOpenSmartAssistantHeader');
+      if (btnOpenSmartHeader) btnOpenSmartHeader.addEventListener('click', openSmartAssistantModal);
+      var btnOpenSmartFab = document.getElementById('btnFloatingSmartAssistant');
+      if (btnOpenSmartFab) btnOpenSmartFab.addEventListener('click', openSmartAssistantModal);
+      var btnCloseSmart = document.getElementById('btnCloseSmartAssistant');
+      if (btnCloseSmart) btnCloseSmart.addEventListener('click', function () {
+        document.getElementById('smartAssistantModal').classList.add('hidden');
+      });
+      var btnToggleAiSet = document.getElementById('btnToggleSmartAiSettings');
+      if (btnToggleAiSet) btnToggleAiSet.addEventListener('click', function () {
+        var p = document.getElementById('smartAiSettingsPanel');
+        if (p) p.classList.toggle('hidden');
+      });
+      var btnSaveAiKey = document.getElementById('btnSaveSmartGeminiKey');
+      if (btnSaveAiKey) btnSaveAiKey.addEventListener('click', function () {
+        var keyVal = ((document.getElementById('smartGeminiKeyInput') || {}).value || '').trim();
+        var enVal = !!(document.getElementById('chkSmartUseGemini') || {}).checked;
+        smartAiConfig.apiKey = keyVal;
+        smartAiConfig.enabled = enVal && !!keyVal;
+        try {
+          localStorage.setItem('mihrab_gemini_api_key', keyVal);
+          localStorage.setItem('mihrab_gemini_enabled', smartAiConfig.enabled ? '1' : '0');
+        } catch (e) {}
+        updateSmartEngineBadge();
+        document.getElementById('smartAiSettingsPanel').classList.add('hidden');
+        showToast(smartAiConfig.enabled ? '🧠 تم تفعيل الوضع الهجين (محلي + Gemini AI) على جهازك بنجاح!' : '⚡ تم ضبط المساعد على الوضع المحلي السريع (مجاني 100%)', false);
+      });
+
+      var btnClearSmart = document.getElementById('btnClearSmartChat');
+      if (btnClearSmart) btnClearSmart.addEventListener('click', function () {
+        smartChatLog = [];
+        smartContext = { lastStudentId: null, lastTeacherId: null };
+        renderSmartChatStream();
+      });
+
+      var smartInpEl = document.getElementById('smartAssistantInput');
+      if (smartInpEl) {
+        smartInpEl.addEventListener('input', function (ev) {
+          updateSmartAutocomplete(ev.target.value);
+        });
+      }
+
+      var formSmartAsk = document.getElementById('formSmartAssistantAsk');
+      if (formSmartAsk) {
+        formSmartAsk.addEventListener('submit', function (ev) {
+          ev.preventDefault();
+          var inp = document.getElementById('smartAssistantInput');
+          var qVal = (inp.value || '').trim();
+          if (!qVal) return;
+          inp.value = '';
+          processSmartAssistantInput(qVal);
+        });
+      }
+
+      var btnCopySmartReply = document.getElementById('btnCopySmartAssistantReply');
+      if (btnCopySmartReply) {
+        btnCopySmartReply.addEventListener('click', function () {
+          copyText(state.lastSmartAssistantText || 'تقرير المساعد الذكي', 'إجابة المساعد الذكي');
+        });
+      }
+
+      document.body.addEventListener('click', function (ev) {
+        var btn = ev.target.closest('button');
+        if (!btn) return;
+
+        var acFill = btn.getAttribute('data-smart-ac-fill');
+        if (acFill) {
+          var inpAc = document.getElementById('smartAssistantInput');
+          if (inpAc) inpAc.value = '';
+          processSmartAssistantInput(acFill);
+          return;
+        }
+        var disambKind = btn.getAttribute('data-smart-disamb-kind');
+        if (disambKind) {
+          var dId = btn.getAttribute('data-smart-disamb-id');
+          var dRaw = btn.getAttribute('data-smart-disamb-raw') || '';
+          processSmartAssistantInput(dRaw, { kind: disambKind, id: dId });
+          return;
+        }
+        var smartAskMode = btn.getAttribute('data-smart-ask');
+        if (smartAskMode) {
+          processSmartAssistantInput(smartAskMode);
+          return;
+        }
+        var quickPaidId = btn.getAttribute('data-smart-quick-paid');
+        if (quickPaidId) {
+          var permsQP = getActivePermissions();
+          if (isUserReadOnlyMode() || !permsQP.edit_students) { showToast('🔒 مقيد حسب الصلاحية', false); return; }
+          state.students = state.students.map(function (s) { return s.id === quickPaidId ? Object.assign({}, s, { paymentStatus: 'PAID', renewalStatus: 'RENEWED' }) : s; });
+          renderAll();
+          smartChatLog.push({ role: 'assistant', html: '<div style="color:#065F46; font-weight:800;">✅ تم تأكيد الدفع بنجاح وتحديث البطاقة والميزانية!</div>' });
+          renderSmartChatStream();
+          return;
+        }
+        var quickRenewId = btn.getAttribute('data-smart-quick-renew');
+        if (quickRenewId) {
+          var permsQR = getActivePermissions();
+          if (isUserReadOnlyMode() || !permsQR.edit_students) { showToast('🔒 مقيد حسب الصلاحية', false); return; }
+          state.students = state.students.map(function (s) { return s.id === quickRenewId ? Object.assign({}, s, { consumedLessons: 0, renewalStatus: 'RENEWED' }) : s; });
+          renderAll();
+          smartChatLog.push({ role: 'assistant', html: '<div style="color:#065F46; font-weight:800;">🔄 تم تجديد الباقة وبدء دورة حلقات جديدة بنجاح!</div>' });
+          renderSmartChatStream();
+          return;
+        }
+        var execAid = btn.getAttribute('data-exec-smart-action');
+        if (execAid && smartPendingActions[execAid]) {
+          var act = smartPendingActions[execAid];
+          var permsEx = getActivePermissions();
+          if (isUserReadOnlyMode()) { showToast('🔒 حسابك مخصص للاطلاع فقط', false); return; }
+
+          if (act.type === 'ADD_STUDENT_FORM') {
+            if (!permsEx.edit_students) { showToast('🔒 لا تملك صلاحية إضافة طلاب', false); return; }
+            var sName = ((document.getElementById('sa_add_s_name_' + execAid) || {}).value || '').trim();
+            if (!sName) { showToast('يرجى كتابة اسم الطالب أولاً', false); return; }
+            state.students.push({
+              id: 's_' + Date.now(), name: sName,
+              country: ((document.getElementById('sa_add_s_country_' + execAid) || {}).value || 'السعودية').trim(),
+              adCampaign: (state.campaigns[0] && state.campaigns[0].id) || 'عام',
+              teacherId: (document.getElementById('sa_add_s_teacher_' + execAid) || {}).value || (state.teachers[0] && state.teachers[0].id),
+              totalLessons: Math.max(1, Number((document.getElementById('sa_add_s_total_' + execAid) || {}).value) || 8),
+              defaultDurationMin: 45, consumedLessons: 0,
+              scheduleText: ((document.getElementById('sa_add_s_sched_' + execAid) || {}).value || 'السبت والثلاثاء 5:00 م').trim(),
+              subStartDate: new Date().toISOString().slice(0, 10),
+              renewalDate: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+              paymentStatus: 'PAID', renewalStatus: 'NEW_SUB',
+              foreignPackageText: permsEx.see_student_money ? (((document.getElementById('sa_add_s_pkg_' + execAid) || {}).value || '15 دينار').trim()) : '',
+              tuitionReceived: permsEx.see_student_money ? (Number((document.getElementById('sa_add_s_egp_' + execAid) || {}).value) || 0) : 0
+            });
+            delete smartPendingActions[execAid];
+            renderAll();
+            smartChatLog.push({ role: 'assistant', html: '<div style="color:#065F46; font-weight:800;">✅ تمت إضافة الطالب "' + escHtml(sName) + '" بنجاح!</div>' });
+            renderSmartChatStream();
+            return;
+          }
+          if (act.type === 'ADD_LESSON_FORM') {
+            if (!permsEx.add_lesson) { showToast('🔒 لا تملك صلاحية تسجيل الحلقات', false); return; }
+            var lStuId = (document.getElementById('sa_add_l_stu_' + execAid) || {}).value;
+            var lStu = state.students.find(function (s) { return s.id === lStuId; });
+            if (!lStu) return;
+            var lTreat = (document.getElementById('sa_add_l_treat_' + execAid) || {}).value || 'NORMAL_MAKEUP';
+            var lDur = Math.max(10, Number((document.getElementById('sa_add_l_dur_' + execAid) || {}).value) || 45);
+            var lDate = (document.getElementById('sa_add_l_date_' + execAid) || {}).value || state.scheduleDateFilter;
+            var lTime = (document.getElementById('sa_add_l_time_' + execAid) || {}).value || '17:00';
+            var lRule = TREATMENT_RULES[lTreat] || TREATMENT_RULES.NORMAL_MAKEUP;
+            state.lessons.unshift({
+              id: 'l_sa_' + Date.now(), date: lDate, time: lTime, studentId: lStu.id, teacherId: lStu.teacherId,
+              durationMin: lDur, rateTier: 'RATE_1', treatment: lTreat, notes: lRule.label + ' (عبر المساعد الذكي)'
+            });
+            if (lRule.deductsStudent) {
+              state.students = state.students.map(function (s) { return s.id === lStu.id ? Object.assign({}, s, { consumedLessons: s.consumedLessons + 1 }) : s; });
+            }
+            delete smartPendingActions[execAid];
+            renderAll();
+            smartChatLog.push({ role: 'assistant', html: '<div style="color:#065F46; font-weight:800;">✅ تم تسجيل الحلقة للطالب "' + escHtml(lStu.name) + '" (' + lDur + ' دقيقة) وتحديث الحسابات!</div>' });
+            renderSmartChatStream();
+            return;
+          }
+          if (act.type === 'ADD_TEACHER_FORM') {
+            if (!permsEx.edit_teachers) { showToast('🔒 لا تملك صلاحية إضافة معلمين', false); return; }
+            var tName = ((document.getElementById('sa_add_t_name_' + execAid) || {}).value || '').trim();
+            if (!tName) { showToast('يرجى كتابة اسم المعلم أولاً', false); return; }
+            var rVal = permsEx.see_teacher_rates ? (Number((document.getElementById('sa_add_t_rate_' + execAid) || {}).value) || 75) : 75;
+            state.teachers.push({
+              id: 't_' + Date.now(), name: tName, age: '',
+              specialization: ((document.getElementById('sa_add_t_spec_' + execAid) || {}).value || 'تحفيظ وتجويد').trim(),
+              phone: ((document.getElementById('sa_add_t_phone_' + execAid) || {}).value || '+2010').trim(),
+              rate1: rVal, rate2: rVal
+            });
+            delete smartPendingActions[execAid];
+            renderAll();
+            smartChatLog.push({ role: 'assistant', html: '<div style="color:#065F46; font-weight:800;">✅ تمت إضافة المعلم "' + escHtml(tName) + '" إلى الرادار بنجاح!</div>' });
+            renderSmartChatStream();
+            return;
+          }
+          if (act.type === 'MARK_PAID' && permsEx.edit_students) {
+            state.students = state.students.map(function (s) { return s.id === act.studentId ? Object.assign({}, s, { paymentStatus: 'PAID', renewalStatus: 'RENEWED' }) : s; });
+          } else if (act.type === 'RENEW_STUDENT' && permsEx.edit_students) {
+            state.students = state.students.map(function (s) { return s.id === act.studentId ? Object.assign({}, s, { consumedLessons: 0, renewalStatus: 'RENEWED' }) : s; });
+          } else if (act.type === 'SET_TOTAL_LESSONS' && permsEx.edit_students) {
+            state.students = state.students.map(function (s) {
+              if (s.id !== act.studentId) return s;
+              var nr = s.consumedLessons >= act.value ? 'PENDING_RENEWAL' : (s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus);
+              return Object.assign({}, s, { totalLessons: act.value, renewalStatus: nr });
+            });
+          } else if (act.type === 'SET_CONSUMED' && permsEx.edit_students) {
+            state.students = state.students.map(function (s) {
+              if (s.id !== act.studentId) return s;
+              var nr2 = act.value >= s.totalLessons ? 'PENDING_RENEWAL' : (s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus);
+              return Object.assign({}, s, { consumedLessons: act.value, renewalStatus: nr2 });
+            });
+          } else if (act.type === 'UPDATE_STUDENT_SCHED_TEACHER' && (permsEx.edit_schedule || permsEx.edit_students)) {
+            state.students = state.students.map(function (s) {
+              if (s.id !== act.studentId) return s;
+              return Object.assign({}, s, {
+                scheduleText: act.scheduleText || s.scheduleText,
+                teacherId: (act.teacherId && permsEx.edit_students) ? act.teacherId : s.teacherId
+              });
+            });
+          } else if (act.type === 'UPDATE_TEACHER_RATE' && permsEx.edit_teachers && permsEx.see_teacher_rates) {
+            state.teachers = state.teachers.map(function (t) {
+              return t.id === act.teacherId ? Object.assign({}, t, { rate1: Number(act.rate1) || t.rate1 }) : t;
+            });
+          } else if (act.type === 'EXEC_TODAY_LESSON' && permsEx.approve_today_lessons) {
+            var dT = state.scheduleDateFilter || '2026-11-15';
+            var stExec = state.students.find(function (s) { return s.id === act.studentId; });
+            if (stExec) {
+              var trCode = act.isAbsence ? 'ABSENCE' : 'NORMAL_MAKEUP';
+              state.lessons.unshift({
+                id: 'l_sa_' + Date.now(), date: dT, time: '17:00', studentId: stExec.id, teacherId: stExec.teacherId,
+                durationMin: stExec.defaultDurationMin || 45, rateTier: 'RATE_1', treatment: trCode,
+                notes: act.isAbsence ? 'غياب طالب (مسجل عبر المساعد الذكي)' : 'تمت الحلقة (معتمدة عبر المساعد الذكي)'
+              });
+              state.students = state.students.map(function (s) { return s.id === stExec.id ? Object.assign({}, s, { consumedLessons: s.consumedLessons + 1 }) : s; });
+              state.dailyReports.unshift({
+                id: 'rep_sa_' + Date.now(), type: 'EXECUTION', date: dT, studentId: stExec.id, teacherId: stExec.teacherId,
+                teacherName: (state.teachers.find(function (t) { return t.id === stExec.teacherId; }) || {}).name || '',
+                studentName: stExec.name, status: act.isAbsence ? 'NOT_DONE' : 'DONE',
+                reasonCat: act.isAbsence ? 'STUDENT_NO_REPLY' : 'NONE', note: act.isAbsence ? 'غياب طالب' : 'تمت الحلقة',
+                createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : getActiveSupervisorObj().id,
+                createdByName: state.currentUserName || 'المساعد الذكي', createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+              });
+            }
+          } else if (act.type === 'ADD_SECRET_NOTE' && permsEx.add_confidential_note) {
+            var stSecObj = state.students.find(function (s) { return s.id === act.studentId; });
+            if (stSecObj) {
+              state.confidentialNotes.unshift({
+                id: 'sec_' + Date.now(), date: state.scheduleDateFilter || '2026-11-15',
+                studentId: stSecObj.id, studentName: stSecObj.name, teacherId: stSecObj.teacherId,
+                teacherName: (state.teachers.find(function (t) { return t.id === stSecObj.teacherId; }) || {}).name || '',
+                category: 'ملاحظة عبر المساعد الذكي', text: act.text,
+                createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : getActiveSupervisorObj().id,
+                createdByName: state.currentUserName || getActiveSupervisorObj().name,
+                createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+              });
+            }
+          } else if (act.type === 'DELETE_STUDENT_TRASH' && permsEx.delete_items) {
+            var stDelObj = state.students.find(function (s) { return s.id === act.studentId; });
+            if (stDelObj) {
+              var stLes = state.lessons.filter(function (l) { return l.studentId === act.studentId; });
+              pushToTrash('STUDENT', stDelObj.name, { student: stDelObj, removedLessons: stLes });
+              state.lessons = state.lessons.filter(function (l) { return l.studentId !== act.studentId; });
+              state.students = state.students.filter(function (s) { return s.id !== act.studentId; });
+            }
+          } else if (act.type === 'RESTORE_LATEST_TRASH' && permsEx.delete_items && permsEx.view_trash) {
+            restoreTrashItem(act.trashId);
+          }
+
+          delete smartPendingActions[execAid];
+          renderAll();
+          smartChatLog.push({ role: 'assistant', html: '<div style="color:#065F46; font-weight:800;">✅ تم تنفيذ التحديث بنجاح ومزامنته في جميع تبويبات المنصة!</div>' });
+          renderSmartChatStream();
+          return;
+        }
+        var smartFindStu = btn.getAttribute('data-smart-find-student');
+        if (smartFindStu) {
+          document.getElementById('smartAssistantModal').classList.add('hidden');
+          state.studentPayFilter = 'ALL';
+          state.studentSearchQuery = smartFindStu;
+          var sSel = document.getElementById('studentPayFilterSelect');
+          if (sSel) sSel.value = 'ALL';
+          var sInp = document.getElementById('studentSearchInput');
+          if (sInp) sInp.value = smartFindStu;
+          switchTab('students');
+          renderAll(true);
+          return;
+        }
+        var smartFindTea = btn.getAttribute('data-smart-find-teacher');
+        if (smartFindTea) {
+          document.getElementById('smartAssistantModal').classList.add('hidden');
+          state.teacherFilter = 'ALL';
+          state.teacherSearchQuery = smartFindTea;
+          var tSel = document.getElementById('teacherFilterSelect');
+          if (tSel) tSel.value = 'ALL';
+          var tInp = document.getElementById('teacherSearchInput');
+          if (tInp) tInp.value = smartFindTea;
+          switchTab('teachers');
+          renderAll(true);
+          return;
+        }
+        var smartGoTab = btn.getAttribute('data-smart-go-tab');
+        if (smartGoTab) {
+          document.getElementById('smartAssistantModal').classList.add('hidden');
+          switchTab(smartGoTab);
+          return;
+        }
+      });
 
       renderAll(true);
       if (state.webhookUrl) {
