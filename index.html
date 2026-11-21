@@ -1091,6 +1091,10 @@
         <button type="button" id="btnSaveSmartGeminiKey" class="btn btn-primary" style="padding:6px 11px; font-size:0.74rem;">💾 حفظ واختبار الاتصال الآن</button>
       </div>
       <div id="smartGeminiTestStatus" style="margin-top:6px; font-size:0.75rem; font-weight:700;"></div>
+      <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #BFDBFE;">
+        <label for="smartAcademyPoliciesInput" style="display:block; font-size:0.73rem; font-weight:800; color:#1E3A8A; margin-bottom:4px;">📜 قوانين وسياسات أكاديميتك (يلتزم بها الذكاء الاصطناعي في كل إجابة وتنفيذ):</label>
+        <textarea id="smartAcademyPoliciesInput" class="form-input" rows="2" placeholder="اكتب سياسات الغياب أو الخصم أو التوقيت الخاصة بأكاديميتك..." style="width:100%; font-size:0.75rem; padding:5px 8px; resize:vertical;"></textarea>
+      </div>
     </div>
 
     <!-- شريط الأوامر السريعة الأفقي المدمج (صف واحد أنيق لا يضيق المحادثة) -->
@@ -1867,6 +1871,37 @@
           <div id="VisualDistributionBars" style="margin-top: 8px;"></div>
         </div>
       </div>
+
+      <!-- صناديق العملات قيد التحويل للمصري (تجميع تلقائي لكل عملة: ليبي، عراقي، سعودي، تونسي، قطري...) -->
+      <div style="margin-top: 16px; padding: 14px; background: #FFFDF7; border: 2px solid #FCD34D; border-radius: 14px;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom: 10px;">
+          <div>
+            <strong style="font-size: 0.94rem; color: #92400E;">🏦 صناديق العملات قيد التحويل للمصري (إيرادات لم تُحوّل للمصري بعد)</strong>
+            <div style="font-size: 0.74rem; color: var(--slate-600);">تُجمع تلقائياً كل عملة وحدها للطلاب الذين لم يُكتب معادلهم بالمصري؛ وفي نهاية الشهر اكتب مبلغ الحوالة التي وصلتك بالمصري واضغط "اعتماد" فتُضاف فوراً لإيراد الشهر.</div>
+          </div>
+        </div>
+        <div id="currencyVaultsContainer"></div>
+      </div>
+
+      <!-- إقفال الشهر الحالي وترحيل مستحقات المعلمين + أرشيف الشهور المقفلة -->
+      <div style="margin-top: 14px; padding: 14px; background: #F8FAFC; border: 2px solid var(--blue-border); border-radius: 14px;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom: 12px;">
+          <div>
+            <strong style="font-size: 0.94rem; color: #1E3A8A;">🔒 إقفال الشهر الحالي وترحيل مستحقات المعلمين والأرشيف الشهري</strong>
+            <div style="font-size: 0.74rem; color: var(--slate-600);">يُغلق الشهر الحالي ويؤرشف أرقامه بالكامل، ويرحّل رصيد المعلمين المتبقي باسم الشهر السابق لتبدأ الشهر الجديد بصفحة نظيفة.</div>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+            <input type="text" id="nextMonthLabelInput" class="form-input" placeholder="اسم الشهر الجديد (مثال: ديسمبر 2026)" style="width:205px; padding:6px 10px; font-size:0.78rem; font-weight:700;" />
+            <button type="button" id="btnCloseCurrentMonthNow" class="btn btn-primary" style="padding:7px 14px; font-size:0.78rem; font-weight:800;">🔒 إقفال الشهر وترحيل الأرصدة</button>
+          </div>
+        </div>
+
+        <!-- أرصدة المعلمين المُرحّلة من الشهور السابقة -->
+        <div id="carriedTeacherDuesContainer" style="margin-bottom: 10px;"></div>
+
+        <!-- أرشيف الشهور المقفلة -->
+        <div id="monthlyArchivesContainer"></div>
+      </div>
     </div>
 
     <!-- اللوحة 3: رادار التدقيق المحاسبي التلقائي -->
@@ -2148,12 +2183,33 @@
 
             <div id="studentMoneyInputsWrap" class="grid-2" style="background: var(--emerald-bg); padding: 12px; border-radius: 10px; border: 1px solid var(--emerald-border); margin-bottom: 12px;">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="studentForeignPackage" style="color: #065F46;">1️⃣ باقة الطالب بعملته (تُكتب يدوياً)</label>
-                <input type="text" id="studentForeignPackage" class="form-input" placeholder="مثال: 15 دينار / 150 ريال / 50 دولار" value="15 دينار" required />
+                <label class="form-label" for="studentForeignPackage" style="color: #065F46;">1️⃣ باقة الطالب بعملته (اختر العملة أو اكتب يدوياً)</label>
+                <div style="display:flex; gap:5px;">
+                  <input type="text" id="studentForeignPackage" class="form-input" placeholder="مثال: 700 دينار ليبي / 50000 دينار عراقي" value="15 دينار" required style="flex:1;" />
+                  <select id="studentQuickCurrencyPick" class="form-select" style="width:125px; padding:4px 6px; font-size:0.74rem; font-weight:700;" title="إدراج اسم العملة سريعاً">
+                    <option value="">عملة سريعة...</option>
+                    <option value="دينار ليبي">🇱🇾 دينار ليبي</option>
+                    <option value="دينار عراقي">🇮🇶 دينار عراقي</option>
+                    <option value="ريال سعودي">🇸🇦 ريال سعودي</option>
+                    <option value="دينار تونسي">🇹🇳 دينار تونسي</option>
+                    <option value="دينار كويتي">🇰🇼 دينار كويتي</option>
+                    <option value="ريال قطري">🇶🇦 ريال قطري</option>
+                    <option value="درهم إماراتي">🇦🇪 درهم إماراتي</option>
+                    <option value="ريال عماني">🇴🇲 ريال عماني</option>
+                    <option value="دينار بحريني">🇧🇭 دينار بحريني</option>
+                    <option value="دينار أردني">🇯🇴 دينار أردني</option>
+                    <option value="دينار جزائري">🇩🇿 دينار جزائري</option>
+                    <option value="درهم مغربي">🇲🇦 درهم مغربي</option>
+                    <option value="دولار أمريكي">🇺🇸 دولار</option>
+                    <option value="يورو">🇪🇺 يورو</option>
+                    <option value="جنيه إسترليني">🇬🇧 إسترليني</option>
+                    <option value="جنيه مصري">🇪🇬 جنيه مصري</option>
+                  </select>
+                </div>
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="studentTuition" style="color: #065F46;">2️⃣ ما يعادلها بالمصري (تُكتب يدوياً بالجنيه)</label>
-                <input type="number" step="0.01" id="studentTuition" class="form-input" placeholder="مثال: 2400" value="1200" min="0" required style="font-weight: 800; color: #065F46;" />
+                <input type="number" step="0.01" id="studentTuition" class="form-input" placeholder="اتركه 0 إن لم يُحوّل للمصري بعد" value="0" min="0" style="font-weight: 800; color: #065F46;" />
               </div>
             </div>
 
@@ -2820,6 +2876,10 @@
       adPercentage: 30,
       currency: 'جنيه',
       monthLabel: 'نوفمبر 2026',
+      currencySettlements: [],
+      monthlyArchives: [],
+      carriedTeacherDues: [],
+      academyPolicies: 'التوقيت المعتمد هو توقيت مصر. الأخوان المرتبطان بباقة عائلية يُحسبان طالبين بعداد مستقل وسعر واحد. نسبة الأكاديمية هي الثلثان وأرباح الإدارة هي الثلث.',
       includeHistoricalGap: true,
       adMode: 'PERCENTAGE',
       teacherFilter: 'ALL',
@@ -2874,6 +2934,46 @@
       "}",
       "",
       "function doPost(e) {",
+      "  try {",
+      "    var raw = e.postData.contents;",
+      "    var payload = JSON.parse(raw);",
+      "    // 0. وسيط الذكاء الاصطناعي السحابي مع التبديل التلقائي الذكي بين 5 مفاتيح (Failover + Cache)",
+      "    if (payload && payload.action === 'AI_CHAT') {",
+      "      var props = PropertiesService.getScriptProperties();",
+      "      var keys = [props.getProperty('GEMINI_API_KEY'), props.getProperty('GEMINI_API_KEY_2'), props.getProperty('GEMINI_API_KEY_3'), props.getProperty('GEMINI_API_KEY_4'), props.getProperty('GEMINI_API_KEY_5')].filter(function(k){ return k && k.trim(); });",
+      "      if (keys.length === 0) {",
+      "        return ContentService.createTextOutput(JSON.stringify({ status: 'no_key' })).setMimeType(ContentService.MimeType.JSON);",
+      "      }",
+      "      var cache = CacheService.getScriptCache();",
+      "      var startIdx = parseInt(cache.get('MIHRAB_ACTIVE_KEY_IDX') || '0', 10) || 0;",
+      "      if (startIdx >= keys.length) startIdx = 0;",
+      "      var models = ['gemini-2.5-flash', 'gemini-2.0-flash'];",
+      "      var lastErr = 'API Error';",
+      "      for (var kStep = 0; kStep < keys.length; kStep++) {",
+      "        var kIdx = (startIdx + kStep) % keys.length;",
+      "        var curKey = keys[kIdx].trim();",
+      "        for (var mi = 0; mi < models.length; mi++) {",
+      "          var mName = models[mi];",
+      "          var apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + mName + ':generateContent?key=' + encodeURIComponent(curKey);",
+      "          var resp = UrlFetchApp.fetch(apiUrl, { method: 'post', contentType: 'application/json', payload: JSON.stringify(payload.geminiPayload || {}), muteHttpExceptions: true });",
+      "          var code = resp.getResponseCode();",
+      "          var rJson = {};",
+      "          try { rJson = JSON.parse(resp.getContentText() || '{}'); } catch (pe) {}",
+      "          if (code === 200 && rJson && rJson.candidates && rJson.candidates[0] && rJson.candidates[0].content && rJson.candidates[0].content.parts && rJson.candidates[0].content.parts[0]) {",
+      "            try { cache.put('MIHRAB_ACTIVE_KEY_IDX', String(kIdx), 600); } catch (ce) {}",
+      "            return ContentService.createTextOutput(JSON.stringify({ status: 'ok', text: rJson.candidates[0].content.parts[0].text, model: mName, keySlot: kIdx + 1 })).setMimeType(ContentService.MimeType.JSON);",
+      "          }",
+      "          lastErr = (rJson && rJson.error && rJson.error.message) ? rJson.error.message : ('HTTP ' + code);",
+      "          // عند انتهاء الحصة (429) أو عدم صلاحية المفتاح، ننتقل فوراً للمفتاح التالي دون تأخير",
+      "          if (code === 429 || code === 401 || code === 403 || lastErr.indexOf('quota') !== -1 || lastErr.indexOf('RESOURCE_EXHAUSTED') !== -1) {",
+      "            break;",
+      "          }",
+      "        }",
+      "      }",
+      "      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: lastErr })).setMimeType(ContentService.MimeType.JSON);",
+      "    }",
+      "  } catch (aiPreErr) {}",
+      "",
       "  var lock = LockService.getScriptLock();",
       "  lock.waitLock(10000);",
       "  try {",
@@ -3230,6 +3330,91 @@
       showToast('✅ تم تجهيز ونسخ: ' + cleanLabel, false);
     }
 
+    var ACADEMY_CURRENCIES = [
+      { code: 'LYD', name: 'دينار ليبي', flag: '🇱🇾', keys: ['ليبي', 'ليبيا'] },
+      { code: 'IQD', name: 'دينار عراقي', flag: '🇮🇶', keys: ['عراقي', 'العراق', 'عراق'] },
+      { code: 'SAR', name: 'ريال سعودي', flag: '🇸🇦', keys: ['سعودي', 'السعودية', 'السعوديه'] },
+      { code: 'TND', name: 'دينار تونسي', flag: '🇹🇳', keys: ['تونسي', 'تونس'] },
+      { code: 'KWD', name: 'دينار كويتي', flag: '🇰🇼', keys: ['كويتي', 'الكويت'] },
+      { code: 'QAR', name: 'ريال قطري', flag: '🇶🇦', keys: ['قطري', 'قطر'] },
+      { code: 'AED', name: 'درهم إماراتي', flag: '🇦🇪', keys: ['اماراتي', 'إماراتي', 'الامارات', 'الإمارات', 'درهم'] },
+      { code: 'OMR', name: 'ريال عماني', flag: '🇴🇲', keys: ['عماني', 'عمان'] },
+      { code: 'BHD', name: 'دينار بحريني', flag: '🇧🇭', keys: ['بحريني', 'البحرين'] },
+      { code: 'JOD', name: 'دينار أردني', flag: '🇯🇴', keys: ['اردني', 'أردني', 'الاردن', 'الأردن'] },
+      { code: 'DZD', name: 'دينار جزائري', flag: '🇩🇿', keys: ['جزائري', 'الجزائر'] },
+      { code: 'MAD', name: 'درهم مغربي', flag: '🇲🇦', keys: ['مغربي', 'المغرب'] },
+      { code: 'USD', name: 'دولار أمريكي', flag: '🇺🇸', keys: ['دولار', 'usd', '$', 'امريكا', 'أمريكا'] },
+      { code: 'EUR', name: 'يورو', flag: '🇪🇺', keys: ['يورو', 'eur', '€', 'فرنسا', 'المانيا', 'ألمانيا', 'اوروبا'] },
+      { code: 'GBP', name: 'جنيه إسترليني', flag: '🇬🇧', keys: ['استرليني', 'إسترليني', 'gbp', '£', 'بريطانيا'] },
+      { code: 'EGP', name: 'جنيه مصري', flag: '🇪🇬', keys: ['مصري', 'مصر', 'egp', 'جنيه'] }
+    ];
+
+    function detectStudentCurrencyBucket(foreignText, country) {
+      var raw = String(foreignText || '').trim();
+      var arD = '٠١٢٣٤٥٦٧٨٩';
+      var normRaw = raw;
+      for (var i = 0; i < 10; i++) normRaw = normRaw.split(arD[i]).join(String(i));
+      var numMatch = normRaw.replace(/,/g, '').match(/\d+(\.\d+)?/);
+      var amount = numMatch ? Number(numMatch[0]) : 0;
+      var combined = (normRaw + ' ' + String(country || '')).toLowerCase();
+
+      for (var c = 0; c < ACADEMY_CURRENCIES.length; c++) {
+        var cur = ACADEMY_CURRENCIES[c];
+        for (var k = 0; k < cur.keys.length; k++) {
+          if (combined.indexOf(cur.keys[k]) !== -1) {
+            return { code: cur.code, name: cur.name, flag: cur.flag, amount: amount };
+          }
+        }
+      }
+      if (combined.indexOf('دينار') !== -1) return { code: 'DINAR_GEN', name: 'دينار (غير محدد الدولة)', flag: '💱', amount: amount };
+      if (combined.indexOf('ريال') !== -1) return { code: 'RIYAL_GEN', name: 'ريال (غير محدد الدولة)', flag: '💱', amount: amount };
+      return { code: 'OTHER', name: 'عملة أخرى', flag: '🌍', amount: amount };
+    }
+
+    function computeCurrencyVaults() {
+      var pendingByCode = {};
+      var directConvertedStudents = [];
+      var settledThisMonth = (state.currencySettlements || []).filter(function (x) {
+        return x.monthLabel === state.monthLabel;
+      });
+      var settledCodesMap = {};
+      settledThisMonth.forEach(function (st) {
+        settledCodesMap[st.currencyCode] = (settledCodesMap[st.currencyCode] || 0) + Number(st.egpReceived || 0);
+      });
+
+      state.students.forEach(function (s) {
+        if (s.familyBillingParentId) return;
+        var egp = Number(s.tuitionReceived || 0);
+        if (egp > 0) {
+          directConvertedStudents.push({ name: s.name, foreignText: s.foreignPackageText || '—', egp: egp });
+          return;
+        }
+        var bucket = detectStudentCurrencyBucket(s.foreignPackageText, s.country);
+        if (bucket.amount > 0) {
+          if (!pendingByCode[bucket.code]) {
+            pendingByCode[bucket.code] = {
+              code: bucket.code,
+              name: bucket.name,
+              flag: bucket.flag,
+              totalForeign: 0,
+              students: []
+            };
+          }
+          pendingByCode[bucket.code].totalForeign += bucket.amount;
+          pendingByCode[bucket.code].students.push({ id: s.id, name: s.name, amount: bucket.amount, rawText: s.foreignPackageText || '' });
+        }
+      });
+
+      var settledVaultsEgpTotal = settledThisMonth.reduce(function (sum, x) { return sum + Number(x.egpReceived || 0); }, 0);
+      return {
+        pendingVaults: Object.keys(pendingByCode).map(function (k) { return pendingByCode[k]; }),
+        settledThisMonth: settledThisMonth,
+        settledCodesMap: settledCodesMap,
+        settledVaultsEgpTotal: settledVaultsEgpTotal,
+        directConvertedStudents: directConvertedStudents
+      };
+    }
+
     function computeFinancials() {
       var totalTeacherPaid = 0;
       var totalTeacherPending = 0;
@@ -3312,11 +3497,14 @@
       var currencyTotals = {};
       var totalRevenueEGP = 0;
 
+      var vaultsSummary = computeCurrencyVaults();
+      var directEgpRevenue = 0;
       state.students.forEach(function (s) {
         if (s.familyBillingParentId) return; // أخ مرتبط بباقة عائلية موحدة — الإيراد محسوب مرة واحدة لدى صاحب الفاتورة
         var egpVal = Number(s.tuitionReceived || 0);
-        totalRevenueEGP += egpVal;
+        directEgpRevenue += egpVal;
       });
+      totalRevenueEGP = directEgpRevenue + vaultsSummary.settledVaultsEgpTotal;
 
       var campaignsSpend = state.campaigns.reduce(function (sum, c) { return sum + Number(c.cost || 0); }, 0);
       var initialNetProfit = totalRevenueEGP - totalTeacherPaid - totalTeacherPending - state.staffSalary;
@@ -4119,6 +4307,13 @@
     }
 
     function updateSyncStatusUI() {
+      var permsSync = getActivePermissions();
+      var syncBarEl = document.getElementById('teamSyncBar');
+      if (syncBarEl) syncBarEl.classList.toggle('hidden', !permsSync.isAdmin);
+      var storagePill = document.getElementById('storageStatusText');
+      if (storagePill && storagePill.parentElement) {
+        storagePill.parentElement.classList.toggle('hidden', !permsSync.isAdmin);
+      }
       var badge = document.getElementById('syncConnectionBadge');
       var meta = document.getElementById('lastSyncMetaText');
       var urlInput = document.getElementById('webhookUrlInput');
@@ -4266,6 +4461,7 @@
     }
 
     function pushToCloud(silent) {
+      if (!getActivePermissions().isAdmin) silent = true;
       var url = (state.webhookUrl || '').trim();
       if (!url) {
         if (!silent) showToast('يرجى إدخال رابط Google Apps Script أولاً في تبويب الربط', false);
@@ -4296,6 +4492,9 @@
         trash: state.trash,
         staffSalary: state.staffSalary,
         adPercentage: state.adPercentage,
+        currencySettlements: state.currencySettlements || [],
+        monthlyArchives: state.monthlyArchives || [],
+        carriedTeacherDues: state.carriedTeacherDues || [],
         monthLabel: state.monthLabel,
         includeHistoricalGap: state.includeHistoricalGap,
         adMode: state.adMode,
@@ -4324,6 +4523,7 @@
     }
 
     function pullFromCloud(silent) {
+      if (!getActivePermissions().isAdmin) silent = true;
       var url = (state.webhookUrl || '').trim();
       if (!url) {
         hasCompletedInitialPull = true;
@@ -4370,6 +4570,9 @@
             }
             if (typeof sh.staffSalary === 'number') state.staffSalary = sh.staffSalary;
             if (typeof sh.adPercentage === 'number') state.adPercentage = sh.adPercentage;
+            if (Array.isArray(sh.currencySettlements)) state.currencySettlements = mergeArraysById(sh.currencySettlements, state.currencySettlements || []);
+            if (Array.isArray(sh.monthlyArchives)) state.monthlyArchives = mergeArraysById(sh.monthlyArchives, state.monthlyArchives || []);
+            if (Array.isArray(sh.carriedTeacherDues)) state.carriedTeacherDues = mergeArraysById(sh.carriedTeacherDues, state.carriedTeacherDues || []);
             if (sh.monthLabel) state.monthLabel = sh.monthLabel;
             if (typeof sh.includeHistoricalGap === 'boolean') state.includeHistoricalGap = sh.includeHistoricalGap;
             if (sh.adMode) state.adMode = sh.adMode;
@@ -4506,6 +4709,7 @@
           '</div>';
       }).join('');
       document.getElementById('VisualDistributionBars').innerHTML = barsHtml;
+      if (typeof renderCurrencyVaultsAndClosingUI === 'function') renderCurrencyVaultsAndClosingUI(summary);
 
       // تحديث القوائم المنسدلة والجداول
       renderSelectOptions(summary);
@@ -8146,6 +8350,7 @@
         updateSmartEngineBadge();
 
         var chips = [
+          { show: true, cls: 'btn-primary', ask: 'فحص تعارض المواعيد وتسرّب الإيرادات', label: '🔍 فحص الأخطاء والتعارضات' },
           { show: true, cls: 'btn-soft', ask: 'كم عدد الطلاب والمعلمين؟', label: '📊 إحصائيات شاملة' },
           { show: perms.view_today, cls: 'btn-soft', ask: 'ملخص حلقات اليوم', label: '📅 ملخص اليوم' },
           { show: perms.view_unpaid_renewal_alert || perms.view_students, cls: 'btn-danger-soft', ask: 'من لم يدفع أو يحتاج تجديد؟', label: '🚨 التجديد والدفع' },
@@ -8940,25 +9145,448 @@
         tryIdx(0);
       }
 
+      // =========================================================
+      // 🔍 رادار الفحص الاستباقي الذكي (كشف تعارض مواعيد المعلمين + تسرّب الإيرادات)
+      // =========================================================
+      function runProactiveAcademyDiagnostics(perms) {
+        var clashes = [];
+        var slotMap = {};
+        state.students.forEach(function (s) {
+          if (!s.teacherId || !s.scheduleText) return;
+          var parsed = parseStudentScheduleStrict(s.scheduleText);
+          parsed.daysList.forEach(function (dayIdx) {
+            var tm = parsed.daysMap[dayIdx];
+            var key = s.teacherId + '__' + dayIdx + '__' + tm;
+            if (!slotMap[key]) slotMap[key] = [];
+            slotMap[key].push(s);
+          });
+        });
+        Object.keys(slotMap).forEach(function (k) {
+          var arr = slotMap[k];
+          if (arr.length > 1) {
+            var parts = k.split('__');
+            var tObj = state.teachers.find(function (t) { return t.id === parts[0]; });
+            // نستثني الأخوين المرتبطين بنفس الباقة العائلية لو كانا يحضران معاً
+            var distinctGroups = {};
+            arr.forEach(function (st) { distinctGroups[st.familyBillingParentId || st.id] = true; });
+            if (Object.keys(distinctGroups).length > 1) {
+              clashes.push({
+                teacherName: tObj ? tObj.name : 'معلم',
+                dayName: ARABIC_DAYS_MAP[Number(parts[1])] || '',
+                time: parts[2],
+                students: arr.map(function (x) { return x.name; })
+              });
+            }
+          }
+        });
+
+        var overPkg = state.students.filter(function (s) { return s.consumedLessons > s.totalLessons; });
+        var vData = computeCurrencyVaults();
+        var unsettledVaults = vData.pendingVaults.filter(function (v) { return !(vData.settledCodesMap[v.code] > 0); });
+
+        var plainLines = ['🔍 تقرير الفحص الاستباقي الذكي للأكاديمية:'];
+        var htmlOut = '<div style="font-weight:800; color:var(--primary); margin-bottom:8px;">🔍 نتائج الفحص الاستباقي الذكي للأكاديمية:</div>';
+
+        // 1. تعارضات المواعيد
+        if (clashes.length === 0) {
+          plainLines.push('✅ لا يوجد أي تعارض في مواعيد المعلمين حالياً.');
+          htmlOut += '<div style="padding:8px 10px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:8px; color:#065F46; margin-bottom:8px; font-size:0.8rem;">✅ <strong>مواعيد المعلمين سليمة:</strong> لا يوجد أي معلم لديه طالبان في نفس اليوم ونفس الساعة.</div>';
+        } else {
+          plainLines.push('⚠️ تم رصد ' + clashes.length + ' تعارض في مواعيد المعلمين:');
+          htmlOut += '<div style="padding:9px 11px; background:#FFF1F2; border:1.5px solid #F43F5E; border-radius:10px; margin-bottom:8px;">' +
+            '<div style="font-weight:800; color:#9F1239; font-size:0.82rem; margin-bottom:5px;">⚠️ تعارض مواعيد المعلمين (' + clashes.length + ' تعارض):</div>' +
+            clashes.map(function (c) {
+              plainLines.push('  - ' + c.teacherName + ' | يوم ' + c.dayName + ' الساعة ' + c.time + ' (' + c.students.join(' + ') + ')');
+              return '<div style="font-size:0.77rem; padding:4px 0; border-top:1px dashed #FECDD3;">👤 <strong>' + escHtml(c.teacherName) + '</strong> — يوم <strong>' + escHtml(c.dayName) + '</strong> الساعة <strong>' + escHtml(c.time) + '</strong>: ' + escHtml(c.students.join(' ⚡ ')) + '</div>';
+            }).join('') + '</div>';
+        }
+
+        // 2. تجاوز الباقة دون تجديد
+        if (overPkg.length > 0) {
+          plainLines.push('🚨 طلاب تجاوزوا عدد حلقات باقتهم دون تجديد (' + overPkg.length + '): ' + overPkg.map(function (s) { return s.name + ' (' + s.consumedLessons + '/' + s.totalLessons + ')'; }).join('، '));
+          htmlOut += '<div style="padding:8px 10px; background:#FFFBEB; border:1px solid #FCD34D; border-radius:8px; margin-bottom:8px; font-size:0.78rem;">' +
+            '<strong style="color:#92400E;">🚨 طلاب تجاوزوا باقتهم دون تجديد (' + overPkg.length + '):</strong> ' +
+            overPkg.map(function (s) { return escHtml(s.name) + ' (' + s.consumedLessons + '/' + s.totalLessons + ')'; }).join('، ') +
+          '</div>';
+        }
+
+        // 3. صناديق العملات غير المحوّلة للمصري (للمصرح لهم مالياً فقط)
+        if ((perms.view_finance || perms.see_student_money) && unsettledVaults.length > 0) {
+          plainLines.push('🏦 صناديق عملات بانتظار اعتماد تحويلها للمصري: ' + unsettledVaults.map(function (v) { return v.totalForeign + ' ' + v.name; }).join(' | '));
+          htmlOut += '<div style="padding:8px 10px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; font-size:0.78rem;">' +
+            '<strong style="color:#1E3A8A;">🏦 عملات بانتظار التحويل للمصري:</strong> ' +
+            unsettledVaults.map(function (v) { return v.flag + ' ' + v.totalForeign.toLocaleString('en-US') + ' ' + escHtml(v.name); }).join(' • ') +
+          '</div>';
+        }
+
+        return { clashes: clashes, overPkg: overPkg, unsettledVaults: unsettledVaults, plain: plainLines.join('\n'), html: htmlOut };
+      }
+
+      // تصفية وتوصيف حزمة إجراءات متعددة (Multi-Action Batch) مع حارس RBAC صارم لكل خطوة
+      function buildBatchActionsPreviewCard(actionsArr, perms) {
+        if (!Array.isArray(actionsArr) || actionsArr.length === 0) return null;
+        if (isUserReadOnlyMode()) {
+          return smartPermDenied('حسابك مخصص للاطلاع فقط ولا يسمح بتنفيذ تعديلات.');
+        }
+
+        var allowed = [];
+        var deniedNotes = [];
+
+        actionsArr.forEach(function (act) {
+          if (!act || !act.type) return;
+          var tp = act.type;
+          if (tp === 'NAVIGATE_TAB') {
+            allowed.push({ act: act, desc: '🧭 الانتقال إلى تبويب: ' + act.tabId });
+            return;
+          }
+          if (tp === 'ADD_STUDENT') {
+            if (!perms.edit_students) { deniedNotes.push('إضافة طالب (تتطلب صلاحية الطلاب)'); return; }
+            allowed.push({ act: act, desc: '➕ إضافة الطالب: ' + (act.name || 'طالب جديد') + ' (باقة ' + (act.totalLessons || 8) + ' حلقات)' });
+          } else if (tp === 'ADD_TEACHER') {
+            if (!perms.edit_teachers) { deniedNotes.push('إضافة معلم (تتطلب صلاحية المعلمين)'); return; }
+            allowed.push({ act: act, desc: '➕ إضافة المعلم: ' + (act.name || 'معلم جديد') });
+          } else if (tp === 'ADD_LESSON') {
+            if (!perms.add_lesson) { deniedNotes.push('تسجيل حلقة (تتطلب صلاحية تسجيل الحلقات)'); return; }
+            var stAL = state.students.find(function (s) { return s.id === act.studentId; });
+            allowed.push({ act: act, desc: '⏱️ تسجيل حلقة للطالب: ' + (stAL ? stAL.name : act.studentId) + ' (' + (act.durationMin || 45) + ' دقيقة)' });
+          } else if (tp === 'UPDATE_STUDENT' || tp === 'SET_TOTAL_LESSONS' || tp === 'SET_CONSUMED' || tp === 'UPDATE_STUDENT_SCHED_TEACHER') {
+            var needStu = (tp !== 'UPDATE_STUDENT_SCHED_TEACHER') || !!act.teacherId;
+            if (needStu && !perms.edit_students) { deniedNotes.push('تعديل بيانات الطالب (تتطلب صلاحية الطلاب)'); return; }
+            if (!needStu && !perms.edit_schedule && !perms.edit_students) { deniedNotes.push('تعديل الموعد (تتطلب صلاحية المواعيد)'); return; }
+            var stU = state.students.find(function (s) { return s.id === act.studentId; });
+            if (!stU) return;
+            var changes = [];
+            if (act.name && act.name !== stU.name) changes.push('الاسم ← ' + act.name);
+            if (act.scheduleText) changes.push('الموعد ← ' + act.scheduleText);
+            if (act.teacherId) {
+              var nt = state.teachers.find(function (t) { return t.id === act.teacherId; });
+              if (nt) changes.push('المعلم ← ' + nt.name);
+            }
+            if (tp === 'SET_TOTAL_LESSONS' || typeof act.totalLessons === 'number') changes.push('إجمالي الباقة ← ' + (act.totalLessons || act.value) + ' حلقة');
+            if (tp === 'SET_CONSUMED' || typeof act.consumedLessons === 'number') changes.push('المستهلك ← ' + (typeof act.consumedLessons === 'number' ? act.consumedLessons : act.value));
+            if (act.paymentStatus) changes.push('حالة الدفع ← ' + act.paymentStatus);
+            if (perms.see_student_money && typeof act.tuitionReceived === 'number') changes.push('المصري ← ' + act.tuitionReceived + ' ج');
+            if (perms.see_student_money && act.foreignPackageText) changes.push('الباقة بعملته ← ' + act.foreignPackageText);
+            allowed.push({ act: act, desc: '✏️ تعديل الطالب ' + stU.name + (changes.length ? (' (' + changes.join(' • ') + ')') : '') });
+          } else if (tp === 'MARK_PAID' || tp === 'RENEW_STUDENT') {
+            if (!perms.edit_students) { deniedNotes.push('تأكيد الدفع/التجديد (تتطلب صلاحية الطلاب)'); return; }
+            var stPR = state.students.find(function (s) { return s.id === act.studentId; });
+            if (!stPR) return;
+            allowed.push({ act: act, desc: (tp === 'RENEW_STUDENT' ? '🔄 تجديد باقة: ' : '💳 تأكيد دفع: ') + stPR.name });
+          } else if (tp === 'SPLIT_SIBLINGS') {
+            if (!perms.edit_students) { deniedNotes.push('فصل الأخوين (تتطلب صلاحية الطلاب)'); return; }
+            var stSp = state.students.find(function (s) { return s.id === act.studentId; });
+            if (!stSp) return;
+            allowed.push({ act: act, desc: '✂️ فصل "' + stSp.name + '" إلى أخوين: (' + (act.name1 || '') + ' + ' + (act.name2 || '') + ') بباقة عائلية واحدة' });
+          } else if (tp === 'UPDATE_TEACHER' || tp === 'UPDATE_TEACHER_RATE') {
+            if (!perms.edit_teachers) { deniedNotes.push('تعديل بيانات المعلم (تتطلب صلاحية المعلمين)'); return; }
+            if ((act.rate1 || act.rate2) && !perms.see_teacher_rates) { deniedNotes.push('تعديل سعر الساعة (تتطلب صلاحية أسعار المعلمين)'); return; }
+            var tU = state.teachers.find(function (t) { return t.id === act.teacherId; });
+            if (!tU) return;
+            allowed.push({ act: act, desc: '✏️ تعديل المعلم ' + tU.name + (act.rate1 ? (' (سعر الساعة ← ' + act.rate1 + ' ج)') : '') });
+          } else if (tp === 'EXEC_TODAY_LESSON') {
+            if (!perms.approve_today_lessons) { deniedNotes.push('اعتماد حلقة اليوم (تتطلب صلاحية اعتماد الحلقات)'); return; }
+            var stEx = state.students.find(function (s) { return s.id === act.studentId; });
+            if (!stEx) return;
+            var isAbs = act.isAbsence || act.status === 'NOT_DONE' || act.treatment === 'ABSENCE';
+            allowed.push({ act: act, desc: (isAbs ? '⭕ تسجيل غياب/لم تتم اليوم: ' : '✅ اعتماد حلقة اليوم تمت: ') + stEx.name });
+          } else if (tp === 'SETTLE_CURRENCY_VAULT') {
+            if (!perms.isAdmin) { deniedNotes.push('اعتماد تحويل صندوق عملة (متاح للإدارة فقط)'); return; }
+            allowed.push({ act: act, desc: '🏦 اعتماد تحويل صندوق ' + (act.currencyName || act.currencyCode) + ' بمبلغ ' + Number(act.egpReceived || 0).toFixed(2) + ' جنيه مصري' });
+          } else if (tp === 'ADD_SECRET_NOTE') {
+            if (!perms.add_confidential_note) { deniedNotes.push('ملاحظة سرية (تتطلب صلاحية الملاحظات السرية)'); return; }
+            var stSc = state.students.find(function (s) { return s.id === act.studentId; });
+            allowed.push({ act: act, desc: '🔒 إضافة ملاحظة سرية للإدارة على: ' + (stSc ? stSc.name : 'طالب') });
+          } else if (tp === 'DELETE_STUDENT_TRASH') {
+            if (!perms.delete_items) { deniedNotes.push('الحذف للسلة (تتطلب صلاحية الحذف)'); return; }
+            var stDl = state.students.find(function (s) { return s.id === act.studentId; });
+            if (!stDl) return;
+            allowed.push({ act: act, desc: '🗑️ نقل الطالب ' + stDl.name + ' إلى سلة المحذوفات' });
+          }
+        });
+
+        if (allowed.length === 0) {
+          return deniedNotes.length > 0 ? smartPermDenied(deniedNotes.join(' • ')) : null;
+        }
+
+        var batchId = registerPendingSmartAction({ type: 'BATCH_EXECUTE', items: allowed.map(function (x) { return x.act; }) });
+        return {
+          plain: 'خطة تنفيذ جاهزة (' + allowed.length + ' إجراء)',
+          html: '<div style="padding:10px 12px; background:#EFF6FF; border:1.5px solid #3B82F6; border-radius:12px;">' +
+            '<div style="font-weight:800; color:#1E3A8A; font-size:0.82rem; margin-bottom:6px;">⚡ خطة التنفيذ الجاهزة (' + allowed.length + ' ' + (allowed.length === 1 ? 'إجراء' : 'إجراءات') + '):</div>' +
+            allowed.map(function (item, idx) {
+              return '<div style="font-size:0.78rem; padding:3px 0; color:var(--slate-800);"><strong>' + (idx + 1) + '.</strong> ' + escHtml(item.desc) + '</div>';
+            }).join('') +
+            (deniedNotes.length > 0 ? '<div style="font-size:0.73rem; color:#9F1239; margin-top:4px;">🔒 تم استبعاد إجراءات خارج صلاحياتك: ' + escHtml(deniedNotes.join('، ')) + '</div>' : '') +
+            '<button type="button" class="btn btn-emerald" style="margin-top:8px; width:100%; font-weight:800;" data-exec-smart-action="' + batchId + '">✅ تأكيد وتنفيذ ' + (allowed.length === 1 ? 'الإجراء الآن' : 'جميع الإجراءات الآن (' + allowed.length + ')') + '</button>' +
+          '</div>'
+        };
+      }
+
+      function executeSingleVerifiedSmartAction(act, perms) {
+        var tp = act.type;
+        if (tp === 'NAVIGATE_TAB' && act.tabId) {
+          switchTab(act.tabId);
+          return;
+        }
+        if (tp === 'ADD_STUDENT' && perms.edit_students) {
+          state.students.push({
+            id: 's_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+            name: String(act.name || 'طالب جديد').trim(),
+            country: String(act.country || 'السعودية').trim(),
+            adCampaign: (state.campaigns[0] && state.campaigns[0].id) || 'عام',
+            teacherId: act.teacherId || (state.teachers[0] && state.teachers[0].id),
+            totalLessons: Math.max(1, Number(act.totalLessons) || 8),
+            defaultDurationMin: Math.max(10, Number(act.defaultDurationMin) || 45),
+            consumedLessons: Math.max(0, Number(act.consumedLessons) || 0),
+            scheduleText: String(act.scheduleText || 'السبت والثلاثاء 5:00 م').trim(),
+            subStartDate: new Date().toISOString().slice(0, 10),
+            renewalDate: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+            paymentStatus: act.paymentStatus || 'PAID',
+            renewalStatus: 'NEW_SUB',
+            familyBillingParentId: act.familyBillingParentId || '',
+            foreignPackageText: perms.see_student_money ? String(act.foreignPackageText || '').trim() : '',
+            tuitionReceived: (perms.see_student_money && !act.familyBillingParentId) ? (Number(act.tuitionReceived) || 0) : 0
+          });
+        } else if (tp === 'ADD_TEACHER' && perms.edit_teachers) {
+          var r1 = perms.see_teacher_rates ? (Number(act.rate1) || 75) : 75;
+          var r2 = perms.see_teacher_rates ? (Number(act.rate2) || r1) : r1;
+          state.teachers.push({
+            id: 't_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+            name: String(act.name || 'معلم جديد').trim(),
+            age: '',
+            specialization: String(act.specialization || 'تحفيظ وتجويد').trim(),
+            phone: String(act.phone || '+2010').trim(),
+            rate1: r1,
+            rate2: r2
+          });
+        } else if (tp === 'ADD_LESSON' && perms.add_lesson) {
+          var stAL = state.students.find(function (s) { return s.id === act.studentId; });
+          if (stAL) {
+            var tr = act.treatment || 'NORMAL_MAKEUP';
+            var rule = TREATMENT_RULES[tr] || TREATMENT_RULES.NORMAL_MAKEUP;
+            state.lessons.unshift({
+              id: 'l_ai_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+              date: act.date || state.scheduleDateFilter || new Date().toISOString().slice(0, 10),
+              time: act.time || '17:00',
+              studentId: stAL.id,
+              teacherId: act.teacherId || stAL.teacherId,
+              durationMin: Math.max(10, Number(act.durationMin) || stAL.defaultDurationMin || 45),
+              rateTier: act.rateTier || 'RATE_1',
+              treatment: tr,
+              notes: act.notes || (rule.label + ' (عبر المساعد الذكي)')
+            });
+            if (rule.deductsStudent) {
+              state.students = state.students.map(function (s) {
+                return s.id === stAL.id ? Object.assign({}, s, { consumedLessons: s.consumedLessons + 1 }) : s;
+              });
+            }
+          }
+        } else if (tp === 'UPDATE_STUDENT' && perms.edit_students) {
+          state.students = state.students.map(function (s) {
+            if (s.id !== act.studentId) return s;
+            var u = Object.assign({}, s);
+            if (act.name) u.name = String(act.name).trim();
+            if (act.country) u.country = String(act.country).trim();
+            if (act.teacherId) u.teacherId = act.teacherId;
+            if (act.scheduleText) u.scheduleText = String(act.scheduleText).trim();
+            if (typeof act.totalLessons === 'number') u.totalLessons = Math.max(1, act.totalLessons);
+            if (typeof act.consumedLessons === 'number') u.consumedLessons = Math.max(0, act.consumedLessons);
+            if (typeof act.defaultDurationMin === 'number') u.defaultDurationMin = Math.max(10, act.defaultDurationMin);
+            if (act.paymentStatus) u.paymentStatus = act.paymentStatus;
+            if (act.renewalStatus) u.renewalStatus = act.renewalStatus;
+            if (typeof act.familyBillingParentId === 'string') u.familyBillingParentId = act.familyBillingParentId;
+            if (perms.see_student_money && act.foreignPackageText) u.foreignPackageText = String(act.foreignPackageText).trim();
+            if (perms.see_student_money && typeof act.tuitionReceived === 'number') u.tuitionReceived = u.familyBillingParentId ? 0 : Math.max(0, act.tuitionReceived);
+            u.renewalStatus = u.consumedLessons >= u.totalLessons ? 'PENDING_RENEWAL' : (u.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : u.renewalStatus);
+            return u;
+          });
+        } else if (tp === 'SET_TOTAL_LESSONS' && perms.edit_students) {
+          var nv = Math.max(1, Number(act.value || act.totalLessons) || 8);
+          state.students = state.students.map(function (s) {
+            if (s.id !== act.studentId) return s;
+            return Object.assign({}, s, { totalLessons: nv, renewalStatus: s.consumedLessons >= nv ? 'PENDING_RENEWAL' : (s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus) });
+          });
+        } else if (tp === 'SET_CONSUMED' && perms.edit_students) {
+          var nc = Math.max(0, Number(act.value || act.consumedLessons) || 0);
+          state.students = state.students.map(function (s) {
+            if (s.id !== act.studentId) return s;
+            return Object.assign({}, s, { consumedLessons: nc, renewalStatus: nc >= s.totalLessons ? 'PENDING_RENEWAL' : (s.renewalStatus === 'PENDING_RENEWAL' ? 'RENEWED' : s.renewalStatus) });
+          });
+        } else if (tp === 'UPDATE_STUDENT_SCHED_TEACHER' && (perms.edit_schedule || perms.edit_students)) {
+          state.students = state.students.map(function (s) {
+            if (s.id !== act.studentId) return s;
+            return Object.assign({}, s, {
+              scheduleText: act.scheduleText || s.scheduleText,
+              teacherId: (act.teacherId && perms.edit_students) ? act.teacherId : s.teacherId
+            });
+          });
+        } else if (tp === 'MARK_PAID' && perms.edit_students) {
+          var targetS = state.students.find(function (s) { return s.id === act.studentId; });
+          var rootId = (targetS && targetS.familyBillingParentId) ? targetS.familyBillingParentId : act.studentId;
+          state.students = state.students.map(function (s) {
+            return (s.id === rootId || s.familyBillingParentId === rootId) ? Object.assign({}, s, { paymentStatus: 'PAID', renewalStatus: 'RENEWED' }) : s;
+          });
+        } else if (tp === 'RENEW_STUDENT' && perms.edit_students) {
+          var targetR = state.students.find(function (s) { return s.id === act.studentId; });
+          var rootR = (targetR && targetR.familyBillingParentId) ? targetR.familyBillingParentId : act.studentId;
+          var todayIso = new Date().toISOString().slice(0, 10);
+          var nextIso = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+          state.students = state.students.map(function (s) {
+            return (s.id === rootR || s.familyBillingParentId === rootR) ? Object.assign({}, s, { consumedLessons: 0, subStartDate: todayIso, renewalDate: nextIso, renewalStatus: 'RENEWED' }) : s;
+          });
+        } else if (tp === 'SPLIT_SIBLINGS' && perms.edit_students) {
+          var orig = state.students.find(function (s) { return s.id === act.studentId; });
+          if (orig && act.name1 && act.name2) {
+            state.students = state.students.map(function (s) {
+              return s.id === orig.id ? Object.assign({}, s, { name: String(act.name1).trim(), consumedLessons: typeof act.consumed1 === 'number' ? act.consumed1 : s.consumedLessons }) : s;
+            });
+            var sibObj = {
+              id: 's_sib_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+              name: String(act.name2).trim(),
+              country: orig.country, adCampaign: orig.adCampaign, teacherId: orig.teacherId,
+              totalLessons: orig.totalLessons, defaultDurationMin: orig.defaultDurationMin || 45,
+              consumedLessons: typeof act.consumed2 === 'number' ? act.consumed2 : orig.consumedLessons,
+              scheduleText: orig.scheduleText, subStartDate: orig.subStartDate, renewalDate: orig.renewalDate,
+              paymentStatus: orig.paymentStatus || 'PAID', renewalStatus: orig.renewalStatus || 'RENEWED',
+              familyBillingParentId: orig.id, foreignPackageText: 'باقة عائلية مشتركة مع ' + String(act.name1).trim(), tuitionReceived: 0
+            };
+            state.students.push(sibObj);
+          }
+        } else if ((tp === 'UPDATE_TEACHER' || tp === 'UPDATE_TEACHER_RATE') && perms.edit_teachers) {
+          state.teachers = state.teachers.map(function (t) {
+            if (t.id !== act.teacherId) return t;
+            var ut = Object.assign({}, t);
+            if (act.name) ut.name = String(act.name).trim();
+            if (act.specialization) ut.specialization = String(act.specialization).trim();
+            if (act.phone) ut.phone = String(act.phone).trim();
+            if (perms.see_teacher_rates && typeof act.rate1 === 'number') ut.rate1 = Math.max(0, act.rate1);
+            if (perms.see_teacher_rates && typeof act.rate2 === 'number') ut.rate2 = Math.max(0, act.rate2);
+            return ut;
+          });
+        } else if (tp === 'EXEC_TODAY_LESSON' && perms.approve_today_lessons) {
+          var dT = state.scheduleDateFilter || '2026-11-15';
+          var stExec = state.students.find(function (s) { return s.id === act.studentId; });
+          if (stExec) {
+            var isAbs = act.isAbsence || act.status === 'NOT_DONE' || act.treatment === 'ABSENCE';
+            var trCode = act.treatment || (isAbs ? 'ABSENCE' : 'NORMAL_MAKEUP');
+            if (trCode !== 'DEFERRED_LATER') {
+              var rl = TREATMENT_RULES[trCode] || TREATMENT_RULES.NORMAL_MAKEUP;
+              state.lessons.unshift({
+                id: 'l_sa_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+                date: dT, time: extractDefaultTimeFromScheduleText(stExec.scheduleText, getDayIndexFromIsoDate(dT)),
+                studentId: stExec.id, teacherId: stExec.teacherId, durationMin: stExec.defaultDurationMin || 45,
+                rateTier: 'RATE_1', treatment: trCode, notes: act.reasonNote || (isAbs ? 'غياب طالب (عبر المساعد الذكي)' : 'تمت الحلقة (عبر المساعد الذكي)')
+              });
+              if (rl.deductsStudent) {
+                state.students = state.students.map(function (s) { return s.id === stExec.id ? Object.assign({}, s, { consumedLessons: s.consumedLessons + 1 }) : s; });
+              }
+            }
+            state.dailyReports.unshift({
+              id: 'rep_sa_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+              type: 'EXECUTION', date: dT, studentId: stExec.id, teacherId: stExec.teacherId,
+              teacherName: (state.teachers.find(function (t) { return t.id === stExec.teacherId; }) || {}).name || '',
+              studentName: stExec.name, status: isAbs ? 'NOT_DONE' : 'DONE',
+              reasonCat: isAbs ? 'STUDENT_NO_REPLY' : 'NONE', note: act.reasonNote || (isAbs ? 'لم تتم الحلقة' : 'تمت الحلقة'),
+              createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : getActiveSupervisorObj().id,
+              createdByName: state.currentUserName || 'المساعد الذكي', createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+            });
+          }
+        } else if (tp === 'SETTLE_CURRENCY_VAULT' && perms.isAdmin) {
+          state.currencySettlements.unshift({
+            id: 'set_' + Date.now(),
+            monthLabel: state.monthLabel,
+            currencyCode: act.currencyCode || 'LYD',
+            currencyName: act.currencyName || act.currencyCode || 'عملة',
+            foreignTotal: Number(act.foreignTotal) || 0,
+            egpReceived: Number(act.egpReceived) || 0,
+            settledAt: new Date().toLocaleDateString('ar-EG')
+          });
+        } else if (tp === 'ADD_SECRET_NOTE' && perms.add_confidential_note) {
+          var stSecObj = state.students.find(function (s) { return s.id === act.studentId; });
+          if (stSecObj) {
+            state.confidentialNotes.unshift({
+              id: 'sec_' + Date.now(), date: state.scheduleDateFilter || '2026-11-15',
+              studentId: stSecObj.id, studentName: stSecObj.name, teacherId: stSecObj.teacherId,
+              teacherName: (state.teachers.find(function (t) { return t.id === stSecObj.teacherId; }) || {}).name || '',
+              category: 'ملاحظة عبر المساعد الذكي', text: String(act.text || '').trim(),
+              createdBySupervisorId: state.userRole === 'ADMIN' ? 'ADMIN' : getActiveSupervisorObj().id,
+              createdByName: state.currentUserName || getActiveSupervisorObj().name,
+              createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+            });
+          }
+        } else if (tp === 'DELETE_STUDENT_TRASH' && perms.delete_items) {
+          var stDelObj = state.students.find(function (s) { return s.id === act.studentId; });
+          if (stDelObj) {
+            var stLes = state.lessons.filter(function (l) { return l.studentId === act.studentId; });
+            pushToTrash('STUDENT', stDelObj.name, { student: stDelObj, removedLessons: stLes });
+            state.lessons = state.lessons.filter(function (l) { return l.studentId !== act.studentId; });
+            state.students = state.students.filter(function (s) { return s.id !== act.studentId; });
+          }
+        }
+      }
+
       function callGeminiHybridApi(rawQuestion, perms, onDone) {
         var safeCtx = buildRbacSafeContextForAi(perms);
+        var diag = runProactiveAcademyDiagnostics(perms);
+        safeCtx.detectedScheduleClashes = diag.clashes;
+        if (perms.view_finance || perms.see_student_money) {
+          safeCtx.unsettledCurrencyVaults = diag.unsettledVaults.map(function (v) { return { code: v.code, name: v.name, totalForeign: v.totalForeign, studentsCount: v.students.length }; });
+          safeCtx.carriedTeacherDues = (state.carriedTeacherDues || []).filter(function (d) { return !d.settled; });
+        }
         var recentHistory = smartChatLog.slice(-6).map(function (m) {
           return (m.role === 'user' ? 'المستخدم: ' : 'المساعد: ') + (m.text || m.plain || '');
         }).join('\n');
 
-        var sysPrompt = 'أنت المساعد الذكي الفائق المدمج في نظام "مِحراب ERP" لإدارة أكاديمية قرآن. ' +
-          'تفهم العربية الفصحى والعامية المصرية والخليجية بدقة عالية، وتميّز بذكاء بين المعلم والطالب حتى لو تشابهت الأسماء. ' +
-          'أجب بالعربية الواضحة والمنظمة بدقة 100% من البيانات المرفقة فقط ولا تخترع أي أسماء أو أرقام. ' +
-          'التزم بصلاحيات المستخدم المرفقة؛ إذا طلب شيئاً خارج صلاحياته اعتذر بلباقة. ' +
-          'مهم جداً: أعد ردك بصيغة JSON صالحة فقط بدون أي نص خارج JSON بهذا الشكل:\n' +
-          '{"reply":"نص الرد العربي الدقيق والمرتب","action":null أو {"type":"MARK_PAID|RENEW_STUDENT|SET_TOTAL_LESSONS|SET_CONSUMED|UPDATE_STUDENT_SCHED_TEACHER|UPDATE_TEACHER_RATE|EXEC_TODAY_LESSON|DELETE_STUDENT_TRASH","studentId":"...","teacherId":"...","value":12,"scheduleText":"...","rate1":80,"isAbsence":false}}\n' +
+        var sysPrompt = 'أنت العقل التنفيذي الذكي لنظام "مِحراب ERP" لإدارة أكاديمية قرآن. ' +
+          'تفهم العربية الفصحى والعامية المصرية والخليجية بدقة فائقة، وتميز دائماً بين المعلم والطالب حسب السياق. ' +
+          'قوانين الأكاديمية المعتمدة:\n' + (state.academyPolicies || '') + '\n' +
+          'التعليمات الصارمة:\n' +
+          '1. استخرج الأرقام والأسماء من البيانات الحية المرفقة فقط دون اختراع.\n' +
+          '2. إذا طلب المستخدم تنفيذ إجراء واحد أو عدة إجراءات (إضافة، تعديل موعد/باقة/سعر، اعتماد حلقة/غياب، تأكيد دفع/تجديد، فصل أخوين، اعتماد تحويل صندوق عملة، ملاحظة سرية، حذف، انتقال لتبويب)، أدرجها في مصفوفة "actions" باستخدام المعرفات الحقيقية (studentId / teacherId) من البيانات المرفقة.\n' +
+          '3. إذا طلب صياغة رسالة واتساب لولي أمر أو معلم، ضع نص الرسالة الجاهز في "whatsappDraft".\n' +
+          '4. التزم بصلاحيات المستخدم المرفقة؛ لا تكشف بيانات غير مصرح بها.\n' +
+          'أعد ردك بصيغة JSON صالحة فقط بدون أي نص خارج JSON:\n' +
+          '{"reply":"نص الرد العربي الواضح والمباشر","whatsappDraft":null أو "رسالة واتساب جاهزة للنسخ","actions":[] أو [{"type":"ADD_STUDENT|ADD_TEACHER|ADD_LESSON|EXEC_TODAY_LESSON|UPDATE_STUDENT|UPDATE_TEACHER|MARK_PAID|RENEW_STUDENT|SPLIT_SIBLINGS|SETTLE_CURRENCY_VAULT|ADD_SECRET_NOTE|DELETE_STUDENT_TRASH|NAVIGATE_TAB", ...}]}\n' +
           'البيانات الحية المسموحة للحساب الحالي:\n' + JSON.stringify(safeCtx) +
           (recentHistory ? ('\n\nسياق المحادثة السابقة:\n' + recentHistory) : '');
 
         var payload = {
-          contents: [{ role: 'user', parts: [{ text: sysPrompt + '\n\nسؤال أو أمر المستخدم الآن: ' + rawQuestion }] }],
-          generationConfig: { temperature: 0.15, responseMimeType: 'application/json' }
+          contents: [{ role: 'user', parts: [{ text: sysPrompt + '\n\nطلب المستخدم الآن: ' + rawQuestion }] }],
+          generationConfig: { temperature: 0.12, responseMimeType: 'application/json' }
         };
+
+        var useDirectKey = !!(smartAiConfig.enabled && smartAiConfig.apiKey);
+        if (!useDirectKey && state.webhookUrl) {
+          fetch(state.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'AI_CHAT', geminiPayload: payload }),
+            redirect: 'follow'
+          })
+          .then(function (r) { return r.json(); })
+          .then(function (resObj) {
+            if (resObj && resObj.status === 'no_key') {
+              window.__cloudAiNoKey = true;
+              onDone(new Error('NO_CLOUD_KEY'), null);
+              return;
+            }
+            if (!resObj || resObj.status !== 'ok' || !resObj.text) {
+              onDone(new Error((resObj && resObj.message) || 'cloud_ai_error'), null);
+              return;
+            }
+            try {
+              var cleanJson = resObj.text.replace(/```json|```/g, '').trim();
+              var parsed = JSON.parse(cleanJson);
+              parsed._model = (resObj.model || 'gemini-2.5-flash') + ' • سحابي';
+              onDone(null, parsed);
+            } catch (pe) {
+              onDone(null, { reply: resObj.text, actions: [], whatsappDraft: null, _model: (resObj.model || 'gemini-2.5-flash') + ' • سحابي' });
+            }
+          })
+          .catch(function (err) { onDone(err || new Error('cloud_ai_net_error'), null); });
+          return;
+        }
 
         fetchGeminiWithFallback(smartAiConfig.apiKey, payload, function (err, resObj) {
           if (err || !resObj) {
@@ -8971,7 +9599,7 @@
             parsed._model = resObj.model;
             onDone(null, parsed);
           } catch (parseErr) {
-            onDone(null, { reply: resObj.text, action: null, _model: resObj.model });
+            onDone(null, { reply: resObj.text, actions: [], whatsappDraft: null, _model: resObj.model });
           }
         });
       }
@@ -8986,14 +9614,23 @@
         renderSmartChatStream();
 
         var perms = getActivePermissions();
-        var useGeminiPrimary = !!(smartAiConfig.enabled && smartAiConfig.apiKey && !forcedEntity);
+        var qNorm = normAr(raw);
 
-        // عند تفعيل مفتاح Gemini، يكون Gemini AI هو العقل الأول لكل سؤال وأمر!
+        // استجابة فورية مجانية لطلب فحص التعارضات والأخطاء
+        if (qNorm.indexOf('تعارض') !== -1 || qNorm.indexOf('فحص') !== -1 && (qNorm.indexOf('اخطاء') !== -1 || qNorm.indexOf('تسرب') !== -1 || qNorm.indexOf('مواعيد') !== -1)) {
+          var diagRes = runProactiveAcademyDiagnostics(perms);
+          state.lastSmartAssistantText = diagRes.plain;
+          smartChatLog.push({ role: 'assistant', plain: diagRes.plain, html: diagRes.html });
+          renderSmartChatStream();
+          return;
+        }
+
+        var useGeminiPrimary = !!(((smartAiConfig.enabled && smartAiConfig.apiKey) || (state.webhookUrl && !window.__cloudAiNoKey)) && !forcedEntity);
         if (useGeminiPrimary) {
           var loadingIdx = smartChatLog.push({
             role: 'assistant',
             plain: '',
-            html: '<div style="color:var(--primary); font-weight:700;">🧠 جاري التحليل الفوري عبر Gemini AI (مع حارس الصلاحيات RBAC)...</div>'
+            html: '<div style="color:var(--primary); font-weight:700;">🧠 جاري فهم الطلب وتجهيز النتيجة والتنفيذ عبر Gemini AI...</div>'
           }) - 1;
           renderSmartChatStream();
 
@@ -9001,23 +9638,42 @@
             if (err || !aiData) {
               var errTxt = err ? (err.message || 'تعذر الاتصال') : 'تعذر الاتصال';
               var fallbackRes = runLocalMihrabEngine(raw, forcedEntity);
-              var warnBanner = '<div style="font-size:0.73rem; padding:6px 9px; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; color:#92400E; margin-bottom:8px;">⚠️ تعذر الاتصال بـ Gemini AI (' + escHtml(errTxt) + ') — تم الرد تلقائياً بالمحرك المحلي:</div>';
+              var warnBanner = (errTxt === 'NO_CLOUD_KEY')
+                ? '<div style="margin-bottom:6px;"><span class="status-pill pill-emerald" style="font-size:0.68rem;">⚡ إجابة المحرك المحلي</span></div>'
+                : '<div style="font-size:0.73rem; padding:6px 9px; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; color:#92400E; margin-bottom:8px;">⚠️ تعذر الاتصال بـ Gemini AI (' + escHtml(errTxt) + ') — تم الرد تلقائياً بالمحرك المحلي:</div>';
               if (fallbackRes.matched) {
                 state.lastSmartAssistantText = fallbackRes.plain || '';
                 smartChatLog[loadingIdx] = { role: 'assistant', plain: fallbackRes.plain || '', html: warnBanner + fallbackRes.html };
               } else {
-                smartChatLog[loadingIdx] = { role: 'assistant', plain: errTxt, html: warnBanner + '<div style="color:#9F1239;">تأكد من صلاحية المفتاح بالضغط على <strong>⚙️ ربط Gemini ← 💾 حفظ واختبار الاتصال الآن</strong>.</div>' };
+                smartChatLog[loadingIdx] = { role: 'assistant', plain: errTxt, html: warnBanner + '<div style="color:#9F1239;">تأكد من صلاحية المفتاح بالضغط على <strong>⚙️ ربط ← 💾 حفظ واختبار الاتصال الآن</strong>.</div>' };
               }
               renderSmartChatStream();
               return;
             }
 
-            var modelBadge = '<div style="margin-bottom:6px;"><span class="status-pill pill-purple" style="font-size:0.68rem;">🧠 إجابة Gemini AI (' + escHtml(aiData._model || 'gemini-2.5-flash') + ')</span></div>';
+            var modelBadge = '<div style="margin-bottom:6px;"><span class="status-pill pill-purple" style="font-size:0.68rem;">🧠 Gemini AI التنفيذي (' + escHtml(aiData._model || 'gemini-2.5-flash') + ')</span></div>';
             var replyHtml = modelBadge + '<div style="white-space:pre-line; line-height:1.75; color:var(--slate-800);">' + escHtml(aiData.reply || '') + '</div>';
-            if (aiData.action && aiData.action.type) {
-              var previewCard = buildActionPreviewCard(aiData.action, perms);
-              if (previewCard) replyHtml += '<div style="margin-top:8px;">' + previewCard.html + '</div>';
+
+            // رسالة واتساب جاهزة للنسخ إن وُجدت
+            if (aiData.whatsappDraft && String(aiData.whatsappDraft).trim()) {
+              var waId = registerPendingSmartAction({ type: 'COPY_WA_DRAFT', text: String(aiData.whatsappDraft).trim() });
+              replyHtml += '<div style="margin-top:8px; padding:10px 12px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:10px;">' +
+                '<div style="font-size:0.76rem; font-weight:800; color:#065F46; margin-bottom:4px;">📲 رسالة واتساب جاهزة للنسخ والإرسال:</div>' +
+                '<div style="white-space:pre-line; font-size:0.8rem; background:#FFFFFF; padding:8px; border-radius:8px; border:1px solid #D1FAE5; margin-bottom:6px;">' + escHtml(aiData.whatsappDraft) + '</div>' +
+                '<button type="button" class="btn btn-emerald" data-exec-smart-action="' + waId + '" style="font-size:0.74rem; padding:4px 10px;">📋 نسخ رسالة الواتساب الآن</button>' +
+              '</div>';
             }
+
+            // تجميع الأفعال (سواء actions[] أو action مفرد للتوافق)
+            var actionsList = [];
+            if (Array.isArray(aiData.actions) && aiData.actions.length > 0) actionsList = aiData.actions;
+            else if (aiData.action && aiData.action.type) actionsList = [aiData.action];
+
+            if (actionsList.length > 0) {
+              var batchCard = buildBatchActionsPreviewCard(actionsList, perms);
+              if (batchCard) replyHtml += '<div style="margin-top:8px;">' + batchCard.html + '</div>';
+            }
+
             state.lastSmartAssistantText = aiData.reply || '';
             smartChatLog[loadingIdx] = { role: 'assistant', plain: aiData.reply || '', html: replyHtml };
             renderSmartChatStream();
@@ -9025,7 +9681,7 @@
           return;
         }
 
-        // الوضع المحلي السريع (عند عدم تفعيل مفتاح Gemini أو عند اختيار استيضاح سريع)
+        // الوضع المحلي السريع
         var localRes = runLocalMihrabEngine(raw, forcedEntity);
         if (localRes.matched) {
           var localBadge = '<div style="margin-bottom:6px;"><span class="status-pill pill-emerald" style="font-size:0.68rem;">⚡ إجابة المحرك المحلي</span></div>';
@@ -9039,8 +9695,8 @@
             plain: fallbackMsg,
             html: '<div style="color:var(--slate-700);">' +
               '<strong>🤔 لم تتضح لي التفاصيل الكافية من:</strong> "' + escHtml(raw) + '"<br/>' +
-              '<div style="font-size:0.77rem; color:var(--slate-600); margin-top:6px;">جرّب: <em>"من طلاب الشيخ أحمد الفاروق؟"</em> أو <em>"كم باقي في باقة رنيم؟"</em>' +
-              (perms.isAdmin ? '<br/>💡 لتشغيل الذكاء الاصطناعي الكامل لأي صيغة حوارية، اضغط <strong>⚙️ ربط Gemini</strong> وأدخل المفتاح ثم اضغط <strong>حفظ واختبار الاتصال الآن</strong>.' : '') +
+              '<div style="font-size:0.77rem; color:var(--slate-600); margin-top:6px;">جرّب: <em>"فحص تعارض المواعيد"</em> أو <em>"من طلاب الشيخ أحمد الفاروق؟"</em>' +
+              (perms.isAdmin ? '<br/>💡 فعّل <strong>⚙️ ربط</strong> بمفتاح Gemini لفهم أي صيغة حوارية وتنفيذ عدة أوامر معاً.' : '') +
               '</div></div>'
           });
         }
@@ -9108,6 +9764,8 @@
         var kChk = document.getElementById('chkSmartUseGemini');
         if (kInp) kInp.value = smartAiConfig.apiKey || '';
         if (kChk) kChk.checked = !!smartAiConfig.enabled;
+        var polInp = document.getElementById('smartAcademyPoliciesInput');
+        if (polInp) polInp.value = state.academyPolicies || '';
         if (smartChatLog.length === 0) {
           var initLocal = runLocalMihrabEngine('كم عدد الطلاب والمعلمين؟');
           var modeNote = (smartAiConfig.enabled && smartAiConfig.apiKey)
@@ -9313,6 +9971,11 @@
         }
         var enVal = !!(chkEl && chkEl.checked);
         var stBox = document.getElementById('smartGeminiTestStatus');
+        var polEl = document.getElementById('smartAcademyPoliciesInput');
+        if (polEl) {
+          state.academyPolicies = polEl.value.trim();
+          saveState();
+        }
         smartAiConfig.apiKey = keyVal;
         smartAiConfig.enabled = enVal && !!keyVal;
         try {
@@ -9421,6 +10084,20 @@
           var permsEx = getActivePermissions();
           if (isUserReadOnlyMode()) { showToast('🔒 حسابك مخصص للاطلاع فقط', false); return; }
 
+          if (act.type === 'COPY_WA_DRAFT') {
+            copyText(act.text || '', 'رسالة الواتساب الذكية');
+            return;
+          }
+          if (act.type === 'BATCH_EXECUTE' && Array.isArray(act.items)) {
+            act.items.forEach(function (subAct) {
+              executeSingleVerifiedSmartAction(subAct, permsEx);
+            });
+            delete smartPendingActions[execAid];
+            renderAll();
+            smartChatLog.push({ role: 'assistant', plain: 'تم تنفيذ ' + act.items.length + ' إجراء بنجاح.', html: '<div style="color:#065F46; font-weight:800;">✅ تم تنفيذ ' + act.items.length + ' ' + (act.items.length === 1 ? 'إجراء' : 'إجراءات') + ' بنجاح وتحديث المنصة والمزامنة!</div>' });
+            renderSmartChatStream();
+            return;
+          }
           if (act.type === 'ADD_STUDENT_FORM') {
             if (!permsEx.edit_students) { showToast('🔒 لا تملك صلاحية إضافة طلاب', false); return; }
             var sName = ((document.getElementById('sa_add_s_name_' + execAid) || {}).value || '').trim();
@@ -9594,6 +10271,220 @@
         if (smartGoTab) {
           document.getElementById('smartAssistantModal').classList.add('hidden');
           switchTab(smartGoTab);
+          return;
+        }
+      });
+
+      // =========================================================
+      // 🏦 عرض وإدارة صناديق العملات قيد التحويل + الإقفال الشهري والترحيل
+      // =========================================================
+      window.renderCurrencyVaultsAndClosingUI = function (summary) {
+        var vBox = document.getElementById('currencyVaultsContainer');
+        var cBox = document.getElementById('carriedTeacherDuesContainer');
+        var aBox = document.getElementById('monthlyArchivesContainer');
+        var perms = getActivePermissions();
+        var vData = computeCurrencyVaults();
+
+        if (vBox) {
+          var pendingHtml = '';
+          if (vData.pendingVaults.length === 0) {
+            pendingHtml = '<div style="font-size:0.8rem; color:#065F46; background:#ECFDF5; padding:8px 12px; border-radius:8px; border:1px solid #A7F3D0;">✅ جميع مبالغ الطلاب المسجلة محوّلة ومعروفة بالمصري حالياً.</div>';
+          } else {
+            pendingHtml = '<div class="grid-2" style="gap:10px; margin-bottom:10px;">' + vData.pendingVaults.map(function (v) {
+              var alreadySettledEgp = vData.settledCodesMap[v.code] || 0;
+              var stuNamesList = v.students.map(function (st) { return st.name + ' (' + st.amount + ')'; }).join('، ');
+              return '<div style="background:#FFFFFF; border:1.5px solid ' + (alreadySettledEgp > 0 ? '#10B981' : '#F59E0B') + '; border-radius:12px; padding:10px 12px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px;">' +
+                  '<strong style="font-size:0.9rem; color:var(--slate-900);">' + v.flag + ' صندوق ' + escHtml(v.name) + '</strong>' +
+                  '<span class="status-pill ' + (alreadySettledEgp > 0 ? 'pill-emerald' : 'pill-amber') + '" style="font-size:0.78rem; font-weight:800;">' + v.totalForeign.toLocaleString('en-US') + ' ' + escHtml(v.name) + '</span>' +
+                '</div>' +
+                '<div style="font-size:0.73rem; color:var(--slate-600); margin-bottom:8px;">الطلاب (' + v.students.length + '): ' + escHtml(stuNamesList) + '</div>' +
+                (alreadySettledEgp > 0
+                  ? '<div style="font-size:0.76rem; font-weight:800; color:#065F46; background:#ECFDF5; padding:5px 8px; border-radius:8px;">✅ تم اعتماد تحويل هذا الصندوق للمصري بقيمة: ' + alreadySettledEgp.toFixed(2) + ' جنيه (مضاف للإيراد)</div>'
+                  : (perms.isAdmin ? '<div style="display:flex; gap:6px; align-items:center;">' +
+                      '<input type="number" step="0.01" min="0" id="vault_egp_' + v.code + '" class="form-input" placeholder="وصلت بالمصري كم جنيه؟" style="flex:1; padding:5px 8px; font-size:0.78rem; font-weight:800;" />' +
+                      '<button type="button" class="btn btn-emerald" data-settle-vault="' + v.code + '" data-vault-name="' + escHtml(v.name) + '" data-vault-foreign="' + v.totalForeign + '" style="padding:5px 10px; font-size:0.75rem; white-space:nowrap;">✅ اعتماد بالمصري</button>' +
+                    '</div>' : '')
+                ) +
+              '</div>';
+            }).join('') + '</div>';
+          }
+
+          var settledHtml = '';
+          if (vData.settledThisMonth.length > 0) {
+            settledHtml = '<div style="margin-top:8px; padding-top:8px; border-top:1px dashed #FCD34D;">' +
+              '<div style="font-size:0.76rem; font-weight:800; color:#065F46; margin-bottom:5px;">💱 حوالات الصناديق المعتمدة بالمصري في شهر (' + escHtml(state.monthLabel) + ') — إجمالي: ' + vData.settledVaultsEgpTotal.toFixed(2) + ' جنيه:</div>' +
+              vData.settledThisMonth.map(function (st) {
+                return '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px; padding:5px 10px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:8px; margin-bottom:4px; font-size:0.76rem;">' +
+                  '<span>✅ <strong>' + st.foreignTotal.toLocaleString('en-US') + ' ' + escHtml(st.currencyName) + '</strong> ← تحوّلت إلى <strong style="color:#065F46;">' + Number(st.egpReceived).toFixed(2) + ' جنيه مصري</strong> (' + escHtml(st.settledAt) + ')</span>' +
+                  (perms.isAdmin ? '<button type="button" class="btn btn-danger-soft" data-unsettle-vault="' + st.id + '" style="padding:2px 7px; font-size:0.7rem;">↩️ إلغاء</button>' : '') +
+                '</div>';
+              }).join('') +
+            '</div>';
+          }
+          vBox.innerHTML = pendingHtml + settledHtml;
+        }
+
+        if (cBox) {
+          var dues = state.carriedTeacherDues || [];
+          var unpaidDues = dues.filter(function (d) { return !d.settled; });
+          var unpaidSum = unpaidDues.reduce(function (s, d) { return s + Number(d.amountEGP || 0); }, 0);
+          if (dues.length === 0) {
+            cBox.innerHTML = '<div style="font-size:0.78rem; color:var(--slate-500); background:#FFFFFF; padding:8px 12px; border-radius:8px; border:1px solid var(--slate-200);">📌 لا توجد أرصدة مُرحّلة للمعلمين من شهور سابقة حالياً.</div>';
+          } else {
+            cBox.innerHTML = '<div style="background:#FFF1F2; border:1px solid #FECDD3; border-radius:10px; padding:10px 12px;">' +
+              '<div style="font-size:0.82rem; font-weight:800; color:#9F1239; margin-bottom:6px;">📌 أرصدة ومستحقات المعلمين المُرحّلة من الشهور السابقة (المتبقي غير المصروف: ' + unpaidSum.toFixed(2) + ' جنيه):</div>' +
+              dues.map(function (d) {
+                return '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px; padding:6px 10px; background:#FFFFFF; border:1px solid ' + (d.settled ? '#A7F3D0' : '#FECDD3') + '; border-radius:8px; margin-bottom:5px; font-size:0.78rem;">' +
+                  '<div><strong>' + escHtml(d.teacherName) + '</strong> <span class="status-pill pill-blue" style="font-size:0.68rem;">عن ' + escHtml(d.monthLabel) + '</span> — <strong style="color:' + (d.settled ? '#065F46' : '#9F1239') + ';">' + Number(d.amountEGP).toFixed(2) + ' جنيه</strong> ' + (d.settled ? '<span class="status-pill pill-emerald">✅ تم الصرف</span>' : '<span class="status-pill pill-rose">⏳ متبقي للصرف</span>') + '</div>' +
+                  (perms.isAdmin ? '<button type="button" class="btn ' + (d.settled ? 'btn-soft' : 'btn-emerald') + '" data-toggle-carried-due="' + d.id + '" style="padding:3px 9px; font-size:0.72rem;">' + (d.settled ? '↩️ إعادة للمتبقي' : '✅ تأكيد الصرف الآن') + '</button>' : '') +
+                '</div>';
+              }).join('') +
+            '</div>';
+          }
+        }
+
+        if (aBox) {
+          var archs = state.monthlyArchives || [];
+          if (archs.length === 0) {
+            aBox.innerHTML = '';
+          } else {
+            aBox.innerHTML = '<details style="background:#FFFFFF; border:1px solid var(--slate-200); border-radius:10px; padding:10px 12px; cursor:pointer;">' +
+              '<summary style="font-size:0.84rem; font-weight:800; color:#1E3A8A; list-style:none; display:flex; justify-content:space-between; align-items:center;">' +
+                '<span>📁 أرشيف الشهور المقفلة (' + archs.length + ' شهر مقفول)</span>' +
+                '<span class="status-pill pill-blue">فتح الأرشيف ▾</span>' +
+              '</summary>' +
+              '<div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">' +
+                archs.map(function (ar) {
+                  return '<div style="padding:10px 12px; background:#F8FAFC; border:1px solid var(--slate-200); border-radius:10px; font-size:0.77rem;">' +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">' +
+                      '<strong style="font-size:0.88rem; color:#1E3A8A;">📅 إقفال شهر: ' + escHtml(ar.monthLabel) + '</strong>' +
+                      '<span style="color:var(--slate-500); font-size:0.71rem;">تاريخ الإقفال: ' + escHtml(ar.closedAt) + '</span>' +
+                    '</div>' +
+                    '<div class="grid-3" style="gap:6px;">' +
+                      '<div>💰 الإيراد المؤكد: <strong>' + Number(ar.totalRevenueEGP).toFixed(2) + ' ج</strong></div>' +
+                      '<div>💸 أجور المعلمين المكتملة: <strong>' + Number(ar.totalTeacherPaid).toFixed(2) + ' ج</strong></div>' +
+                      '<div>⏳ مُرحّل للمعلمين: <strong style="color:#9F1239;">' + Number(ar.carriedTeacherDues).toFixed(2) + ' ج</strong></div>' +
+                      '<div>📢 الإعلانات: <strong>' + Number(ar.adBudget).toFixed(2) + ' ج</strong></div>' +
+                      '<div>🏛️ نسبة الأكاديمية (الثلثين): <strong style="color:#5B21B6;">' + Number(ar.academyShare).toFixed(2) + ' ج</strong></div>' +
+                      '<div>👔 أرباح الإدارة (الثلث): <strong style="color:#065F46;">' + Number(ar.adminShare).toFixed(2) + ' ج</strong></div>' +
+                    '</div>' +
+                  '</div>';
+                }).join('') +
+              '</div>' +
+            '</details>';
+          }
+        }
+      };
+
+      // اختيار سريع للعملة عند إضافة طالب جديد
+      var qCurPick = document.getElementById('studentQuickCurrencyPick');
+      if (qCurPick) {
+        qCurPick.addEventListener('change', function (ev) {
+          var cName = ev.target.value;
+          if (!cName) return;
+          var pkgEl = document.getElementById('studentForeignPackage');
+          if (pkgEl) {
+            var numOnly = (pkgEl.value || '').match(/\d+(\.\d+)?/);
+            pkgEl.value = (numOnly ? numOnly[0] + ' ' : '') + cName;
+            pkgEl.focus();
+          }
+          ev.target.value = '';
+        });
+      }
+
+      // زر إقفال الشهر الحالي وترحيل مستحقات المعلمين وأرشفة الشهر
+      var btnCloseMonth = document.getElementById('btnCloseCurrentMonthNow');
+      if (btnCloseMonth) {
+        btnCloseMonth.addEventListener('click', function () {
+          var perms = getActivePermissions();
+          if (!perms.isAdmin) { showToast('🔒 إقفال الشهر متاح للإدارة العامة فقط', false); return; }
+          var sum = computeFinancials();
+          var nextLblInp = document.getElementById('nextMonthLabelInput');
+          var nextLbl = (nextLblInp && nextLblInp.value.trim()) ? nextLblInp.value.trim() : ('الشهر التالي بعد ' + state.monthLabel);
+          var closedMonthName = state.monthLabel || 'الشهر السابق';
+
+          // ترحيل الأجور المنتظرة لكل معلم باسم الشهر المقفول
+          state.teachers.forEach(function (t) {
+            var st = sum.teacherStats[t.id];
+            if (st && st.pendingWage > 0) {
+              state.carriedTeacherDues.unshift({
+                id: 'due_' + Date.now() + '_' + t.id,
+                monthLabel: closedMonthName,
+                teacherId: t.id,
+                teacherName: t.name,
+                amountEGP: Number(st.pendingWage.toFixed(2)),
+                settled: false,
+                settledAt: ''
+              });
+            }
+          });
+
+          // حفظ اللقطة الأرشيفية الدائمة للشهر المقفول
+          state.monthlyArchives.unshift({
+            id: 'arch_' + Date.now(),
+            monthLabel: closedMonthName,
+            closedAt: new Date().toLocaleDateString('ar-EG'),
+            totalRevenueEGP: Number(sum.totalRevenue.toFixed(2)),
+            staffSalary: Number(state.staffSalary || 0),
+            totalTeacherPaid: Number(sum.totalTeacherPaid.toFixed(2)),
+            carriedTeacherDues: Number(sum.totalTeacherPending.toFixed(2)),
+            adBudget: Number(sum.adBudget.toFixed(2)),
+            charityAmount: Number(sum.charityAmount.toFixed(2)),
+            academyShare: Number(sum.academyShare.toFixed(2)),
+            adminShare: Number(sum.adminShare.toFixed(2))
+          });
+
+          // بدء الشهر الجديد مع الحفاظ على سجل الطلاب والمعلمين
+          state.monthLabel = nextLbl;
+          var mInp = document.getElementById('monthLabelInput');
+          if (mInp) mInp.value = nextLbl;
+          if (nextLblInp) nextLblInp.value = '';
+          renderAll();
+          showToast('🔒 تم إقفال شهر "' + closedMonthName + '" وأرشفته وترحيل أرصدة المعلمين وبدء "' + nextLbl + '" بنجاح!', false);
+        });
+      }
+
+      // اعتماد تحويل صندوق عملة للمصري / إلغاء / تأكيد صرف رصيد مُرحّل لمعلم
+      document.body.addEventListener('click', function (ev) {
+        var btn = ev.target.closest('button');
+        if (!btn) return;
+        var settleCode = btn.getAttribute('data-settle-vault');
+        if (settleCode) {
+          var egpInp = document.getElementById('vault_egp_' + settleCode);
+          var egpVal = Number(egpInp && egpInp.value) || 0;
+          if (egpVal <= 0) {
+            showToast('⚠️ اكتب قيمة الحوالة التي وصلتك بالجنيه المصري أولاً', false);
+            return;
+          }
+          state.currencySettlements.unshift({
+            id: 'set_' + Date.now(),
+            monthLabel: state.monthLabel,
+            currencyCode: settleCode,
+            currencyName: btn.getAttribute('data-vault-name') || settleCode,
+            foreignTotal: Number(btn.getAttribute('data-vault-foreign')) || 0,
+            egpReceived: egpVal,
+            settledAt: new Date().toLocaleDateString('ar-EG')
+          });
+          renderAll();
+          showToast('✅ تم اعتماد تحويل صندوق ' + (btn.getAttribute('data-vault-name') || '') + ' وإضافة ' + egpVal.toFixed(2) + ' جنيه لإيراد الشهر!', false);
+          return;
+        }
+        var unsettleId = btn.getAttribute('data-unsettle-vault');
+        if (unsettleId) {
+          state.currencySettlements = (state.currencySettlements || []).filter(function (x) { return x.id !== unsettleId; });
+          renderAll();
+          showToast('↩️ تم إلغاء اعتماد الحوالة وإعادة الصندوق لقائمة الانتظار', false);
+          return;
+        }
+        var toggleDueId = btn.getAttribute('data-toggle-carried-due');
+        if (toggleDueId) {
+          state.carriedTeacherDues = (state.carriedTeacherDues || []).map(function (d) {
+            if (d.id !== toggleDueId) return d;
+            return Object.assign({}, d, { settled: !d.settled, settledAt: !d.settled ? new Date().toLocaleDateString('ar-EG') : '' });
+          });
+          renderAll();
+          showToast('✅ تم تحديث حالة صرف الرصيد المُرحّل للمعلم', false);
           return;
         }
       });
