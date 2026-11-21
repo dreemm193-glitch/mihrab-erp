@@ -669,6 +669,7 @@
       display: none !important;
     }
 
+    body.readonly-viewer-mode [data-toggle-add-family],
     body.readonly-viewer-mode [data-toggle-split-student],
     body.readonly-viewer-mode [data-toggle-edit-student],
     body.readonly-viewer-mode [data-inc-total-lessons],
@@ -1846,10 +1847,16 @@
     <div id="dashPanelFinanceMatrix" class="card dash-collapsible-panel hidden" style="margin-bottom: 16px; border: 2px solid var(--emerald-border);">
       <div class="section-header" style="margin-bottom: 12px;">
         <div>
-          <div class="section-title" style="color: #065F46;">📊 الميزانية العمومية ومصفوفة توزيع الأرباح (بالجنيه المصري)</div>
-          <div class="section-desc">تعديل رواتب الإشراف ونسبة الإعلانات مع عرض فوري لمصفوفة الأرباح والمخطط المرئي</div>
+          <div class="section-title" style="color: #065F46;">📊 الميزانية العمومية وصناديق العملات حسب الشهر المالي</div>
+          <div class="section-desc">كل شهر يعمل بشكل مستقل وتلقائي حسب "تاريخ التحويل الفعلي" لكل طالب — يمكن إبقاء شهر مفتوحاً لحين وصول الحوالة بينما الشهر الجديد يسجل تلقائياً</div>
         </div>
-        <button type="button" class="btn btn-danger-soft" data-dash-panel-close="dashPanelFinanceMatrix" style="padding:5px 10px; font-size:0.75rem;">إغلاق ✕</button>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <label for="financeMonthFilterSelect" style="font-size:0.78rem; font-weight:800; color:#065F46;">📅 الشهر المالي:</label>
+          <select id="financeMonthFilterSelect" class="form-select" style="width:auto; padding:5px 10px; font-size:0.78rem; font-weight:800; color:#1E3A8A; border:2px solid var(--blue-border);">
+            <option value="ALL">📚 جميع الشهور (إجمالي تراكمي)</option>
+          </select>
+          <button type="button" class="btn btn-danger-soft" data-dash-panel-close="dashPanelFinanceMatrix" style="padding:5px 10px; font-size:0.75rem;">إغلاق ✕</button>
+        </div>
       </div>
       <div class="grid-2-1" style="gap: 16px;">
         <div>
@@ -2142,12 +2149,25 @@
 
             <div class="grid-2">
               <div class="form-group">
-                <label class="form-label" for="studentCountry">الدولة</label>
-                <input type="text" id="studentCountry" class="form-input" value="السعودية" />
+                <label class="form-label" for="studentCountry">🌍 الدولة (ابحث أو اكتب يدوياً)</label>
+                <input type="text" id="studentCountry" list="academyCountriesDatalist" class="form-input" value="السعودية" placeholder="ابحث عن الدولة..." autocomplete="off" />
+                <datalist id="academyCountriesDatalist">
+                  <option value="السعودية"></option><option value="ليبيا"></option><option value="العراق"></option>
+                  <option value="تونس"></option><option value="قطر"></option><option value="الكويت"></option>
+                  <option value="الإمارات"></option><option value="عُمان"></option><option value="البحرين"></option>
+                  <option value="الأردن"></option><option value="مصر"></option><option value="الجزائر"></option>
+                  <option value="المغرب"></option><option value="فلسطين"></option><option value="اليمن"></option>
+                  <option value="السودان"></option><option value="سوريا"></option><option value="لبنان"></option>
+                  <option value="موريتانيا"></option><option value="أمريكا"></option><option value="كندا"></option>
+                  <option value="بريطانيا"></option><option value="ألمانيا"></option><option value="فرنسا"></option>
+                  <option value="هولندا"></option><option value="السويد"></option><option value="تركيا"></option>
+                  <option value="أستراليا"></option><option value="إيطاليا"></option><option value="إسبانيا"></option>
+                </datalist>
               </div>
               <div class="form-group">
-                <label class="form-label" for="studentCampaignSelect">الحملة الإعلانية</label>
-                <select id="studentCampaignSelect" class="form-select"></select>
+                <label class="form-label" for="studentCampaignSelect">📢 مصدر الطالب / الحملة (اختر أو اكتب)</label>
+                <input type="text" id="studentCampaignSelect" list="academyCampaignsDatalist" class="form-input" value="إعلان فيسبوك" placeholder="اختر حملة أو اكتب يدوياً..." autocomplete="off" />
+                <datalist id="academyCampaignsDatalist"></datalist>
               </div>
             </div>
 
@@ -2172,7 +2192,7 @@
             </div>
 
             <div class="form-group" style="background: #F5F3FF; padding: 10px 12px; border-radius: 10px; border: 1px solid #DDD6FE; margin-bottom: 10px;">
-              <label class="form-label" for="studentFamilyParentSelect" style="color: #5B21B6;">👨‍👩‍👧‍👦 ربط بباقة عائلية مشتركة مع أخ مسجل (اختياري):</label>
+              <label class="form-label" for="studentFamilyParentSelect" style="color: #5B21B6;">👨‍👩‍👧‍👦 ربط بباقة الأسرة (أخ / أخت / أم / أب — فردين أو أكثر بسعر واحد):</label>
               <select id="studentFamilyParentSelect" class="form-select" style="font-weight: 700; color: #5B21B6;">
                 <option value="">— طالب مستقل (له فاتورة وسعر خاص به) —</option>
               </select>
@@ -2226,31 +2246,24 @@
 
             <div class="grid-2" style="background: var(--slate-50); padding: 10px; border-radius: 10px; border: 1px solid var(--slate-200); margin-bottom: 12px;">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="studentSubStartDate">📅 تاريخ بدء الاشتراك</label>
+                <label class="form-label" for="studentSubStartDate">📅 تاريخ بدء الاشتراك الأول (ثابت)</label>
                 <input type="date" id="studentSubStartDate" class="form-input" value="2026-11-01" />
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="studentRenewalDate">🔔 موعد التجديد القادم</label>
-                <input type="date" id="studentRenewalDate" class="form-input" value="2026-12-01" />
+                <label class="form-label" for="studentRenewalDate" style="color: #065F46;">💸 تاريخ التحويل / التجديد الفعلي (يحدد الشهر المالي تلقائياً)</label>
+                <input type="date" id="studentRenewalDate" class="form-input" value="2026-11-21" title="يكتبه الإشراف أو الإدارة يوم استلام الحوالة (اليوم/الشهر/السنة) فيدخل تلقائياً في ميزانية ذلك الشهر" />
               </div>
             </div>
 
-            <div class="grid-2" style="background: #FFFBEB; padding: 10px; border-radius: 10px; border: 1px solid #FCD34D; margin-bottom: 12px;">
+            <div style="background: #FFFBEB; padding: 10px; border-radius: 10px; border: 1px solid #FCD34D; margin-bottom: 12px;">
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="studentPaymentStatus" style="color: #92400E;">💳 حالة الدفع والسداد</label>
                 <select id="studentPaymentStatus" class="form-select" style="font-weight: 700;">
-                  <option value="PAID">✅ تم الدفع</option>
-                  <option value="CREDIT_ALLOWED">🚨 مسموح باستكمال الحلقات ثم يدفع (آجل)</option>
+                  <option value="PAID">✅ تم الدفع (ساري)</option>
+                  <option value="CREDIT_ALLOWED">⏳ آجل — يستكمل الحلقات قبل التحويل (تنبيه مستمر للإدارة)</option>
                   <option value="UNPAID">⭕ لم يتم الدفع بعد</option>
                 </select>
-              </div>
-              <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="studentRenewalStatus" style="color: #92400E;">🔄 حالة التجديد</label>
-                <select id="studentRenewalStatus" class="form-select" style="font-weight: 700;">
-                  <option value="RENEWED">✅ تم التجديد</option>
-                  <option value="PENDING_RENEWAL">⏳ في انتظار التجديد</option>
-                  <option value="NEW_SUB">🆕 اشتراك جديد</option>
-                </select>
+                <select id="studentRenewalStatus" class="hidden"><option value="NEW_SUB" selected>جديد</option></select>
               </div>
             </div>
 
@@ -2876,6 +2889,7 @@
       adPercentage: 30,
       currency: 'جنيه',
       monthLabel: 'نوفمبر 2026',
+      activeFinanceMonth: 'ALL',
       currencySettlements: [],
       monthlyArchives: [],
       carriedTeacherDues: [],
@@ -2889,6 +2903,7 @@
       editingTeacherId: null,
       editingStudentId: null,
       splittingStudentId: null,
+      addingFamilyToStudentId: null,
       lastSmartAssistantText: '',
       scheduleDateFilter: '2026-11-15',
       todayRosterMode: 'TODAY_MATCH',
@@ -3371,47 +3386,94 @@
       return { code: 'OTHER', name: 'عملة أخرى', flag: '🌍', amount: amount };
     }
 
+    function getStudentTransferMonthKey(s) {
+      var d = (s.transferDate || s.renewalDate || s.subStartDate || '').trim();
+      var m = d.match(/^(\d{4}-\d{2})/);
+      return m ? m[1] : '2026-11';
+    }
+
+    function getAvailableFinanceMonths() {
+      var mSet = { '2026-11': true, '2026-12': true };
+      var curIsoMonth = new Date().toISOString().slice(0, 7);
+      mSet[curIsoMonth] = true;
+      state.students.forEach(function (s) {
+        var mk = getStudentTransferMonthKey(s);
+        if (mk) mSet[mk] = true;
+      });
+      (state.currencySettlements || []).forEach(function (st) {
+        if (st.monthKey) mSet[st.monthKey] = true;
+      });
+      return Object.keys(mSet).sort().reverse();
+    }
+
     function computeCurrencyVaults() {
-      var pendingByCode = {};
-      var directConvertedStudents = [];
-      var settledThisMonth = (state.currencySettlements || []).filter(function (x) {
-        return x.monthLabel === state.monthLabel;
+      var activeM = state.activeFinanceMonth || 'ALL';
+      var byCode = {};
+      var settledForScope = (state.currencySettlements || []).filter(function (x) {
+        if (activeM === 'ALL') return true;
+        return x.monthKey === activeM || (!x.monthKey && x.monthLabel === state.monthLabel);
       });
       var settledCodesMap = {};
-      settledThisMonth.forEach(function (st) {
+      settledForScope.forEach(function (st) {
         settledCodesMap[st.currencyCode] = (settledCodesMap[st.currencyCode] || 0) + Number(st.egpReceived || 0);
       });
 
       state.students.forEach(function (s) {
         if (s.familyBillingParentId) return;
+        var stMonth = getStudentTransferMonthKey(s);
+        if (activeM !== 'ALL' && stMonth !== activeM) return;
+
         var egp = Number(s.tuitionReceived || 0);
-        if (egp > 0) {
-          directConvertedStudents.push({ name: s.name, foreignText: s.foreignPackageText || '—', egp: egp });
-          return;
-        }
         var bucket = detectStudentCurrencyBucket(s.foreignPackageText, s.country);
-        if (bucket.amount > 0) {
-          if (!pendingByCode[bucket.code]) {
-            pendingByCode[bucket.code] = {
-              code: bucket.code,
-              name: bucket.name,
-              flag: bucket.flag,
-              totalForeign: 0,
-              students: []
-            };
-          }
-          pendingByCode[bucket.code].totalForeign += bucket.amount;
-          pendingByCode[bucket.code].students.push({ id: s.id, name: s.name, amount: bucket.amount, rawText: s.foreignPackageText || '' });
+        if (bucket.amount <= 0 && egp <= 0) return;
+
+        var codeKey = bucket.amount > 0 ? bucket.code : 'EGP';
+        var curName = bucket.amount > 0 ? bucket.name : 'جنيه مصري';
+        var curFlag = bucket.amount > 0 ? bucket.flag : '🇪🇬';
+
+        if (!byCode[codeKey]) {
+          byCode[codeKey] = {
+            code: codeKey,
+            name: curName,
+            flag: curFlag,
+            totalForeignAll: 0,
+            convertedForeign: 0,
+            convertedEgp: 0,
+            pendingForeign: 0,
+            convertedItems: [],
+            pendingItems: []
+          };
+        }
+        var v = byCode[codeKey];
+        v.totalForeignAll += bucket.amount;
+
+        if (egp > 0) {
+          v.convertedForeign += bucket.amount;
+          v.convertedEgp += egp;
+          v.convertedItems.push({
+            id: s.id, name: s.name, amount: bucket.amount, egp: egp,
+            rawText: s.foreignPackageText || (egp + ' جنيه'), transferMonth: stMonth
+          });
+        } else if (bucket.amount > 0) {
+          v.pendingForeign += bucket.amount;
+          v.pendingItems.push({
+            id: s.id, name: s.name, amount: bucket.amount,
+            rawText: s.foreignPackageText || '', transferMonth: stMonth,
+            isCreditPending: (s.paymentStatus === 'CREDIT_ALLOWED' || s.paymentStatus === 'UNPAID')
+          });
         }
       });
 
-      var settledVaultsEgpTotal = settledThisMonth.reduce(function (sum, x) { return sum + Number(x.egpReceived || 0); }, 0);
+      var settledVaultsEgpTotal = settledForScope.reduce(function (sum, x) { return sum + Number(x.egpReceived || 0); }, 0);
+      var allVaults = Object.keys(byCode).map(function (k) { return byCode[k]; });
+      var pendingVaults = allVaults.filter(function (v) { return v.pendingForeign > 0; });
+
       return {
-        pendingVaults: Object.keys(pendingByCode).map(function (k) { return pendingByCode[k]; }),
-        settledThisMonth: settledThisMonth,
+        allVaults: allVaults,
+        pendingVaults: pendingVaults,
+        settledThisMonth: settledForScope,
         settledCodesMap: settledCodesMap,
-        settledVaultsEgpTotal: settledVaultsEgpTotal,
-        directConvertedStudents: directConvertedStudents
+        settledVaultsEgpTotal: settledVaultsEgpTotal
       };
     }
 
@@ -3499,8 +3561,10 @@
 
       var vaultsSummary = computeCurrencyVaults();
       var directEgpRevenue = 0;
+      var activeFinM = state.activeFinanceMonth || 'ALL';
       state.students.forEach(function (s) {
         if (s.familyBillingParentId) return; // أخ مرتبط بباقة عائلية موحدة — الإيراد محسوب مرة واحدة لدى صاحب الفاتورة
+        if (activeFinM !== 'ALL' && getStudentTransferMonthKey(s) !== activeFinM) return;
         var egpVal = Number(s.tuitionReceived || 0);
         directEgpRevenue += egpVal;
       });
@@ -4766,9 +4830,19 @@
         }
       });
 
-      stCampaignSelect.innerHTML = state.campaigns.map(function (c) {
-        return '<option value="' + c.id + '">' + (c.name || c.id) + ' (' + c.country + ')</option>';
-      }).join('') + '<option value="توصية_مباشرة">توصية مباشرة (بدون إعلان)</option>';
+      var campDl = document.getElementById('academyCampaignsDatalist');
+      if (campDl) {
+        var defaultChannels = [
+          'إعلان فيسبوك', 'إعلان تيك توك', 'إعلان إنستغرام', 'إعلان يوتيوب / جوجل',
+          'إعلان واتساب', 'توصية وترشيح مباشر', 'باقة أسرة / أقارب', 'حملة الخليج',
+          'حملة ليبيا', 'حملة العراق', 'حملة تونس', 'حملة أوروبا وأمريكا'
+        ];
+        var customCamps = state.campaigns.map(function (c) { return (c.name || c.id) + (c.country ? (' - ' + c.country) : ''); });
+        var allCampOpts = customCamps.concat(defaultChannels);
+        campDl.innerHTML = allCampOpts.map(function (label) {
+          return '<option value="' + escHtml(label) + '"></option>';
+        }).join('');
+      }
 
       var famParentSel = document.getElementById('studentFamilyParentSelect');
       if (famParentSel) {
@@ -5777,86 +5851,195 @@
         return;
       }
 
-      container.innerHTML = filteredStudents.map(function (s) {
+      // تجميع أفراد الأسرة داخل بطاقة صاحب الفاتورة الأسرية (كل فرد بعداده وموعده ومعلمه المستقل أسفل فرد العائلة مباشرة)
+      var filteredIdsSet = {};
+      filteredStudents.forEach(function (st) { filteredIdsSet[st.id] = true; });
+      var primaryRenderList = [];
+      var addedPrimarySet = {};
+      filteredStudents.forEach(function (st) {
+        if (st.familyBillingParentId) {
+          var pObj = state.students.find(function (x) { return x.id === st.familyBillingParentId; });
+          if (pObj) {
+            if (!addedPrimarySet[pObj.id]) {
+              addedPrimarySet[pObj.id] = true;
+              primaryRenderList.push(pObj);
+            }
+            return;
+          }
+        }
+        if (!addedPrimarySet[st.id]) {
+          addedPrimarySet[st.id] = true;
+          primaryRenderList.push(st);
+        }
+      });
+
+      container.innerHTML = primaryRenderList.map(function (s) {
         var teacher = state.teachers.find(function (t) { return t.id === s.teacherId; });
         var isCompleted = s.consumedLessons >= s.totalLessons;
         var pct = Math.min(100, Math.round((s.consumedLessons / Math.max(1, s.totalLessons)) * 100));
-        var familyParent = s.familyBillingParentId ? state.students.find(function (p) { return p.id === s.familyBillingParentId; }) : null;
-        var linkedSiblings = state.students.filter(function (ch) { return ch.familyBillingParentId === s.id; });
-        var foreignText = familyParent ? ('باقة عائلية مشتركة مع ' + familyParent.name) : (s.foreignPackageText || '');
-        var payStatus = familyParent ? (familyParent.paymentStatus || 'PAID') : (s.paymentStatus || 'PAID');
-        var renStatus = s.renewalStatus || (isCompleted ? 'PENDING_RENEWAL' : 'RENEWED');
+        var linkedMembers = state.students.filter(function (ch) { return ch.familyBillingParentId === s.id; });
+        var foreignText = s.foreignPackageText || '';
+        var payStatus = s.paymentStatus || 'PAID';
         var subStart = s.subStartDate || '2026-11-01';
-        var renDate = s.renewalDate || '2026-12-01';
+        var transferDt = s.transferDate || s.renewalDate || '';
         var isUnpaidOrCredit = (payStatus === 'CREDIT_ALLOWED' || payStatus === 'UNPAID');
         var isEditingStu = state.editingStudentId === s.id;
+        var isAddingFam = state.addingFamilyToStudentId === s.id;
 
         var cardBg = isUnpaidOrCredit ? '#FFF1F2' : '#FFFFFF';
-        var cardBorder = isUnpaidOrCredit ? '2px solid #F43F5E' : '1px solid var(--slate-200)';
+        var cardBorder = isUnpaidOrCredit ? '2px solid #F43F5E' : (linkedMembers.length > 0 ? '2px solid #C4B5FD' : '1px solid var(--slate-200)');
 
         var payBadge = '<span class="status-pill pill-emerald">✅ تم الدفع</span>';
         if (payStatus === 'CREDIT_ALLOWED') {
-          payBadge = '<span class="status-pill pill-rose" style="border:1px solid #F43F5E;">🚨 يستكمل الحلقات ولم يدفع بعد (آجل)</span>';
+          payBadge = '<span class="status-pill pill-rose" style="border:1px solid #F43F5E;">⏳ آجل — يستكمل قبل التحويل</span>';
         } else if (payStatus === 'UNPAID') {
-          payBadge = '<span class="status-pill pill-rose" style="border:1px solid #F43F5E;">⭕ لم يتم الدفع بعد</span>';
+          payBadge = '<span class="status-pill pill-rose" style="border:1px solid #F43F5E;">⭕ لم يدفع بعد</span>';
         }
 
-        var renBadge = renStatus === 'RENEWED'
-          ? '<span class="status-pill pill-emerald">🔄 تم التجديد</span>'
-          : (renStatus === 'PENDING_RENEWAL' ? '<span class="status-pill pill-amber">🔔 في انتظار التجديد</span>' : '<span class="status-pill pill-blue">🆕 اشتراك جديد</span>');
+        // درج إضافة فرد أسرة جديد (أخ / أخت / أم / أب / ابن / ابنة) مباشرة داخل نفس البطاقة
+        var addFamDrawerHtml = '';
+        if (isAddingFam && perms.edit_students) {
+          var famTeaOpts = state.teachers.map(function (tc) {
+            return '<option value="' + tc.id + '" ' + (tc.id === s.teacherId ? 'selected' : '') + '>' + escHtml(tc.name) + '</option>';
+          }).join('');
+          addFamDrawerHtml = '<div style="margin-top:10px; padding:12px 14px; background:#F5F3FF; border:2px solid #A78BFA; border-radius:12px;">' +
+            '<div style="font-size:0.84rem; font-weight:800; color:#5B21B6; margin-bottom:8px;">➕👨‍👩‍👧‍👦 إضافة فرد جديد لباقة أسرة "' + escHtml(s.name) + '" (يظهر بعداد وحضور مستقل داخل نفس البطاقة وبسعر واحد):</div>' +
+            '<div class="grid-4" style="gap:8px; margin-bottom:8px;">' +
+              '<div><label class="form-label">اسم الفرد الجديد</label><input type="text" id="add_fam_name_' + s.id + '" class="form-input" placeholder="مثال: عمر / أم حنان" style="font-weight:800;" /></div>' +
+              '<div><label class="form-label">صلة القرابة</label><select id="add_fam_rel_' + s.id + '" class="form-select" style="font-weight:700;"><option value="أخ">👦 أخ</option><option value="أخت">👧 أخت</option><option value="أم">👩 أم</option><option value="أب">👨 أب</option><option value="ابن">👦 ابن</option><option value="ابنة">👧 ابنة</option><option value="زوجة">👩 زوجة</option><option value="فرد أسرة">👨‍👩‍👧‍👦 فرد أسرة</option></select></div>' +
+              '<div><label class="form-label">المعلم المسؤول</label><select id="add_fam_tea_' + s.id + '" class="form-select">' + famTeaOpts + '</select></div>' +
+              '<div><label class="form-label">حلقات الباقة</label><input type="number" min="1" id="add_fam_total_' + s.id + '" class="form-input" value="' + s.totalLessons + '" /></div>' +
+            '</div>' +
+            '<div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between;">' +
+              '<input type="text" id="add_fam_sched_' + s.id + '" class="form-input" value="' + escHtml(s.scheduleText || '') + '" placeholder="موعد الفرد الجديد الثابت..." style="flex:1; min-width:220px; font-weight:700;" />' +
+              '<div style="display:flex; gap:6px;">' +
+                '<button type="button" class="btn btn-primary" style="background:#6D28D9;" data-confirm-add-family-member="' + s.id + '">✅ إضافة الفرد داخل باقة الأسرة</button>' +
+                '<button type="button" class="btn btn-soft" data-cancel-add-family-member="' + s.id + '">إلغاء</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }
 
+        // درج التعديل الشامل للطالب
         var stuEditDrawerHtml = '';
         if (isEditingStu && perms.edit_students) {
           var teacherSelectOpts = state.teachers.map(function (tc) {
             return '<option value="' + tc.id + '" ' + (tc.id === s.teacherId ? 'selected' : '') + '>' + escHtml(tc.name) + '</option>';
           }).join('');
           stuEditDrawerHtml = '<div style="margin-top:10px; padding:14px; background:var(--blue-bg); border:1px solid var(--blue-border); border-radius:12px;">' +
-            '<div style="font-size:0.82rem; font-weight:800; color:#1E3A8A; margin-bottom:10px;">✏️ تعديل بيانات الطالب وموعده الثابت وحلقات باقته (مباشرة دون إضافة سجل جديد):</div>' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+              '<span style="font-size:0.82rem; font-weight:800; color:#1E3A8A;">✏️ تعديل بيانات الطالب وموعده وحلقات باقته:</span>' +
+              '<button type="button" class="btn btn-soft" style="background:#F5F3FF; border-color:#C4B5FD; color:#5B21B6; font-weight:800; font-size:0.74rem; padding:4px 10px;" data-toggle-add-family="' + s.id + '">➕ إضافة أخ / أخت / أم / أب</button>' +
+            '</div>' +
             '<div class="grid-3" style="gap:10px; margin-bottom:10px;">' +
               '<div><label class="form-label">اسم الطالب</label><input type="text" id="edit_s_name_' + s.id + '" class="form-input" value="' + escHtml(s.name || '') + '" /></div>' +
-              '<div><label class="form-label">الدولة</label><input type="text" id="edit_s_country_' + s.id + '" class="form-input" value="' + escHtml(s.country || '') + '" /></div>' +
+              '<div><label class="form-label">الدولة</label><input type="text" list="academyCountriesDatalist" id="edit_s_country_' + s.id + '" class="form-input" value="' + escHtml(s.country || '') + '" /></div>' +
               '<div><label class="form-label">المعلم المسؤول</label><select id="edit_s_teacher_' + s.id + '" class="form-select">' + teacherSelectOpts + '</select></div>' +
             '</div>' +
             '<div class="grid-4" style="gap:10px; margin-bottom:10px;">' +
-              '<div><label class="form-label">📅 الموعد الثابت (تعديل على الموعد الحالي)</label><input type="text" id="edit_s_sched_' + s.id + '" class="form-input" value="' + escHtml(s.scheduleText || '') + '" style="font-weight:800; color:var(--primary);" /></div>' +
-              '<div><label class="form-label">⏱️ مدة الحلقة الافتراضية (د)</label><input type="number" min="10" step="5" id="edit_s_dur_' + s.id + '" class="form-input" value="' + (s.defaultDurationMin || 45) + '" /></div>' +
-              '<div><label class="form-label">الحلقات المستهلكة حالياً</label><input type="number" min="0" id="edit_s_consumed_' + s.id + '" class="form-input" value="' + s.consumedLessons + '" /></div>' +
-              '<div><label class="form-label">📦 إجمالي حلقات الباقة (زيادة/نقصان)</label><input type="number" min="1" id="edit_s_total_' + s.id + '" class="form-input" value="' + s.totalLessons + '" style="font-weight:800; color:#065F46;" /></div>' +
+              '<div><label class="form-label">📅 الموعد الثابت</label><input type="text" id="edit_s_sched_' + s.id + '" class="form-input" value="' + escHtml(s.scheduleText || '') + '" style="font-weight:800; color:var(--primary);" /></div>' +
+              '<div><label class="form-label">⏱️ مدة الحلقة (د)</label><input type="number" min="10" step="5" id="edit_s_dur_' + s.id + '" class="form-input" value="' + (s.defaultDurationMin || 45) + '" /></div>' +
+              '<div><label class="form-label">الحلقات المستهلكة</label><input type="number" min="0" id="edit_s_consumed_' + s.id + '" class="form-input" value="' + s.consumedLessons + '" /></div>' +
+              '<div><label class="form-label">📦 إجمالي الباقة</label><input type="number" min="1" id="edit_s_total_' + s.id + '" class="form-input" value="' + s.totalLessons + '" style="font-weight:800; color:#065F46;" /></div>' +
             '</div>' +
             '<div style="margin-bottom:10px; padding:8px 10px; background:#F5F3FF; border:1px solid #DDD6FE; border-radius:8px;">' +
-              '<label class="form-label" style="color:#5B21B6;">👨‍👩‍👧‍👦 ربط بباقة عائلية مع أخ (اختياري — يجعلهما بسعر واحد وعداد حضور مستقل لكل أخ):</label>' +
+              '<label class="form-label" style="color:#5B21B6;">👨‍👩‍👧‍👦 أو ربط هذا الطالب بباقة أسرة طالب آخر مسجل:</label>' +
               '<select id="edit_s_family_parent_' + s.id + '" class="form-select" style="font-weight:700; color:#5B21B6;">' +
-                '<option value="">— طالب مستقل / صاحب الفاتورة العائلية —</option>' +
+                '<option value="">— مستقل / صاحب فاتورة الأسرة —</option>' +
                 state.students.filter(function (p) { return p.id !== s.id && !p.familyBillingParentId; }).map(function (p) {
-                  return '<option value="' + p.id + '" ' + (s.familyBillingParentId === p.id ? 'selected' : '') + '>👨‍👩‍👧‍👦 مرتبط بباقة أخيه: ' + escHtml(p.name) + ' (' + escHtml(p.foreignPackageText || '') + ')</option>';
+                  return '<option value="' + p.id + '" ' + (s.familyBillingParentId === p.id ? 'selected' : '') + '>👨‍👩‍👧‍👦 ضمن باقة أسرة: ' + escHtml(p.name) + ' (' + escHtml(p.foreignPackageText || '') + ')</option>';
                 }).join('') +
               '</select>' +
             '</div>' +
             '<div style="display:flex; gap:8px; justify-content:flex-end;">' +
-              '<button type="button" class="btn btn-primary" data-save-edit-student="' + s.id + '">💾 حفظ تعديلات الطالب والموعد والباقة</button>' +
+              '<button type="button" class="btn btn-primary" data-save-edit-student="' + s.id + '">💾 حفظ التعديلات</button>' +
               '<button type="button" class="btn btn-soft" data-cancel-edit-student="' + s.id + '">إغلاق</button>' +
             '</div>' +
+          '</div>';
+        }
+
+        // صفوف أفراد الأسرة المرتبطين داخل نفس البطاقة مباشرة (لكل فرد عداده المستقل وموعده ومعلمه)
+        var familyMembersBlockHtml = '';
+        if (linkedMembers.length > 0) {
+          familyMembersBlockHtml = '<div style="margin-top:10px; padding:10px 12px; background:#FAF5FF; border:1.5px solid #DDD6FE; border-radius:12px;">' +
+            '<div style="font-size:0.78rem; font-weight:800; color:#5B21B6; margin-bottom:8px;">👨‍👩‍👧‍👦 أفراد باقة الأسرة المرتبطون بنفس الفاتورة (' + (linkedMembers.length + 1) + ' طلاب في الإجمالي — لكل فرد عداده وحضوره المستقل):</div>' +
+            linkedMembers.map(function (m) {
+              var mTea = state.teachers.find(function (t) { return t.id === m.teacherId; });
+              var mDone = m.consumedLessons >= m.totalLessons;
+              var mPct = Math.min(100, Math.round((m.consumedLessons / Math.max(1, m.totalLessons)) * 100));
+              var isEditingM = state.editingStudentId === m.id;
+              var mEditHtml = '';
+              if (isEditingM && perms.edit_students) {
+                var mTeaOpts = state.teachers.map(function (tc) { return '<option value="' + tc.id + '" ' + (tc.id === m.teacherId ? 'selected' : '') + '>' + escHtml(tc.name) + '</option>'; }).join('');
+                mEditHtml = '<div style="margin-top:8px; padding:10px; background:#FFFFFF; border:1px solid #C4B5FD; border-radius:10px;">' +
+                  '<div class="grid-4" style="gap:6px; margin-bottom:8px;">' +
+                    '<input type="text" id="edit_s_name_' + m.id + '" class="form-input" value="' + escHtml(m.name) + '" placeholder="الاسم" />' +
+                    '<input type="text" id="edit_s_country_' + m.id + '" class="form-input" value="' + escHtml(m.country || s.country) + '" placeholder="الدولة" />' +
+                    '<select id="edit_s_teacher_' + m.id + '" class="form-select">' + mTeaOpts + '</select>' +
+                    '<input type="text" id="edit_s_sched_' + m.id + '" class="form-input" value="' + escHtml(m.scheduleText || '') + '" placeholder="الموعد" />' +
+                  '</div>' +
+                  '<input type="hidden" id="edit_s_dur_' + m.id + '" value="' + (m.defaultDurationMin || 45) + '" />' +
+                  '<input type="hidden" id="edit_s_consumed_' + m.id + '" value="' + m.consumedLessons + '" />' +
+                  '<input type="hidden" id="edit_s_total_' + m.id + '" value="' + m.totalLessons + '" />' +
+                  '<input type="hidden" id="edit_s_family_parent_' + m.id + '" value="' + s.id + '" />' +
+                  '<div style="display:flex; gap:6px; justify-content:flex-end;">' +
+                    '<button type="button" class="btn btn-primary" style="padding:4px 10px; font-size:0.74rem;" data-save-edit-student="' + m.id + '">💾 حفظ</button>' +
+                    '<button type="button" class="btn btn-soft" style="padding:4px 10px; font-size:0.74rem;" data-cancel-edit-student="' + m.id + '">إغلاق</button>' +
+                  '</div>' +
+                '</div>';
+              }
+              return '<div style="padding:8px 10px; background:#FFFFFF; border:1px solid #E9D5FF; border-radius:10px; margin-bottom:6px;">' +
+                '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">' +
+                  '<div>' +
+                    '<strong style="font-size:0.94rem; color:#4C1D95;">↳ ' + escHtml(m.name) + '</strong> ' +
+                    '<span class="status-pill pill-purple" style="font-size:0.68rem;">' + escHtml(m.familyRelation || 'فرد أسرة') + '</span> ' +
+                    '<span class="status-pill ' + (mDone ? 'pill-emerald' : 'pill-amber') + '" style="font-size:0.68rem;">' + (mDone ? '🔔 انتهت حلقاته' : ('⏳ باقي ' + Math.max(0, m.totalLessons - m.consumedLessons) + ' حلقة')) + '</span>' +
+                    '<div style="font-size:0.74rem; color:var(--slate-600); margin-top:4px; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">' +
+                      '<span>المعلم: <strong>' + escHtml(mTea ? mTea.name : 'غير محدد') + '</strong> • الموعد:</span>' +
+                      '<input type="text" class="form-input" data-edit-schedule="' + m.id + '" value="' + escHtml(m.scheduleText || '') + '" style="width:185px; padding:3px 7px; font-size:0.74rem; font-weight:700; color:var(--primary); background:#EFF6FF;" />' +
+                    '</div>' +
+                  '</div>' +
+                  '<div style="display:flex; flex-wrap:wrap; align-items:center; gap:5px;">' +
+                    '<div style="display:flex; align-items:center; gap:3px; background:#F8FAFC; border:1px solid var(--slate-200); border-radius:8px; padding:2px 6px;">' +
+                      '<span style="font-size:0.7rem; color:var(--slate-500); font-weight:700;">المستهلك:</span>' +
+                      (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:1px 6px; font-size:0.72rem;" data-dec-student="' + m.id + '">-</button>' : '') +
+                      '<input type="number" min="0" class="form-input" data-edit-consumed-lessons="' + m.id + '" value="' + m.consumedLessons + '" style="width:42px; padding:2px; font-size:0.76rem; font-weight:800; text-align:center;" />' +
+                      (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:1px 6px; font-size:0.72rem;" data-inc-student="' + m.id + '">+</button>' : '') +
+                    '</div>' +
+                    '<div style="display:flex; align-items:center; gap:3px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:2px 6px;">' +
+                      '<span style="font-size:0.7rem; color:#1E3A8A; font-weight:800;">الباقة:</span>' +
+                      (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:1px 6px; font-size:0.72rem;" data-dec-total-lessons="' + m.id + '">-</button>' : '') +
+                      '<input type="number" min="1" class="form-input" data-edit-total-lessons="' + m.id + '" value="' + m.totalLessons + '" style="width:44px; padding:2px; font-size:0.76rem; font-weight:800; color:#1E3A8A; text-align:center; background:#FFFFFF;" />' +
+                      (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:1px 6px; font-size:0.72rem;" data-inc-total-lessons="' + m.id + '">+</button>' : '') +
+                    '</div>' +
+                    (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:3px 7px; font-size:0.72rem;" data-toggle-edit-student="' + m.id + '">✏️</button>' : '') +
+                    (perms.delete_items ? '<button type="button" class="btn btn-danger-soft" style="padding:3px 7px; font-size:0.72rem;" data-delete-student="' + m.id + '">🗑️</button>' : '') +
+                  '</div>' +
+                '</div>' +
+                mEditHtml +
+                '<div class="progress-track" style="height:5px; margin-top:6px;"><div class="progress-bar" style="width:' + mPct + '%; background:#7C3AED;"></div></div>' +
+              '</div>';
+            }).join('') +
           '</div>';
         }
 
         return '<div class="card" style="margin-bottom: 14px; background:' + cardBg + '; border:' + cardBorder + ';">' +
           '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">' +
           '<div>' +
-          '<strong style="font-size:1.05rem;">' + s.name + '</strong> ' +
-          '<span class="status-pill pill-blue">' + s.country + '</span> ' +
-          (familyParent ? '<span class="status-pill pill-purple">👨‍👩‍👧‍👦 باقة عائلية مع: ' + escHtml(familyParent.name) + '</span> ' : '') +
-          (linkedSiblings.length > 0 ? '<span class="status-pill pill-purple">👨‍👩‍👧‍👦 فاتورة عائلية تشمل: ' + escHtml(linkedSiblings.map(function (x) { return x.name; }).join('، ')) + '</span> ' : '') +
-          payBadge + ' ' + renBadge + ' ' +
+          '<strong style="font-size:1.05rem;">' + escHtml(s.name) + '</strong> ' +
+          '<span class="status-pill pill-blue">' + escHtml(s.country) + '</span> ' +
+          (linkedMembers.length > 0 ? '<span class="status-pill pill-purple">👨‍👩‍👧‍👦 باقة أسرة (' + (linkedMembers.length + 1) + ' أفراد)</span> ' : '') +
+          payBadge + ' ' +
           '<span class="status-pill ' + (isCompleted ? 'pill-emerald' : 'pill-amber') + '">' +
-          (isCompleted ? '✅ باقة مكتملة' : '⏳ باقة جارية') + '</span>' +
+          (isCompleted ? '🔔 انتهت الباقة (مطلوب تجديد)' : ('⏳ باقي ' + Math.max(0, s.totalLessons - s.consumedLessons) + ' حلقة للتجديد')) + '</span>' +
           '<div style="font-size:0.78rem; color:var(--slate-600); margin-top:6px; display:flex; flex-wrap:wrap; align-items:center; gap:8px;">' +
-          '<span>المعلم: <strong>' + (teacher ? teacher.name : 'غير محدد') + '</strong> • الحملة: ' + s.adCampaign + ' • 📅 الموعد (عدّل مباشرة):</span>' +
-          '<input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + (s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="width:195px; padding:4px 8px; font-size:0.76rem; font-weight:800; color:var(--primary); background:#EFF6FF; border-color:#BFDBFE;" title="تعديل موعد الطالب مباشرة دون إضافة موعد جديد" />' +
+          '<span>المعلم: <strong>' + escHtml(teacher ? teacher.name : 'غير محدد') + '</strong> • المصدر: ' + escHtml(s.adCampaign || '—') + ' • 📅 الموعد:</span>' +
+          '<input type="text" class="form-input" data-edit-schedule="' + s.id + '" value="' + escHtml(s.scheduleText || 'السبت والثلاثاء 5:00 م') + '" style="width:195px; padding:4px 8px; font-size:0.76rem; font-weight:800; color:var(--primary); background:#EFF6FF; border-color:#BFDBFE;" title="تعديل موعد الطالب مباشرة دون إضافة موعد جديد" />' +
           '</div>' +
           '</div>' +
           '<div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">' +
-          (isUnpaidOrCredit && perms.edit_students ? '<button type="button" class="btn btn-emerald" data-mark-paid="' + s.id + '" title="تحويل الحالة إلى تم الدفع وتغيير اللون للأخضر">💳 تأكيد الدفع الآن</button>' : '') +
-          (isCompleted && perms.edit_students ? '<button type="button" class="btn btn-primary" data-renew-student="' + s.id + '">🔄 تجديد الباقة</button>' : '') +
+          (isUnpaidOrCredit && perms.edit_students ? '<button type="button" class="btn btn-emerald" data-mark-paid="' + s.id + '" title="تحويل الحالة إلى تم الدفع وتغيير اللون للأخضر">💳 تأكيد الدفع</button>' : '') +
+          (isCompleted && perms.edit_students ? '<button type="button" class="btn btn-primary" data-renew-student="' + s.id + '" title="تجديد الباقة (مع تأكيد الدفع)">🔄 تجديد مدفوع</button><button type="button" class="btn btn-danger-soft" data-renew-credit-student="' + s.id + '" title="بدء دورة جديدة قبل التحويل مع إبقاء التنبيه للإدارة">⏳ تجديد آجل</button>' : '') +
           '<div style="display:flex; align-items:center; gap:3px; background:#F8FAFC; border:1px solid var(--slate-200); border-radius:10px; padding:3px 7px;" title="تعديل الحلقات المستهلكة">' +
             '<span style="font-size:0.71rem; color:var(--slate-500); font-weight:700;">المستهلك:</span>' +
             (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-dec-student="' + s.id + '">-</button>' : '') +
@@ -5865,77 +6048,70 @@
           '</div>' +
           '<div style="display:flex; align-items:center; gap:3px; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:3px 7px;" title="تعديل إجمالي حلقات الباقة زيادة أو نقصاناً">' +
             '<span style="font-size:0.71rem; color:#1E3A8A; font-weight:800;">الباقة:</span>' +
-            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-dec-total-lessons="' + s.id + '" title="تقليل عدد حلقات الباقة">-</button>' : '') +
+            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-dec-total-lessons="' + s.id + '">-</button>' : '') +
             '<input type="number" min="1" class="form-input" data-edit-total-lessons="' + s.id + '" value="' + s.totalLessons + '" style="width:48px; padding:2px 4px; font-size:0.8rem; font-weight:800; color:#1E3A8A; text-align:center; background:#FFFFFF;" />' +
-            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-inc-total-lessons="' + s.id + '" title="زيادة عدد حلقات الباقة">+</button>' : '') +
+            (perms.edit_students ? '<button type="button" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;" data-inc-total-lessons="' + s.id + '">+</button>' : '') +
           '</div>' +
-          (perms.edit_students && !familyParent ? '<button type="button" class="btn btn-soft" style="' + (/(?:\s+و\s*|\s+\+\s*|\s*\/\s*)/.test(s.name || '') ? 'background:#F5F3FF; border-color:#C4B5FD; color:#5B21B6; font-weight:800;' : '') + '" data-toggle-split-student="' + s.id + '" title="فصل اسمين مدمجين (مثل أحمد وعمر) إلى طالبين مستقلين بباقة عائلية واحدة بضغطة زر">✂️ فصل لأخوين</button>' : '') +
-          (perms.edit_students ? '<button type="button" class="btn btn-soft" data-toggle-edit-student="' + s.id + '" title="تعديل شامل لبيانات وموعد ومعلم الطالب بدون إضافة طالب جديد">✏️ تعديل شامل</button>' : '') +
+          (perms.edit_students ? '<button type="button" class="btn btn-soft" style="background:#F5F3FF; border-color:#C4B5FD; color:#5B21B6; font-weight:800;" data-toggle-add-family="' + s.id + '" title="إضافة أخ أو أخت أو أم أو أب في نفس الباقة الأسرية بعداد مستقل">+ فرد أسرة</button>' : '') +
+          (perms.edit_students && /(?:\s+و\s*|\s+\+\s*|\s*\/\s*)/.test(s.name || '') ? '<button type="button" class="btn btn-soft" style="background:#FEF3C7; border-color:#FCD34D; color:#92400E; font-weight:800;" data-toggle-split-student="' + s.id + '" title="تقسيم اسمين مدمجين إلى باقة أسرة">✂️ تقسيم لأسرة</button>' : '') +
+          (perms.edit_students ? '<button type="button" class="btn btn-soft" data-toggle-edit-student="' + s.id + '">✏️ تعديل</button>' : '') +
           (perms.delete_items ? '<button type="button" class="btn btn-danger-soft" data-delete-student="' + s.id + '">🗑️ نقل للسلة</button>' : '') +
           '</div>' +
           '</div>' +
-          (state.splittingStudentId === s.id && perms.edit_students && !familyParent ? (function () {
+          addFamDrawerHtml +
+          (state.splittingStudentId === s.id && perms.edit_students ? (function () {
             var rawN = (s.name || '').trim();
             var parts = rawN.split(/\s+(?:و\s*|\+\s*|\/\s*)/);
             var n1 = (parts[0] || rawN).trim();
             var n2 = (parts.length > 1 ? parts.slice(1).join(' ').trim() : '');
             return '<div style="margin-top:10px; padding:14px; background:#F5F3FF; border:2px solid #C4B5FD; border-radius:12px;">' +
-              '<div style="font-size:0.84rem; font-weight:800; color:#5B21B6; margin-bottom:8px;">✂️ فصل "' + escHtml(rawN) + '" إلى أخوين مستقلين بباقة عائلية واحدة (سعر واحد وعداد مستقل لكل أخ):</div>' +
+              '<div style="font-size:0.84rem; font-weight:800; color:#5B21B6; margin-bottom:8px;">✂️ تقسيم "' + escHtml(rawN) + '" إلى باقة أسرة داخل نفس البطاقة (سعر واحد وعداد مستقل لكل فرد):</div>' +
               '<div class="grid-4" style="gap:8px; margin-bottom:10px;">' +
-                '<div><label class="form-label">اسم الأخ الأول (صاحب الفاتورة)</label><input type="text" id="split_s_n1_' + s.id + '" class="form-input" value="' + escHtml(n1) + '" style="font-weight:800;" /></div>' +
-                '<div><label class="form-label">اسم الأخ الثاني (مرتبط بالباقة)</label><input type="text" id="split_s_n2_' + s.id + '" class="form-input" value="' + escHtml(n2) + '" placeholder="اكتب اسم الأخ الثاني" style="font-weight:800;" /></div>' +
-                '<div><label class="form-label">مستهلك الأخ الأول</label><input type="number" min="0" id="split_s_c1_' + s.id + '" class="form-input" value="' + s.consumedLessons + '" /></div>' +
-                '<div><label class="form-label">مستهلك الأخ الثاني</label><input type="number" min="0" id="split_s_c2_' + s.id + '" class="form-input" value="' + s.consumedLessons + '" /></div>' +
+                '<div><label class="form-label">الفرد الأول (صاحب الفاتورة)</label><input type="text" id="split_s_n1_' + s.id + '" class="form-input" value="' + escHtml(n1) + '" style="font-weight:800;" /></div>' +
+                '<div><label class="form-label">الفرد الثاني (أخ/أخت/أم/أب)</label><input type="text" id="split_s_n2_' + s.id + '" class="form-input" value="' + escHtml(n2) + '" style="font-weight:800;" /></div>' +
+                '<div><label class="form-label">مستهلك الأول</label><input type="number" min="0" id="split_s_c1_' + s.id + '" class="form-input" value="' + s.consumedLessons + '" /></div>' +
+                '<div><label class="form-label">مستهلك الثاني</label><input type="number" min="0" id="split_s_c2_' + s.id + '" class="form-input" value="' + s.consumedLessons + '" /></div>' +
               '</div>' +
               '<div style="display:flex; gap:8px; justify-content:flex-end;">' +
-                '<button type="button" class="btn btn-primary" style="background:#6D28D9;" data-confirm-split-student="' + s.id + '">✅ فصل وربط بالباقة العائلية الآن</button>' +
+                '<button type="button" class="btn btn-primary" style="background:#6D28D9;" data-confirm-split-student="' + s.id + '">✅ تقسيم وتفعيل باقة الأسرة الآن</button>' +
                 '<button type="button" class="btn btn-soft" data-cancel-split-student="' + s.id + '">إلغاء</button>' +
               '</div>' +
             '</div>';
           })() : '') +
           stuEditDrawerHtml +
+          familyMembersBlockHtml +
 
-          '<!-- شريط الاشتراكات والدفع وموعد التجديد لكل طالب -->' +
-          '<div class="grid-4" style="margin-top:10px; padding:10px; background:#FFFFFF; border:1px solid var(--slate-200); border-radius:10px; gap:8px;">' +
+          '<!-- شريط التواريخ والدفع المبسط (3 خانات واضحة فقط بدون تكرار) -->' +
+          '<div class="grid-3" style="margin-top:10px; padding:10px; background:#FFFFFF; border:1px solid var(--slate-200); border-radius:10px; gap:8px;">' +
             '<div>' +
-              '<label style="display:block; font-size:0.72rem; font-weight:700; color:var(--slate-600); margin-bottom:2px;">📅 تاريخ بدء الاشتراك:</label>' +
+              '<label style="display:block; font-size:0.72rem; font-weight:700; color:var(--slate-600); margin-bottom:2px;">📅 تاريخ الاشتراك الأول:</label>' +
               '<input type="date" class="form-input" data-edit-sub-start="' + s.id + '" value="' + subStart + '" style="padding:4px 8px; font-size:0.76rem;" />' +
             '</div>' +
             '<div>' +
-              '<label style="display:block; font-size:0.72rem; font-weight:700; color:#92400E; margin-bottom:2px;">🔔 موعد التجديد القادم:</label>' +
-              '<input type="date" class="form-input" data-edit-ren-date="' + s.id + '" value="' + renDate + '" style="padding:4px 8px; font-size:0.76rem; font-weight:700; color:#92400E;" />' +
+              '<label style="display:block; font-size:0.72rem; font-weight:700; color:#065F46; margin-bottom:2px;">💸 تاريخ الدفع والتجديد:</label>' +
+              '<input type="date" class="form-input" data-edit-ren-date="' + s.id + '" value="' + transferDt + '" style="padding:4px 8px; font-size:0.76rem; font-weight:800; color:#065F46; background:#F0FDF4;" title="أدخل يوم وشهر وسنة التحويل ليُحسب تلقائياً ضمن ذلك الشهر المالي" />' +
             '</div>' +
             '<div>' +
               '<label style="display:block; font-size:0.72rem; font-weight:700; color:var(--slate-700); margin-bottom:2px;">💳 حالة الدفع:</label>' +
               '<select class="form-select" data-edit-pay-status="' + s.id + '" style="padding:4px 8px; font-size:0.76rem; font-weight:700;">' +
-                '<option value="PAID" ' + (payStatus === 'PAID' ? 'selected' : '') + '>✅ تم الدفع</option>' +
-                '<option value="CREDIT_ALLOWED" ' + (payStatus === 'CREDIT_ALLOWED' ? 'selected' : '') + '>🚨 يستكمل ثم يدفع (آجل)</option>' +
-                '<option value="UNPAID" ' + (payStatus === 'UNPAID' ? 'selected' : '') + '>⭕ لم يتم الدفع</option>' +
-              '</select>' +
-            '</div>' +
-            '<div>' +
-              '<label style="display:block; font-size:0.72rem; font-weight:700; color:var(--slate-700); margin-bottom:2px;">🔄 حالة التجديد:</label>' +
-              '<select class="form-select" data-edit-ren-status="' + s.id + '" style="padding:4px 8px; font-size:0.76rem; font-weight:700;">' +
-                '<option value="RENEWED" ' + (renStatus === 'RENEWED' ? 'selected' : '') + '>✅ تم التجديد</option>' +
-                '<option value="PENDING_RENEWAL" ' + (renStatus === 'PENDING_RENEWAL' ? 'selected' : '') + '>⏳ في انتظار التجديد</option>' +
-                '<option value="NEW_SUB" ' + (renStatus === 'NEW_SUB' ? 'selected' : '') + '>🆕 اشتراك جديد</option>' +
+                '<option value="PAID" ' + (payStatus === 'PAID' ? 'selected' : '') + '>✅ تم الدفع (ساري)</option>' +
+                '<option value="CREDIT_ALLOWED" ' + (payStatus === 'CREDIT_ALLOWED' ? 'selected' : '') + '>⏳ آجل — يستكمل قبل التحويل</option>' +
+                '<option value="UNPAID" ' + (payStatus === 'UNPAID' ? 'selected' : '') + '>⭕ لم يدفع بعد</option>' +
               '</select>' +
             '</div>' +
           '</div>' +
 
-          (perms.see_student_money ? (familyParent ? ('<div style="margin-top:8px; padding:9px 12px; background:#F5F3FF; border:1px solid #DDD6FE; border-radius:10px; font-size:0.78rem; color:#5B21B6; font-weight:700;">' +
-            '👨‍👩‍👧‍👦 <strong>باقة عائلية موحدة:</strong> قيمة الاشتراك محسوبة مرة واحدة فقط في بطاقة أخيه <strong>' + escHtml(familyParent.name) + '</strong> (' + escHtml(familyParent.foreignPackageText || '—') + ' = ' + Number(familyParent.tuitionReceived || 0).toFixed(0) + ' ج) — بينما عداد الحلقات والحضور هنا مستقل 100%.' +
-          '</div>') : ('<!-- الخانتان اليدويتان بجوار كل طالب مباشرة -->' +
+          (perms.see_student_money ? ('<!-- الخانتان اليدويتان بجوار كل باقة مباشرة -->' +
           '<div class="grid-2" style="margin-top:8px; padding:10px; background:var(--slate-50); border:1px solid var(--slate-200); border-radius:10px;">' +
           '<div>' +
-          '<label style="display:block; font-size:0.74rem; font-weight:700; color:var(--slate-700); margin-bottom:3px;">1️⃣ باقة الطالب بعملته (يدوي: دينار/ريال/دولار...):</label>' +
-          '<input type="text" class="form-input" data-edit-foreign="' + s.id + '" value="' + foreignText + '" placeholder="مثال: 15 دينار" style="padding:6px 10px; font-weight:700;" />' +
+          '<label style="display:block; font-size:0.74rem; font-weight:700; color:var(--slate-700); margin-bottom:3px;">1️⃣ ' + (linkedMembers.length > 0 ? 'باقة الأسرة الإجمالية بعملتها:' : 'باقة الطالب بعملته:') + '</label>' +
+          '<input type="text" class="form-input" data-edit-foreign="' + s.id + '" value="' + escHtml(foreignText) + '" placeholder="مثال: 700 دينار ليبي" style="padding:6px 10px; font-weight:700;" />' +
           '</div>' +
           '<div>' +
-          '<label style="display:block; font-size:0.74rem; font-weight:700; color:#065F46; margin-bottom:3px;">2️⃣ ما يعادلها بالمصري (يدوي بالجنيه):</label>' +
-          '<input type="number" step="0.01" class="form-input" data-edit-egp="' + s.id + '" value="' + s.tuitionReceived + '" placeholder="مثال: 1200" style="padding:6px 10px; font-weight:800; color:#065F46; background:var(--emerald-bg);" />' +
+          '<label style="display:block; font-size:0.74rem; font-weight:700; color:#065F46; margin-bottom:3px;">2️⃣ ما يعادلها بالمصري (اتركه 0 إن لم تُحوّل بعد):</label>' +
+          '<input type="number" step="0.01" class="form-input" data-edit-egp="' + s.id + '" value="' + s.tuitionReceived + '" placeholder="0" style="padding:6px 10px; font-weight:800; color:#065F46; background:var(--emerald-bg);" />' +
           '</div>' +
-          '</div>')) : '') +
+          '</div>') : '') +
           '<div class="progress-track"><div class="progress-bar" style="width:' + pct + '%; background:' + (isUnpaidOrCredit ? '#E11D48' : (isCompleted ? 'var(--blue)' : 'var(--amber)')) + ';"></div></div>' +
           '</div>';
       }).join('');
@@ -6300,16 +6476,28 @@
         var renDateId = e.target.getAttribute && e.target.getAttribute('data-edit-ren-date');
         if (renDateId) {
           var vRen = e.target.value;
-          state.students = state.students.map(function (s) { return s.id === renDateId ? Object.assign({}, s, { renewalDate: vRen }) : s; });
+          var targetS = state.students.find(function (s) { return s.id === renDateId; });
+          var rootId = (targetS && targetS.familyBillingParentId) ? targetS.familyBillingParentId : renDateId;
+          state.students = state.students.map(function (s) {
+            if (s.id === rootId || s.familyBillingParentId === rootId) {
+              return Object.assign({}, s, { transferDate: vRen, renewalDate: vRen });
+            }
+            return s;
+          });
           renderAll();
-          showToast('🔔 تم تحديث موعد التجديد القادم للطالب', false);
+          showToast('💸 تم حفظ تاريخ التحويل الفعلي (' + vRen + ') وربطه تلقائياً بالشهر المالي ' + (vRen ? vRen.slice(0, 7) : ''), false);
           return;
         }
 
         var payStatusId = e.target.getAttribute && e.target.getAttribute('data-edit-pay-status');
         if (payStatusId) {
           var vPay = e.target.value;
-          state.students = state.students.map(function (s) { return s.id === payStatusId ? Object.assign({}, s, { paymentStatus: vPay }) : s; });
+          state.students = state.students.map(function (s) {
+            if (s.id === payStatusId || s.familyBillingParentId === payStatusId) {
+              return Object.assign({}, s, { paymentStatus: vPay });
+            }
+            return s;
+          });
           renderAll();
           showToast(vPay === 'PAID' ? '✅ تم تحديث الحالة إلى: تم الدفع وتغيير لون البطاقة للأبيض/الأخضر' : '🚨 تم تحديث حالة الدفع وتفعيل التذكير الدائم', false);
           return;
@@ -6566,7 +6754,8 @@
           consumedLessons: Number(document.getElementById('studentConsumed').value) || 0,
           scheduleText: document.getElementById('studentScheduleInput').value.trim() || 'السبت والثلاثاء 5:00 م',
           subStartDate: document.getElementById('studentSubStartDate').value || '2026-11-01',
-          renewalDate: document.getElementById('studentRenewalDate').value || '2026-12-01',
+          transferDate: document.getElementById('studentRenewalDate').value || new Date().toISOString().slice(0, 10),
+          renewalDate: document.getElementById('studentRenewalDate').value || new Date().toISOString().slice(0, 10),
           paymentStatus: document.getElementById('studentPaymentStatus').value || 'PAID',
           renewalStatus: document.getElementById('studentRenewalStatus').value || 'RENEWED',
           foreignPackageText: foreignText,
@@ -7396,6 +7585,59 @@
           return;
         }
 
+        var toggleAddFamId = target.getAttribute('data-toggle-add-family');
+        if (toggleAddFamId) {
+          state.addingFamilyToStudentId = (state.addingFamilyToStudentId === toggleAddFamId) ? null : toggleAddFamId;
+          state.editingStudentId = null;
+          state.splittingStudentId = null;
+          renderAll(true);
+          return;
+        }
+        var cancelAddFamId = target.getAttribute('data-cancel-add-family-member');
+        if (cancelAddFamId) {
+          state.addingFamilyToStudentId = null;
+          renderAll(true);
+          return;
+        }
+        var confirmAddFamId = target.getAttribute('data-confirm-add-family-member');
+        if (confirmAddFamId) {
+          var parentS = state.students.find(function (s) { return s.id === confirmAddFamId; });
+          if (!parentS) return;
+          var mName = ((document.getElementById('add_fam_name_' + confirmAddFamId) || {}).value || '').trim();
+          var mRel = (document.getElementById('add_fam_rel_' + confirmAddFamId) || {}).value || 'فرد أسرة';
+          var mTea = (document.getElementById('add_fam_tea_' + confirmAddFamId) || {}).value || parentS.teacherId;
+          var mTot = Math.max(1, Number((document.getElementById('add_fam_total_' + confirmAddFamId) || {}).value) || parentS.totalLessons || 8);
+          var mSched = ((document.getElementById('add_fam_sched_' + confirmAddFamId) || {}).value || parentS.scheduleText || '').trim();
+          if (!mName) {
+            showToast('⚠️ يرجى كتابة اسم فرد الأسرة الجديد أولاً', false);
+            return;
+          }
+          state.students.push({
+            id: 's_fam_' + Date.now(),
+            name: mName,
+            familyRelation: mRel,
+            familyBillingParentId: parentS.id,
+            country: parentS.country,
+            adCampaign: parentS.adCampaign,
+            teacherId: mTea,
+            totalLessons: mTot,
+            defaultDurationMin: parentS.defaultDurationMin || 45,
+            consumedLessons: 0,
+            scheduleText: mSched,
+            subStartDate: new Date().toISOString().slice(0, 10),
+            transferDate: parentS.transferDate || parentS.renewalDate || '',
+            renewalDate: parentS.renewalDate || '',
+            paymentStatus: parentS.paymentStatus || 'PAID',
+            renewalStatus: 'RENEWED',
+            foreignPackageText: 'باقة أسرة مع ' + parentS.name,
+            tuitionReceived: 0
+          });
+          state.addingFamilyToStudentId = null;
+          renderAll();
+          showToast('👨‍👩‍👧‍👦 تمت إضافة "' + mName + '" (' + mRel + ') داخل بطاقة أسرة ' + parentS.name + ' بعداد وحضور مستقل!', false);
+          return;
+        }
+
         var toggleSplitId = target.getAttribute('data-toggle-split-student');
         if (toggleSplitId) {
           state.splittingStudentId = (state.splittingStudentId === toggleSplitId) ? null : toggleSplitId;
@@ -7539,13 +7781,31 @@
             if (s.id !== renRootId && s.familyBillingParentId !== renRootId) return s;
             return Object.assign({}, s, {
               consumedLessons: 0,
-              subStartDate: todayIso,
-              renewalDate: nextMonthIso,
+              transferDate: todayIso,
+              renewalDate: todayIso,
+              paymentStatus: 'PAID',
               renewalStatus: 'RENEWED'
             });
           });
           renderAll();
           showToast('🔄 تم تجديد باقة الطالب بنجاح وبدء دورة حلقات جديدة مع الحفاظ على قيمة باقته', false);
+          return;
+        }
+
+        var renewCreditId = target.getAttribute('data-renew-credit-student');
+        if (renewCreditId) {
+          var rcTarget = state.students.find(function (s) { return s.id === renewCreditId; });
+          var rcRoot = (rcTarget && rcTarget.familyBillingParentId) ? rcTarget.familyBillingParentId : renewCreditId;
+          state.students = state.students.map(function (s) {
+            if (s.id !== rcRoot && s.familyBillingParentId !== rcRoot) return s;
+            return Object.assign({}, s, {
+              consumedLessons: 0,
+              paymentStatus: 'CREDIT_ALLOWED',
+              renewalStatus: 'PENDING_RENEWAL'
+            });
+          });
+          renderAll();
+          showToast('⏳ تم بدء دورة حلقات جديدة (آجل قبل التحويل) مع تفعيل التنبيه المستمر للإدارة لحين التحويل!', false);
           return;
         }
 
@@ -9495,6 +9755,7 @@
         } else if (tp === 'SETTLE_CURRENCY_VAULT' && perms.isAdmin) {
           state.currencySettlements.unshift({
             id: 'set_' + Date.now(),
+            monthKey: (state.activeFinanceMonth && state.activeFinanceMonth !== 'ALL') ? state.activeFinanceMonth : new Date().toISOString().slice(0, 7),
             monthLabel: state.monthLabel,
             currencyCode: act.currencyCode || 'LYD',
             currencyName: act.currencyName || act.currencyCode || 'عملة',
@@ -10285,27 +10546,66 @@
         var perms = getActivePermissions();
         var vData = computeCurrencyVaults();
 
+        // تحديث قائمة الشهور المالية المتوازية
+        var mFilterSel = document.getElementById('financeMonthFilterSelect');
+        if (mFilterSel) {
+          var monthsList = getAvailableFinanceMonths();
+          var curM = state.activeFinanceMonth || 'ALL';
+          mFilterSel.innerHTML = '<option value="ALL">📚 جميع الشهور (تراكمي)</option>' +
+            monthsList.map(function (mk) {
+              return '<option value="' + mk + '" ' + (curM === mk ? 'selected' : '') + '>📅 شهر ' + mk + '</option>';
+            }).join('');
+          mFilterSel.value = curM;
+        }
+
         if (vBox) {
+          var allV = vData.allVaults || [];
           var pendingHtml = '';
-          if (vData.pendingVaults.length === 0) {
-            pendingHtml = '<div style="font-size:0.8rem; color:#065F46; background:#ECFDF5; padding:8px 12px; border-radius:8px; border:1px solid #A7F3D0;">✅ جميع مبالغ الطلاب المسجلة محوّلة ومعروفة بالمصري حالياً.</div>';
+          if (allV.length === 0) {
+            pendingHtml = '<div style="font-size:0.8rem; color:var(--slate-600); background:#FFFFFF; padding:10px 12px; border-radius:8px; border:1px solid var(--slate-200);">لا توجد تحصيلات مسجلة بتواريخ تحويل في هذا الشهر المالي المختار بعد.</div>';
           } else {
-            pendingHtml = '<div class="grid-2" style="gap:10px; margin-bottom:10px;">' + vData.pendingVaults.map(function (v) {
+            pendingHtml = '<div class="grid-2" style="gap:10px; margin-bottom:10px;">' + allV.map(function (v) {
               var alreadySettledEgp = vData.settledCodesMap[v.code] || 0;
-              var stuNamesList = v.students.map(function (st) { return st.name + ' (' + st.amount + ')'; }).join('، ');
-              return '<div style="background:#FFFFFF; border:1.5px solid ' + (alreadySettledEgp > 0 ? '#10B981' : '#F59E0B') + '; border-radius:12px; padding:10px 12px;">' +
-                '<div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px;">' +
+              var totalConfirmedEgp = v.convertedEgp + alreadySettledEgp;
+
+              var convertedListHtml = v.convertedItems.length > 0
+                ? '<div style="margin-bottom:7px; padding:6px 8px; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px;">' +
+                    '<div style="font-size:0.72rem; font-weight:800; color:#065F46; margin-bottom:3px;">✅ مبالغ محوّلة ومعروفة بالمصري (' + v.convertedForeign.toLocaleString('en-US') + ' ' + escHtml(v.name) + ' ➔ ' + v.convertedEgp.toFixed(0) + ' ج):</div>' +
+                    v.convertedItems.map(function (it) {
+                      return '<div style="font-size:0.73rem; color:#065F46; padding:1px 0;">• <strong>' + escHtml(it.name) + ':</strong> ' + (it.amount > 0 ? (it.amount.toLocaleString('en-US') + ' ' + escHtml(v.name) + ' ➔ ') : '') + '<strong>' + it.egp.toFixed(0) + ' جنيه مصري</strong></div>';
+                    }).join('') +
+                  '</div>'
+                : '';
+
+              var pendingListHtml = v.pendingItems.length > 0
+                ? '<div style="margin-bottom:7px; padding:6px 8px; background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px;">' +
+                    '<div style="font-size:0.72rem; font-weight:800; color:#92400E; margin-bottom:3px;">⏳ بانتظار التحويل للمصري (المقابل 0 — إجمالي: ' + v.pendingForeign.toLocaleString('en-US') + ' ' + escHtml(v.name) + '):</div>' +
+                    v.pendingItems.map(function (it) {
+                      return '<div style="font-size:0.73rem; color:#78350F; padding:1px 0;">• <strong>' + escHtml(it.name) + ':</strong> ' + it.amount.toLocaleString('en-US') + ' ' + escHtml(v.name) + (it.isCreditPending ? ' <span style="color:#E11D48; font-weight:800;">(لم يحوّل بعد!)</span>' : ' (مجمّع بانتظار الحوالة)') + '</div>';
+                    }).join('') +
+                  '</div>'
+                : '';
+
+              var settleControlHtml = '';
+              if (v.pendingForeign > 0) {
+                if (alreadySettledEgp > 0) {
+                  settleControlHtml = '<div style="font-size:0.75rem; font-weight:800; color:#065F46; background:#ECFDF5; padding:5px 8px; border-radius:8px;">✅ تم اعتماد حوالة الصندوق: ' + v.pendingForeign.toLocaleString('en-US') + ' ' + escHtml(v.name) + ' ➔ ' + alreadySettledEgp.toFixed(2) + ' جنيه مصري</div>';
+                } else if (perms.isAdmin) {
+                  settleControlHtml = '<div style="display:flex; gap:6px; align-items:center;">' +
+                    '<input type="number" step="0.01" min="0" id="vault_egp_' + v.code + '" class="form-input" placeholder="وصلت الحوالة بالمصري كم جنيه؟" style="flex:1; padding:5px 8px; font-size:0.77rem; font-weight:800;" />' +
+                    '<button type="button" class="btn btn-emerald" data-settle-vault="' + v.code + '" data-vault-name="' + escHtml(v.name) + '" data-vault-foreign="' + v.pendingForeign + '" style="padding:5px 10px; font-size:0.74rem; white-space:nowrap;">✅ اعتماد بالمصري</button>' +
+                  '</div>';
+                }
+              }
+
+              return '<div style="background:#FFFFFF; border:1.5px solid ' + (v.pendingForeign > 0 && !alreadySettledEgp ? '#F59E0B' : '#10B981') + '; border-radius:12px; padding:10px 12px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:6px;">' +
                   '<strong style="font-size:0.9rem; color:var(--slate-900);">' + v.flag + ' صندوق ' + escHtml(v.name) + '</strong>' +
-                  '<span class="status-pill ' + (alreadySettledEgp > 0 ? 'pill-emerald' : 'pill-amber') + '" style="font-size:0.78rem; font-weight:800;">' + v.totalForeign.toLocaleString('en-US') + ' ' + escHtml(v.name) + '</span>' +
+                  '<span class="status-pill ' + (v.pendingForeign > 0 && !alreadySettledEgp ? 'pill-amber' : 'pill-emerald') + '" style="font-size:0.75rem; font-weight:800;">الإجمالي: ' + v.totalForeignAll.toLocaleString('en-US') + ' ' + escHtml(v.name) + (totalConfirmedEgp > 0 ? (' ➔ ' + totalConfirmedEgp.toFixed(0) + ' ج') : '') + '</span>' +
                 '</div>' +
-                '<div style="font-size:0.73rem; color:var(--slate-600); margin-bottom:8px;">الطلاب (' + v.students.length + '): ' + escHtml(stuNamesList) + '</div>' +
-                (alreadySettledEgp > 0
-                  ? '<div style="font-size:0.76rem; font-weight:800; color:#065F46; background:#ECFDF5; padding:5px 8px; border-radius:8px;">✅ تم اعتماد تحويل هذا الصندوق للمصري بقيمة: ' + alreadySettledEgp.toFixed(2) + ' جنيه (مضاف للإيراد)</div>'
-                  : (perms.isAdmin ? '<div style="display:flex; gap:6px; align-items:center;">' +
-                      '<input type="number" step="0.01" min="0" id="vault_egp_' + v.code + '" class="form-input" placeholder="وصلت بالمصري كم جنيه؟" style="flex:1; padding:5px 8px; font-size:0.78rem; font-weight:800;" />' +
-                      '<button type="button" class="btn btn-emerald" data-settle-vault="' + v.code + '" data-vault-name="' + escHtml(v.name) + '" data-vault-foreign="' + v.totalForeign + '" style="padding:5px 10px; font-size:0.75rem; white-space:nowrap;">✅ اعتماد بالمصري</button>' +
-                    '</div>' : '')
-                ) +
+                convertedListHtml +
+                pendingListHtml +
+                settleControlHtml +
               '</div>';
             }).join('') + '</div>';
           }
@@ -10313,10 +10613,10 @@
           var settledHtml = '';
           if (vData.settledThisMonth.length > 0) {
             settledHtml = '<div style="margin-top:8px; padding-top:8px; border-top:1px dashed #FCD34D;">' +
-              '<div style="font-size:0.76rem; font-weight:800; color:#065F46; margin-bottom:5px;">💱 حوالات الصناديق المعتمدة بالمصري في شهر (' + escHtml(state.monthLabel) + ') — إجمالي: ' + vData.settledVaultsEgpTotal.toFixed(2) + ' جنيه:</div>' +
+              '<div style="font-size:0.76rem; font-weight:800; color:#065F46; margin-bottom:5px;">💱 حوالات الصناديق المجمّعة المعتمدة بالمصري — إجمالي: ' + vData.settledVaultsEgpTotal.toFixed(2) + ' جنيه:</div>' +
               vData.settledThisMonth.map(function (st) {
                 return '<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px; padding:5px 10px; background:#ECFDF5; border:1px solid #A7F3D0; border-radius:8px; margin-bottom:4px; font-size:0.76rem;">' +
-                  '<span>✅ <strong>' + st.foreignTotal.toLocaleString('en-US') + ' ' + escHtml(st.currencyName) + '</strong> ← تحوّلت إلى <strong style="color:#065F46;">' + Number(st.egpReceived).toFixed(2) + ' جنيه مصري</strong> (' + escHtml(st.settledAt) + ')</span>' +
+                  '<span>✅ <strong>' + st.foreignTotal.toLocaleString('en-US') + ' ' + escHtml(st.currencyName) + '</strong> ➔ <strong style="color:#065F46;">' + Number(st.egpReceived).toFixed(2) + ' جنيه مصري</strong> (' + escHtml(st.monthKey || st.monthLabel) + ')</span>' +
                   (perms.isAdmin ? '<button type="button" class="btn btn-danger-soft" data-unsettle-vault="' + st.id + '" style="padding:2px 7px; font-size:0.7rem;">↩️ إلغاء</button>' : '') +
                 '</div>';
               }).join('') +
@@ -10378,6 +10678,14 @@
       };
 
       // اختيار سريع للعملة عند إضافة طالب جديد
+      var finMonthSel = document.getElementById('financeMonthFilterSelect');
+      if (finMonthSel) {
+        finMonthSel.addEventListener('change', function (ev) {
+          state.activeFinanceMonth = ev.target.value || 'ALL';
+          renderAll(true);
+        });
+      }
+
       var qCurPick = document.getElementById('studentQuickCurrencyPick');
       if (qCurPick) {
         qCurPick.addEventListener('change', function (ev) {
