@@ -1146,9 +1146,14 @@
           </div>
         </div>
 
-        <button type="button" id="btnToggleHeaderTools" class="btn btn-glass" style="padding:7px 14px; font-size:0.8rem; font-weight:800; border-radius:12px;">
-          <span>⚙️ أدوات وإعدادات الهيدر ▾</span>
-        </button>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <button type="button" id="btnGlobalMasterRefresh" class="btn btn-emerald sync-icon-refresh" style="padding:7px 13px; font-size:0.8rem; font-weight:800; border-radius:12px; background:linear-gradient(135deg,#059669,#10B981); border:1px solid #6EE7B7;" title="تحديث شامل: تاريخ اليوم الحقيقي + أحدث بيانات المنصة + فحص وجود تحديث جديد للكود">
+            <span class="sync-glyph">🔄</span> <span>تحديث شامل</span>
+          </button>
+          <button type="button" id="btnToggleHeaderTools" class="btn btn-glass" style="padding:7px 14px; font-size:0.8rem; font-weight:800; border-radius:12px;">
+            <span>⚙️ أدوات وإعدادات الهيدر ▾</span>
+          </button>
+        </div>
 
         <div id="headerActionsCollapsible" class="header-actions hidden" style="width:100%; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.16);">
           <button type="button" id="btnOpenSmartAssistantHeader" class="btn btn-primary" style="background: linear-gradient(135deg, #2563EB, #1D4ED8); border: 1px solid #93C5FD; font-weight:800;" title="اسأل المساعد الذكي عن أي طالب أو معلم أو موعد أو تقرير">
@@ -2631,6 +2636,14 @@
     // =========================================================================
 
     var STORAGE_KEY = 'mihrab_erp_html_v2';
+    var APP_BUILD_SIGNATURE = 'MIHRAB_BUILD_1795264816';
+    function getLocalTodayIso() {
+      var now = new Date();
+      var y = now.getFullYear();
+      var m = String(now.getMonth() + 1).padStart(2, '0');
+      var d = String(now.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
 
     var DEFAULT_EXCHANGE_RATES = {
       SAR: 13.20, // ريال سعودي
@@ -2801,7 +2814,7 @@
       exchangeRates: Object.assign({}, DEFAULT_EXCHANGE_RATES),
       supervisors: JSON.parse(JSON.stringify(DEFAULT_SUPERVISORS)),
       activeSupervisorId: 'sup_1',
-      reportsDateFilter: '2026-11-15',
+      reportsDateFilter: getLocalTodayIso(),
       activeReportSubtab: 'execution',
       autoRosterSearch: '',
       selectedRosterLessonId: null,
@@ -2905,7 +2918,7 @@
       splittingStudentId: null,
       addingFamilyToStudentId: null,
       lastSmartAssistantText: '',
-      scheduleDateFilter: '2026-11-15',
+      scheduleDateFilter: getLocalTodayIso(),
       todayRosterMode: 'TODAY_MATCH',
       todayScheduleSearch: '',
       customDayTimes: {},
@@ -3498,10 +3511,12 @@
 
       var loggedDeductedPerStudent = {};
 
+      var activeFinM = state.activeFinanceMonth || 'ALL';
       state.lessons.forEach(function (l) {
         var teacher = state.teachers.find(function (t) { return t.id === l.teacherId; });
         var student = state.students.find(function (s) { return s.id === l.studentId; });
         if (!teacher || !student) return;
+        if (activeFinM !== 'ALL' && getStudentTransferMonthKey(student) !== activeFinM) return;
 
         var rule = TREATMENT_RULES[l.treatment] || TREATMENT_RULES.NORMAL_MAKEUP;
         if (rule.deductsStudent) {
@@ -3525,8 +3540,9 @@
         }
       });
 
-      // تسوية الحلقات السابقة في عداد الباقات غير المسجلة تفصيلياً
+      // تسوية الحلقات السابقة في عداد الباقات غير المسجلة تفصيلياً (مفلترة بنفس الشهر المالي للباقة حتى لا تدخل باقات شهر 10 في شهر 11)
       state.students.forEach(function (s) {
+        if (activeFinM !== 'ALL' && getStudentTransferMonthKey(s) !== activeFinM) return;
         var logged = loggedDeductedPerStudent[s.id] || 0;
         var gap = Math.max(0, s.consumedLessons - logged);
         if (gap > 0) {
@@ -3561,7 +3577,6 @@
 
       var vaultsSummary = computeCurrencyVaults();
       var directEgpRevenue = 0;
-      var activeFinM = state.activeFinanceMonth || 'ALL';
       state.students.forEach(function (s) {
         if (s.familyBillingParentId) return; // أخ مرتبط بباقة عائلية موحدة — الإيراد محسوب مرة واحدة لدى صاحب الفاتورة
         if (activeFinM !== 'ALL' && getStudentTransferMonthKey(s) !== activeFinM) return;
@@ -6255,6 +6270,27 @@
     // ربط الأحداث عند تحميل الصفحة
     window.addEventListener('DOMContentLoaded', function () {
       loadState();
+      // ضبط تاريخ حلقات اليوم والتقارير تلقائياً على تاريخ اليوم الحقيقي عند كل فتح
+      var realTodayIso = getLocalTodayIso();
+      state.scheduleDateFilter = realTodayIso;
+      state.reportsDateFilter = realTodayIso;
+      window.__lastAutoTodayIso = realTodayIso;
+
+      // مراقبة تلقائية عند تغير اليوم أو العودة للتطبيق في يوم جديد لتحديث حلقات اليوم فوراً
+      function checkDayRolloverAndRefresh() {
+        var nowIso = getLocalTodayIso();
+        if (window.__lastAutoTodayIso !== nowIso) {
+          window.__lastAutoTodayIso = nowIso;
+          state.scheduleDateFilter = nowIso;
+          state.reportsDateFilter = nowIso;
+          renderAll(true);
+          if (state.webhookUrl) pullFromCloud(true);
+        }
+      }
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) checkDayRolloverAndRefresh();
+      });
+      setInterval(checkDayRolloverAndRefresh, 60000);
 
       // التبويبات
       document.querySelectorAll('.tab-btn').forEach(function (btn) {
@@ -10796,6 +10832,57 @@
           return;
         }
       });
+
+      // زر التحديث الشامل: يضبط تاريخ اليوم + يجلب أحدث البيانات + يفحص وجود تحديث جديد لكود المنصة
+      var btnMasterRef = document.getElementById('btnGlobalMasterRefresh');
+      if (btnMasterRef) {
+        btnMasterRef.addEventListener('click', function () {
+          var glyph = btnMasterRef.querySelector('.sync-glyph');
+          if (glyph) glyph.style.animation = 'spinRefresh 0.75s linear infinite';
+
+          var todayNow = getLocalTodayIso();
+          state.scheduleDateFilter = todayNow;
+          state.reportsDateFilter = todayNow;
+          state.todayScopeView = 'TODAY';
+          window.__lastAutoTodayIso = todayNow;
+          renderAll(true);
+
+          if (state.webhookUrl) {
+            pullFromCloud(true);
+          }
+
+          // فحص وجود تحديث جديد للكود على GitHub Pages (بدون مسح بيانات المستخدم)
+          var isHttpHosted = (window.location.protocol === 'http:' || window.location.protocol === 'https:') && window.location.hostname.indexOf('github.io') !== -1;
+          if (isHttpHosted) {
+            var baseCleanUrl = window.location.href.split('#')[0].split('?')[0];
+            var searchKeep = window.location.search || '';
+            fetch(baseCleanUrl + '?_mihrab_chk=' + Date.now(), { cache: 'no-store' })
+              .then(function (r) { return r.text(); })
+              .then(function (remoteHtml) {
+                if (glyph) glyph.style.animation = '';
+                var mSig = remoteHtml.match(/APP_BUILD_SIGNATURE\s*=\s*['"]([^'"]+)['"]/);
+                if (mSig && mSig[1] && mSig[1] !== APP_BUILD_SIGNATURE) {
+                  showToast('🚀 تم اكتشاف إصدار أحدث للمنصة! جاري التحديث التلقائي الآن...', false);
+                  setTimeout(function () {
+                    var sep = searchKeep ? '&' : '?';
+                    window.location.replace(baseCleanUrl + searchKeep + sep + 'v=' + Date.now());
+                  }, 700);
+                } else {
+                  showToast('✅ تم التحديث الشامل: تاريخ اليوم (' + todayNow + ') والبيانات على أحدث إصدار!', false);
+                }
+              })
+              .catch(function () {
+                if (glyph) glyph.style.animation = '';
+                showToast('✅ تم تحديث تاريخ اليوم (' + todayNow + ') وجلب أحدث البيانات!', false);
+              });
+          } else {
+            setTimeout(function () {
+              if (glyph) glyph.style.animation = '';
+              showToast('✅ تم التحديث الشامل: تاريخ اليوم (' + todayNow + ') وجلب أحدث البيانات!', false);
+            }, 650);
+          }
+        });
+      }
 
       // تفعيل طي/فتح شريط أدوات الهيدر (المحدد برقم 1)
       var btnTogHdr = document.getElementById('btnToggleHeaderTools');
